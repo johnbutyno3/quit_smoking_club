@@ -16,11 +16,14 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-// 💡 響應式美工專用：品牌核心高質感色彩規範
+// 🎨 視覺大翻新：設計師品牌雙色漸層與微透光澤規範
 class _ThemeColors {
-  static const primary = Color(0xFF2E7D32); // 森林綠（三端通用主色）
-  static const bg = Color(0xFFF4F9F5); // 輕盈極簡背景色
-  static const cardBg = Colors.white; // 純白懸浮卡片
+  static const primary = Color(0xFF1B5E20);
+  static const accent = Color(0xFF4CAF50);
+  static const bgTop = Color(0xFFE8F5E9);
+  static const bgBot = Color(0xFFF5F7F6);
+  static const glassBorder = Color(0x33FFFFFF);
+  static const cardBg = Colors.white; //
 }
 
 class _HomePageState extends State<HomePage> {
@@ -62,7 +65,6 @@ class _HomePageState extends State<HomePage> {
     final lastDate = await StorageService.getLastResetDate();
     final todayStr = "${now.year}-${now.month}-${now.day}";
 
-    // 📆 00:00 跨天金幣發放邏輯
     if (lastDate != todayStr) {
       final reward = isPremium ? 100 : 20;
       sCoins += reward;
@@ -111,7 +113,7 @@ class _HomePageState extends State<HomePage> {
         return Container(
           height: MediaQuery.of(context).size.height * 0.55,
           decoration: const BoxDecoration(
-            color: _ThemeColors.bg,
+            color: _ThemeColors.bgBot,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: const EdgeInsets.all(16),
@@ -208,7 +210,7 @@ class _HomePageState extends State<HomePage> {
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: ListTile(
         dense: true,
-        leading: Icon(icon, color: _ThemeColors.primary),
+        leading: Icon(icon, color: _ThemeColors.accent),
         title: Text(
           label,
           style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
@@ -233,315 +235,323 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _ThemeColors.bg,
-      appBar: AppBar(
-        title: const Text(
-          "戒菸俱樂部",
-          style: TextStyle(fontWeight: FontWeight.bold),
+    return Container(
+      // 💡 滿版高質感微漸層背景
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [_ThemeColors.bgTop, _ThemeColors.bgBot],
         ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.settings_outlined,
-              color: _ThemeColors.primary,
-            ),
-            onPressed: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SetupPage()),
-              );
-              _loadStoredData();
-            },
-          ),
-        ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Card(
-            color: Colors.orange.shade50,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: Colors.orange.shade100),
-            ),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(16),
-              onTap: () async {
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: const Text(
+            "戒菸俱樂部",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          backgroundColor: Colors.white.withOpacity(0.8),
+          elevation: 0,
+          actions: [
+            IconButton(
+              icon: const Icon(
+                Icons.settings_outlined,
+                color: _ThemeColors.primary,
+              ),
+              onPressed: () async {
                 await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ShopPage()),
+                  MaterialPageRoute(builder: (context) => const SetupPage()),
                 );
                 _loadStoredData();
               },
-              child: ListTile(
-                leading: const Icon(
-                  Icons.stars,
-                  color: Colors.orange,
-                  size: 28,
+            ),
+          ],
+        ),
+        body: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          children: [
+            Card(
+              color: Colors.white.withOpacity(0.9),
+              elevation: 4,
+              shadowColor: Colors.black12,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: const BorderSide(
+                  color: _ThemeColors.glassBorder,
+                  width: 1.5,
                 ),
-                title: const Text(
-                  "目前擁有金幣庫存",
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
+              ),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(20),
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ShopPage()),
+                  );
+                  _loadStoredData();
+                },
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.stars,
                     color: Colors.orange,
+                    size: 28,
                   ),
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      "$_myCoins 💎",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.orange,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 14,
+                  title: const Text(
+                    "目前擁有金幣庫存",
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
                       color: Colors.orange,
                     ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            height: 95,
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: _ThemeColors.cardBg,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 2.0),
-                  child: Text(
-                    _messages[index],
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey.shade800,
-                      fontWeight: FontWeight.w500,
+                  ),
+                  trailing: Text(
+                    "$_myCoins 💎",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange,
                     ),
                   ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatCard(
-                  "已抽支數",
-                  "${engine.totalSmoked} 支",
-                  Colors.red.shade400,
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildStatCard(
-                  "剩餘額度",
-                  "${engine.remaining} 支",
-                  _ThemeColors.primary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: _ThemeColors.cardBg,
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
-                ),
-              ],
             ),
-            child: Column(
-              children: [
-                const Text(
-                  "距離下一次解鎖抽菸倒數",
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey,
+            const SizedBox(height: 16),
+            Container(
+              height: 95,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _ThemeColors.cardBg.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: ListView.builder(
+                itemCount: _messages.length,
+                itemBuilder: (context, index) => Text(
+                  _messages[index],
+                  style: const TextStyle(
+                    fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  countdownString,
-                  style: const TextStyle(
-                    fontSize: 44,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'monospace',
-                    color: Color(0xFF1B5E20),
-                    letterSpacing: 2,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildStatCard(
+                    "已抽支數",
+                    "${engine.totalSmoked} 支",
+                    Colors.red.shade400,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: _buildStatCard(
+                    "剩餘額度",
+                    "${engine.remaining} 支",
+                    _ThemeColors.primary,
                   ),
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 0,
-                  ),
-                  icon: const Icon(Icons.gpp_bad),
-                  label: const Text(
-                    "🚨 SOS 求救",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                  ),
-                  onPressed: _triggerSOS,
+            const SizedBox(height: 20),
+            // 💡 高顏值墨綠深邃倒數大面板
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [_ThemeColors.primary, Color(0xFF0D3211)],
                 ),
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(
+                    color: _ThemeColors.primary.withOpacity(0.3),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: canSmoke
-                        ? _ThemeColors.primary
-                        : Colors.grey.shade300,
-                    foregroundColor: canSmoke
-                        ? Colors.white
-                        : Colors.grey.shade500,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+              child: Column(
+                children: [
+                  const Text(
+                    "距離下一次解鎖抽菸倒數",
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFFE8F5E9),
+                      fontWeight: FontWeight.w400,
                     ),
-                    elevation: 0,
                   ),
-                  icon: Icon(
-                    canSmoke ? Icons.check_circle_outline : Icons.lock_outline,
-                  ),
-                  label: Text(
-                    canSmoke ? "🟢 記錄抽菸" : "🔒 尚未解鎖",
+                  const SizedBox(height: 10),
+                  Text(
+                    countdownString,
                     style: const TextStyle(
-                      fontSize: 15,
+                      fontSize: 52,
                       fontWeight: FontWeight.bold,
+                      fontFamily: 'monospace',
+                      color: Colors.white,
+                      letterSpacing: 3,
                     ),
                   ),
-                  onPressed: canSmoke ? _smoke : null,
-                ),
+                ],
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.blue,
-                    side: const BorderSide(color: Colors.blue),
-                  ),
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const ForumPage()),
-                  ),
-                  child: const Text("交流論壇"),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.orange,
-                    side: const BorderSide(color: Colors.orange),
-                  ),
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const ShopPage()),
-                  ),
-                  child: const Text("金幣商城"),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            "📋 控菸今日排程表:",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-              color: Colors.grey,
             ),
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: engine.schedule.map((t) {
-              final timeStr =
-                  "${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}";
-              return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.green.shade50,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.green.shade100),
-                ),
-                child: Text(
-                  timeStr,
-                  style: const TextStyle(
-                    color: _ThemeColors.primary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
+            const SizedBox(height: 28),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.redAccent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 4,
+                      shadowColor: Colors.red.withOpacity(0.2),
+                    ),
+                    icon: const Icon(Icons.gpp_bad),
+                    label: const Text(
+                      "🚨 SOS 求求協助",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onPressed: _triggerSOS,
                   ),
                 ),
-              );
-            }).toList(),
-          ),
-        ],
+                const SizedBox(width: 14),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: canSmoke
+                          ? _ThemeColors.accent
+                          : Colors.grey.shade400,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: canSmoke ? 4 : 0,
+                      shadowColor: _ThemeColors.accent.withOpacity(0.3),
+                    ),
+                    icon: Icon(
+                      canSmoke
+                          ? Icons.check_circle_outline
+                          : Icons.lock_outline,
+                    ),
+                    label: Text(
+                      canSmoke ? "🟢 記錄抽菸" : "🔒 尚未解鎖",
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onPressed: canSmoke ? _smoke : null,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.blue,
+                      side: const BorderSide(color: Colors.blue),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ForumPage(),
+                      ),
+                    ),
+                    child: const Text("交流論壇"),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.orange,
+                      side: const BorderSide(color: Colors.orange),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ShopPage()),
+                    ),
+                    child: const Text("金幣商城"),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 28),
+            const Text(
+              "📋 控菸今日排程表:",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: engine.schedule.map((t) {
+                final timeStr =
+                    "${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}";
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade50,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.green.shade100),
+                  ),
+                  child: Text(
+                    timeStr,
+                    style: const TextStyle(
+                      color: _ThemeColors.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildStatCard(String label, String value, Color color) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: _ThemeColors.cardBg,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withOpacity(0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -549,14 +559,13 @@ class _HomePageState extends State<HomePage> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-
         children: [
           Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
             value,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: color,
             ),
