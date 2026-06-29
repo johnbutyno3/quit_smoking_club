@@ -59,4 +59,46 @@ class StorageService {
     await prefs.reload();
     return prefs.getInt('user_years') ?? 8;
   }
+
+  // 💾 儲存最新金幣總數
+  static Future<void> saveCoins(int coins) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('user_coins', coins);
+    await prefs.reload();
+  }
+
+  // 📡 讀取目前金幣總數 (預設送50個)
+  static Future<int> getCoins() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
+    return prefs.getInt('user_coins') ?? 50;
+  }
+
+  // 💾 儲存會員身份 (true 代表高級會員, false 代表一般)
+  static Future<void> savePremium(bool isPremium) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('is_premium', isPremium);
+    await prefs.reload();
+  }
+
+  // 📡 讀取會員身份 (預設先設為 false 模擬一般會員)
+  static Future<bool> getPremium() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
+    return prefs.getBool('is_premium') ?? false;
+  }
+
+  // 💾 儲存上次發放金幣的日期字串 (格式如: 2026-06-29)
+  static Future<void> saveLastResetDate(String dateStr) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('last_reset_date', dateStr);
+    await prefs.reload();
+  }
+
+  // 📡 讀取上次發放金幣的日期字串
+  static Future<String> getLastResetDate() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
+    return prefs.getString('last_reset_date') ?? "";
+  }
 }
