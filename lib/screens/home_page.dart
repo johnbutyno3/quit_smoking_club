@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/smoking_state.dart';
 import '../services/smoking_engine.dart';
+import '../services/storage_service.dart';
 import 'forum_page.dart';
 import 'shop_page.dart';
 import 'setup_page.dart';
-import '../services/storage_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,44 +16,18 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late SmokingEngine engine;
-  String _noticeText = "歡迎來到戒菸俱樂部！挑戰正在進行中。";
-
   Timer? _timer;
+
+  // 3.2.2 & 3.2.6.1 訊息牆列表
+  final List<String> _messages = ["歡迎來到戒菸俱樂部！挑戰正在進行中。"];
 
   @override
   void initState() {
     super.initState();
-
-    // 1. 初始化一個基本計時器，防禦任何變數卡死
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() {});
     });
-
-    // 2. 觸發非同步讀取
     _loadStoredData();
-  }
-
-  // 3. 獨立的撈資料方法 (獨立出來絕不干擾 initState 結構)
-  Future<void> _loadStoredData() async {
-    final now = DateTime.now();
-    // 1. 去硬碟撈出最新修改的數量和名字
-    final sCount = await StorageService.getDailyCount();
-    final sName = await StorageService.getUserName();
-
-    if (mounted) {
-      setState(() {
-        // 2. 建立新狀態並指回給 engine 核心
-        final state = SmokingState(
-          startTime: DateTime(now.year, now.month, now.day, 8, 0),
-          endTime: DateTime(now.year, now.month, now.day, 22, 0),
-          plannedCount: sCount,
-        );
-        engine = SmokingEngine(state);
-
-        // 3. 大綱3.2.2：動態更新頂部標準文字框的名字
-        _noticeText = "Welcome back, $sName!";
-      });
-    }
   }
 
   @override
@@ -62,19 +36,38 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  Future<void> _loadStoredData() async {
+    final now = DateTime.now();
+    final sCount = await StorageService.getDailyCount();
+    final sName = await StorageService.getUserName();
+
+    if (mounted) {
+      setState(() {
+        final state = SmokingState(
+          startTime: DateTime(now.year, now.month, now.day, 8, 0),
+          endTime: DateTime(now.year, now.month, now.day, 22, 0),
+          plannedCount: sCount,
+        );
+        engine = SmokingEngine(state);
+        _messages.add("Welcome back, $sName!");
+      });
+    }
+  }
+
   void _smoke() {
     setState(() {
       engine.state = engine.state.addSmoke(DateTime.now());
-      // 💡 真正去覆寫它，提示就會消失！
-      _noticeText = "You recorded a smoke.";
+      _messages.add("You recorded a smoke.");
     });
   }
 
   void _triggerSOS() {
     setState(() {
-      // 💡 真正去覆寫它，提示就會消失！
-      _noticeText = "🚨 SOS Mode Triggered!";
+      _messages.add("🚨 系統：您正在犯菸癮，已通知好友！");
+      _messages.add("💬 朋友小明：加油！想想你的健康！");
+      _messages.add("🎁 朋友小華送給了你 [冰鎮薄荷糖]！");
     });
+
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -116,7 +109,6 @@ class _HomePageState extends State<HomePage> {
     return now.isAfter(next);
   }
 
-  // ⏱️ 精確計算倒數時分秒的文字
   String get countdownString {
     final next = nextSmokeTime;
     if (next == null) return "00:00:00";
@@ -135,41 +127,49 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text("Quit Smoking"),
         actions: [
-          // 3.2.7 設定鈕：點擊開啟基本資料與計畫設定
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              await Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const SetupPage()),
               );
+              _loadStoredData();
             },
           ),
         ],
       ),
-
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // 貼在 ListView( children: [ 的正下方
+          // 3.2.2 標準文字框訊息牆
           Container(
+            height: 90,
             width: double.infinity,
-            padding: const EdgeInsets.all(10),
             margin: const EdgeInsets.only(bottom: 15),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: Colors.grey.shade100,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: Colors.grey.shade300),
             ),
-            child: Text(_noticeText, style: const TextStyle(fontSize: 13)),
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: _messages.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2.0),
+                  child: Text(_messages[index]),
+                );
+              },
+            ),
           ),
 
           Text("Smoked: ${engine.totalSmoked}"),
           Text("Remaining: ${engine.remaining}"),
           const Divider(),
-          const SizedBox(height: 15),
+          const SizedBox(height: 10),
 
-          // ⏱️ 倒數計時表文字區塊
           Center(
             child: Column(
               children: [
@@ -188,7 +188,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          const SizedBox(height: 25),
+          const SizedBox(height: 20),
 
           Row(
             children: [
@@ -212,16 +212,11 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           const SizedBox(height: 20),
-          const Text("Schedule:"),
-          ...engine.schedule.map((t) => Text("${t.hour}:${t.minute}")),
-          const SizedBox(height: 20),
+
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
             icon: const Icon(Icons.chat, color: Colors.white),
-            label: const Text(
-              "Go to Forums",
-              style: TextStyle(color: Colors.white),
-            ),
+            label: const Text("Go to Forums"),
             onPressed: () {
               Navigator.push(
                 context,
@@ -230,13 +225,11 @@ class _HomePageState extends State<HomePage> {
             },
           ),
           const SizedBox(height: 10),
+
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
             icon: const Icon(Icons.shopping_cart, color: Colors.white),
-            label: const Text(
-              "Go to Store",
-              style: TextStyle(color: Colors.white),
-            ),
+            label: const Text("Go to Store"),
             onPressed: () {
               Navigator.push(
                 context,
@@ -244,6 +237,10 @@ class _HomePageState extends State<HomePage> {
               );
             },
           ),
+          const SizedBox(height: 20),
+
+          const Text("Schedule:"),
+          ...engine.schedule.map((t) => Text("${t.hour}:${t.minute}")),
         ],
       ),
     );
