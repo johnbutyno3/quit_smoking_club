@@ -8,20 +8,31 @@ class SetupPage extends StatefulWidget {
 }
 
 class _SetupPageState extends State<SetupPage> {
-  // 1.3 補齊所有基本資料輸入控制器
-  final _nameCtrl = TextEditingController(text: "User");
+  final _nameCtrl = TextEditingController();
   final _ageCtrl = TextEditingController(text: "28");
   final _yearsCtrl = TextEditingController(text: "8");
-  final _countCtrl = TextEditingController(text: "5");
+  final _countCtrl = TextEditingController();
 
-  // 2.2.1 預設 90 天
   double _days = 90.0;
-  // 2.2.2 預設 08:00 與 22:00
   TimeOfDay _firstTime = const TimeOfDay(hour: 8, minute: 0);
   TimeOfDay _lastTime = const TimeOfDay(hour: 22, minute: 0);
-
-  // 2.3.4 模擬多階展開按鈕索引 (0:日, 1:週, 2:月)
   int _tabIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStoredSettings(); // 💡 進入設定頁時，自動回填歷史資料
+  }
+
+  // 📡 回填歷史紀錄，防止一進來就被預設值洗掉
+  Future<void> _loadStoredSettings() async {
+    final name = await StorageService.getUserName();
+    final count = await StorageService.getDailyCount();
+    setState(() {
+      _nameCtrl.text = name;
+      _countCtrl.text = count.toString();
+    });
+  }
 
   Future<void> _selectTime(bool isFirst) async {
     final picked = await showTimePicker(
@@ -42,12 +53,25 @@ class _SetupPageState extends State<SetupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Plan Settings")),
+      appBar: AppBar(
+        title: const Text("Quit Smoking"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SetupPage()),
+              );
+            },
+          ),
+        ],
+      ),
+
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(14),
           children: [
-            // === 1.3 基本資料建立區 ===
             const Text(
               "1. Basic Profile (1.3)",
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -84,7 +108,6 @@ class _SetupPageState extends State<SetupPage> {
             ),
             const SizedBox(height: 20),
 
-            // === 2.2.1 戒斷天數滑動調整 ===
             Text("2. Plan Duration: ${_days.round()} Days (2.2.1)"),
             Slider(
               value: _days,
@@ -95,7 +118,6 @@ class _SetupPageState extends State<SetupPage> {
             ),
             const SizedBox(height: 10),
 
-            // === 2.2.2 時鐘調整區 ===
             const Text(
               "3. Smoke Time Window (2.2.2)",
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -114,7 +136,6 @@ class _SetupPageState extends State<SetupPage> {
             ),
             const Divider(),
 
-            // === 2.3.4 多階展開(月/周/日)比對區 ===
             const Text(
               "4. Schedule Views (2.3.4)",
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -152,7 +173,6 @@ class _SetupPageState extends State<SetupPage> {
             ),
             const SizedBox(height: 12),
 
-            // 顯示比對看板內容
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -175,10 +195,8 @@ class _SetupPageState extends State<SetupPage> {
               onPressed: () async {
                 final name = _nameCtrl.text;
                 final count = int.tryParse(_countCtrl.text) ?? 5;
-
                 await StorageService.saveUserName(name);
                 await StorageService.saveDailyCount(count);
-
                 if (context.mounted) {
                   Navigator.pop(context);
                 }

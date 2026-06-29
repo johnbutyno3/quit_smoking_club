@@ -36,18 +36,22 @@ class _HomePageState extends State<HomePage> {
   // 3. 獨立的撈資料方法 (獨立出來絕不干擾 initState 結構)
   Future<void> _loadStoredData() async {
     final now = DateTime.now();
-    final storedCount = await StorageService.getDailyCount();
-    final storedName = await StorageService.getUserName();
+    // 1. 去硬碟撈出最新修改的數量和名字
+    final sCount = await StorageService.getDailyCount();
+    final sName = await StorageService.getUserName();
 
     if (mounted) {
       setState(() {
+        // 2. 建立新狀態並指回給 engine 核心
         final state = SmokingState(
           startTime: DateTime(now.year, now.month, now.day, 8, 0),
           endTime: DateTime(now.year, now.month, now.day, 22, 0),
-          plannedCount: storedCount,
+          plannedCount: sCount,
         );
         engine = SmokingEngine(state);
-        _noticeText = "Welcome back, $storedName!";
+
+        // 3. 大綱3.2.2：動態更新頂部標準文字框的名字
+        _noticeText = "Welcome back, $sName!";
       });
     }
   }
