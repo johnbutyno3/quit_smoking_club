@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/storage_service.dart';
 
 class SetupPage extends StatefulWidget {
   const SetupPage({super.key});
@@ -171,7 +172,17 @@ class _SetupPageState extends State<SetupPage> {
 
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () async {
+                final name = _nameCtrl.text;
+                final count = int.tryParse(_countCtrl.text) ?? 5;
+
+                await StorageService.saveUserName(name);
+                await StorageService.saveDailyCount(count);
+
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
               child: const Text(
                 "Save and Apply Settings",
                 style: TextStyle(color: Colors.white),

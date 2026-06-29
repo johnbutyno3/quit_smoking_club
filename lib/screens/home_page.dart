@@ -5,6 +5,7 @@ import '../services/smoking_engine.dart';
 import 'forum_page.dart';
 import 'shop_page.dart';
 import 'setup_page.dart';
+import '../services/storage_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,19 +23,33 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    final now = DateTime.now();
-    // 使用您原本設計的 SmokingState 初始化
-    final state = SmokingState(
-      startTime: DateTime(now.year, now.month, now.day, 8, 0),
-      endTime: DateTime(now.year, now.month, now.day, 22, 0),
-      plannedCount: 5,
-    );
-    engine = SmokingEngine(state);
 
-    // ⏱️ 用最標準的 Timer 每秒刷新畫面
+    // 1. 初始化一個基本計時器，防禦任何變數卡死
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() {});
     });
+
+    // 2. 觸發非同步讀取
+    _loadStoredData();
+  }
+
+  // 3. 獨立的撈資料方法 (獨立出來絕不干擾 initState 結構)
+  Future<void> _loadStoredData() async {
+    final now = DateTime.now();
+    final storedCount = await StorageService.getDailyCount();
+    final storedName = await StorageService.getUserName();
+
+    if (mounted) {
+      setState(() {
+        final state = SmokingState(
+          startTime: DateTime(now.year, now.month, now.day, 8, 0),
+          endTime: DateTime(now.year, now.month, now.day, 22, 0),
+          plannedCount: storedCount,
+        );
+        engine = SmokingEngine(state);
+        _noticeText = "Welcome back, $storedName!";
+      });
+    }
   }
 
   @override
