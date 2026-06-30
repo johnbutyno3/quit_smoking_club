@@ -16,17 +16,17 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-// 🎨 視覺大翻新：設計師品牌雙色漸層與微透光澤規範
 class _ThemeColors {
   static const primary = Color(0xFF1B5E20);
   static const accent = Color(0xFF4CAF50);
   static const bgTop = Color(0xFFE8F5E9);
   static const bgBot = Color(0xFFF5F7F6);
   static const glassBorder = Color(0x33FFFFFF);
-  static const cardBg = Colors.white; //
+  static const cardBg = Colors.white;
 }
 
 class _HomePageState extends State<HomePage> {
+  // 💡 核心修復：把不小心被覆蓋掉的變數宣告安全鎖在最上方！
   late SmokingEngine engine;
   Timer? _timer;
   int _myCoins = 0;
@@ -37,7 +37,7 @@ class _HomePageState extends State<HomePage> {
     "每少抽一支菸都是勝利，你正在奪回生命的掌控權！",
     "深呼吸！這口新鮮空氣比尼古丁更有力量！",
     "菸癮每次只會持續3分鐘，撐過去你就贏了！",
-    "省下的不只是菸錢，更是與家人相處的幸福時光！",
+    "省下的不時候菸錢，更是與家人相處的幸福時光！",
     "你比自己想像的更強大！",
   ];
   @override
@@ -91,15 +91,36 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _smoke() {
+    final now = DateTime.now();
+
+    // 💡 智慧配額區間劃分：尋找這支菸屬於哪一個格子的區間
+    int matchedIndex = 0;
+    for (int i = 0; i < engine.schedule.length; i++) {
+      final sTime = engine.schedule[i];
+      if (now.hour > sTime.hour ||
+          (now.hour == sTime.hour && now.minute >= sTime.minute)) {
+        matchedIndex = i;
+      }
+    }
+
+    // 💡 跨輪勵志讚美檢查
+    if (matchedIndex > engine.totalSmoked) {
+      _messages.add("🎉 你太棒了，少抽一支菸！");
+    }
+
     setState(() {
-      engine.state = engine.state.addSmoke(DateTime.now());
-      _messages.add("Recorded smoke.");
+      engine.state = engine.state.addSmoke(now);
+      _messages.add(
+        "Recorded smoke at "
+        "${now.hour.toString().padLeft(2, '0')}:"
+        "${now.minute.toString().padLeft(2, '0')}.",
+      );
     });
   }
 
   void _triggerSOS() {
     setState(() {
-      _messages.add("🚨 警告：使用者菸癮犯了！已通知好友！");
+      _messages.add("🚨 警告：使用者菸瘾犯了！已通知好友！");
       _messages.add("💬 好友小明：堅持住！快進入下方的緩解艙！");
     });
 
@@ -120,7 +141,7 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: [
               const Text(
-                "🚨 菸癮危機緩解艙",
+                "🚨 菸瘾危機緩解艙",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -236,7 +257,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // 💡 滿版高質感微漸層背景
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -358,7 +378,6 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             const SizedBox(height: 20),
-            // 💡 高顏值墨綠深邃倒數大面板
             Container(
               padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
               decoration: BoxDecoration(
@@ -415,7 +434,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     icon: const Icon(Icons.gpp_bad),
                     label: const Text(
-                      "🚨 SOS 求求協助",
+                      "🚨 SOS 求協助",
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
@@ -510,32 +529,110 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 10),
+
+            // 💡 智慧型區間比對排程：過期自動褪色變暗，且右側精準按區間點亮已抽 ✓ 狀態
             Wrap(
               spacing: 10,
               runSpacing: 10,
-              children: engine.schedule.map((t) {
+              children: List.generate(engine.schedule.length, (index) {
+                final t = engine.schedule[index];
+                final now = DateTime.now();
+                final cellTime = DateTime(
+                  now.year,
+                  now.month,
+                  now.day,
+                  t.hour,
+                  t.minute,
+                );
+
+                // 智慧區間判定：檢查使用者的抽菸時間是否落在這格與下一格之間
+                bool thisCellIsSmoked = false;
+                if (engine.state.smokeRecords.isNotEmpty) {
+                  if (index == engine.schedule.length - 1) {
+                    thisCellIsSmoked =
+                        now.isAfter(cellTime) && engine.totalSmoked > index;
+                  } else {
+                    final nextT = engine.schedule[index + 1];
+                    final nextCellTime = DateTime(
+                      now.year,
+                      now.month,
+                      now.day,
+                      nextT.hour,
+                      nextT.minute,
+                    );
+                    thisCellIsSmoked = engine.state.smokeRecords.any(
+                      (rec) =>
+                          (rec.isAfter(cellTime) ||
+                              rec.isAtSameMomentAs(cellTime)) &&
+                          rec.isBefore(nextCellTime),
+                    );
+                  }
+                }
+
+                final isPast = now.isAfter(cellTime);
+                final hasSmoked = thisCellIsSmoked;
+
+                final chipBg = hasSmoked
+                    ? Colors.green.shade50
+                    : (isPast ? Colors.grey.shade200 : Colors.green.shade50);
+                final chipBorder = hasSmoked
+                    ? Colors.green.shade100
+                    : (isPast ? Colors.grey.shade300 : Colors.green.shade100);
+                final textColor = isPast && !hasSmoked
+                    ? Colors.grey.shade600
+                    : _ThemeColors.primary;
+
                 final timeStr =
                     "${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}";
+
                 return Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
+                    horizontal: 10,
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.green.shade50,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.green.shade100),
+                    color: chipBg,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: chipBorder),
                   ),
-                  child: Text(
-                    timeStr,
-                    style: const TextStyle(
-                      color: _ThemeColors.primary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        timeStr,
+                        style: TextStyle(
+                          color: textColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Icon(
+                        hasSmoked
+                            ? Icons.check_circle
+                            : (isPast
+                                  ? Icons.cancel_outlined
+                                  : Icons.lock_clock),
+                        size: 14,
+                        color: hasSmoked
+                            ? Colors.green
+                            : (isPast ? Colors.grey : Colors.grey.shade400),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        hasSmoked ? "已抽 ✓" : (isPast ? "未記錄" : "待解鎖"),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: hasSmoked
+                              ? Colors.green
+                              : (isPast ? Colors.grey : Colors.grey.shade400),
+                        ),
+                      ),
+                    ],
                   ),
                 );
-              }).toList(),
+              }),
             ),
           ],
         ),
@@ -585,16 +682,17 @@ class _HomePageState extends State<HomePage> {
 
   bool get canSmoke {
     final now = DateTime.now();
-    if (engine.totalSmoked >= engine.plannedCount) return false;
-    final next = nextSmokeTime;
-    if (next == null) return true;
-    return now.isAfter(next);
+    if (engine.totalSmoked >= engine.state.plannedCount) return false;
+    final unlockTime = engine.nextUnlockTime;
+    if (unlockTime == null) return true;
+    return now.isAfter(unlockTime);
   }
 
   String get countdownString {
-    final next = nextSmokeTime;
-    if (next == null) return "00:00:00";
-    final diff = next.difference(DateTime.now());
+    final unlockTime = engine.nextUnlockTime;
+    if (unlockTime == null) return "00:00:00";
+    final now = DateTime.now();
+    final diff = unlockTime.difference(now);
     if (diff.isNegative) return "00:00:00";
     final h = diff.inHours.toString().padLeft(2, '0');
     final m = (diff.inMinutes % 60).toString().padLeft(2, '0');
