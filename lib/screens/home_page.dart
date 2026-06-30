@@ -26,7 +26,6 @@ class _ThemeColors {
 }
 
 class _HomePageState extends State<HomePage> {
-  // 💡 核心修復：把不小心被覆蓋掉的變數宣告安全鎖在最上方！
   late SmokingEngine engine;
   Timer? _timer;
   int _myCoins = 0;
@@ -40,11 +39,21 @@ class _HomePageState extends State<HomePage> {
     "省下的不時候菸錢，更是與家人相處的幸福時光！",
     "你比自己想像的更強大！",
   ];
+
+  // 💡 3.2.1 全螢幕劇烈震動與推播提醒狀態
+  bool _isVibrating = false;
+  String? _activeNotification;
+  bool _hasTriggeredUnlockNotify = false;
+
   @override
   void initState() {
     super.initState();
+    // 計時器每秒自動檢查是否該彈出提醒通知
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) setState(() {});
+      if (mounted) {
+        setState(() {});
+        _checkCountdownUnlock();
+      }
     });
     _loadStoredData();
   }
@@ -90,10 +99,41 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  // 💡 3.2.1 按下或時間到連動全螢幕高頻劇烈震動
+  void _triggerVibration() {
+    setState(() => _isVibrating = true);
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) setState(() => _isVibrating = false);
+    });
+  }
+
+  // 💡 3.2.1 橫向滑入自訂頂部推播彈窗
+  void _showTopBanner(String msg) {
+    _triggerVibration();
+    setState(() => _activeNotification = msg);
+    Future.delayed(const Duration(seconds: 4), () {
+      if (mounted) setState(() => _activeNotification = null);
+    });
+  }
+
+  // 💡 自動偵測時間到：秒數一歸零全自動觸發通知
+  void _checkCountdownUnlock() {
+    final unlockTime = engine.nextUnlockTime;
+    if (unlockTime == null) return;
+    final diff = unlockTime.difference(DateTime.now());
+
+    if (diff.isNegative || diff.inSeconds == 0) {
+      if (!_hasTriggeredUnlockNotify) {
+        _hasTriggeredUnlockNotify = true;
+        _showTopBanner("🔔 控菸時間已到！新一輪配額已解鎖，您今天已成功少抽 2 支菸！");
+      }
+    } else {
+      _hasTriggeredUnlockNotify = false;
+    }
+  }
+
   void _smoke() {
     final now = DateTime.now();
-
-    // 💡 智慧配額區間劃分：尋找這支菸屬於哪一個格子的區間
     int matchedIndex = 0;
     for (int i = 0; i < engine.schedule.length; i++) {
       final sTime = engine.schedule[i];
@@ -103,7 +143,6 @@ class _HomePageState extends State<HomePage> {
       }
     }
 
-    // 💡 跨輪勵志讚美檢查
     if (matchedIndex > engine.totalSmoked) {
       _messages.add("🎉 你太棒了，少抽一支菸！");
     }
@@ -120,7 +159,7 @@ class _HomePageState extends State<HomePage> {
 
   void _triggerSOS() {
     setState(() {
-      _messages.add("🚨 警告：使用者菸瘾犯了！已通知好友！");
+      _messages.add("🚨 警告：使用者菸癮犯了！已通知好友！");
       _messages.add("💬 好友小明：堅持住！快進入下方的緩解艙！");
     });
 
@@ -141,7 +180,7 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: [
               const Text(
-                "🚨 菸瘾危機緩解艙",
+                "🚨 菸癮危機緩解艙",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -256,385 +295,470 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [_ThemeColors.bgTop, _ThemeColors.bgBot],
-        ),
+    // 💡 3.2.1 網頁全螢幕高頻震動特效外殼
+    return AnimatedPadding(
+      duration: const Duration(milliseconds: 50),
+      padding: EdgeInsets.only(
+        left: _isVibrating ? 8.0 : 0.0,
+        right: _isVibrating ? 0.0 : 8.0,
       ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          title: const Text(
-            "戒菸俱樂部",
-            style: TextStyle(fontWeight: FontWeight.bold),
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [_ThemeColors.bgTop, _ThemeColors.bgBot],
           ),
-          backgroundColor: Colors.white.withOpacity(0.8),
-          elevation: 0,
-          actions: [
-            IconButton(
-              icon: const Icon(
-                Icons.settings_outlined,
-                color: _ThemeColors.primary,
-              ),
-              onPressed: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SetupPage()),
-                );
-                _loadStoredData();
-              },
-            ),
-          ],
         ),
-        body: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          children: [
-            Card(
-              color: Colors.white.withOpacity(0.9),
-              elevation: 4,
-              shadowColor: Colors.black12,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: const BorderSide(
-                  color: _ThemeColors.glassBorder,
-                  width: 1.5,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            title: const Text(
+              "戒菸俱樂部",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            backgroundColor: Colors.white.withOpacity(0.8),
+            elevation: 0,
+            actions: [
+              IconButton(
+                icon: const Icon(
+                  Icons.settings_outlined,
+                  color: _ThemeColors.primary,
                 ),
-              ),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(20),
-                onTap: () async {
+                onPressed: () async {
                   await Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ShopPage()),
+                    MaterialPageRoute(builder: (context) => const SetupPage()),
                   );
                   _loadStoredData();
                 },
-                child: ListTile(
-                  leading: const Icon(
-                    Icons.stars,
-                    color: Colors.orange,
-                    size: 28,
-                  ),
-                  title: const Text(
-                    "目前擁有金幣庫存",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.orange,
-                    ),
-                  ),
-                  trailing: Text(
-                    "$_myCoins 💎",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.orange,
-                    ),
-                  ),
-                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              height: 95,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: _ThemeColors.cardBg.withOpacity(0.8),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.grey.shade200),
-              ),
-              child: ListView.builder(
-                itemCount: _messages.length,
-                itemBuilder: (context, index) => Text(
-                  _messages[index],
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
+            ],
+          ),
+          // 💡 3.2.1 堆疊最上層：預留自訂頂部推播彈窗空間
+          body: Stack(
+            children: [
+              ListView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
                 ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard(
-                    "已抽支數",
-                    "${engine.totalSmoked} 支",
-                    Colors.red.shade400,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: _buildStatCard(
-                    "剩餘額度",
-                    "${engine.remaining} 支",
-                    _ThemeColors.primary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [_ThemeColors.primary, Color(0xFF0D3211)],
-                ),
-                borderRadius: BorderRadius.circular(28),
-                boxShadow: [
-                  BoxShadow(
-                    color: _ThemeColors.primary.withOpacity(0.3),
-                    blurRadius: 15,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Column(
                 children: [
-                  const Text(
-                    "距離下一次解鎖抽菸倒數",
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFFE8F5E9),
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    countdownString,
-                    style: const TextStyle(
-                      fontSize: 52,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'monospace',
-                      color: Colors.white,
-                      letterSpacing: 3,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 28),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 4,
-                      shadowColor: Colors.red.withOpacity(0.2),
-                    ),
-                    icon: const Icon(Icons.gpp_bad),
-                    label: const Text(
-                      "🚨 SOS 求協助",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
+                  Card(
+                    color: Colors.white.withOpacity(0.9),
+                    elevation: 4,
+                    shadowColor: Colors.black12,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: const BorderSide(
+                        color: _ThemeColors.glassBorder,
+                        width: 1.5,
                       ),
                     ),
-                    onPressed: _triggerSOS,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: canSmoke
-                          ? _ThemeColors.accent
-                          : Colors.grey.shade400,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: canSmoke ? 4 : 0,
-                      shadowColor: _ThemeColors.accent.withOpacity(0.3),
-                    ),
-                    icon: Icon(
-                      canSmoke
-                          ? Icons.check_circle_outline
-                          : Icons.lock_outline,
-                    ),
-                    label: Text(
-                      canSmoke ? "🟢 記錄抽菸" : "🔒 尚未解鎖",
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    onPressed: canSmoke ? _smoke : null,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.blue,
-                      side: const BorderSide(color: Colors.blue),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ForumPage(),
-                      ),
-                    ),
-                    child: const Text("交流論壇"),
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.orange,
-                      side: const BorderSide(color: Colors.orange),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const ShopPage()),
-                    ),
-                    child: const Text("金幣商城"),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 28),
-            const Text(
-              "📋 控菸今日排程表:",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-                color: Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 10),
-
-            // 💡 智慧型區間比對排程：過期自動褪色變暗，且右側精準按區間點亮已抽 ✓ 狀態
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: List.generate(engine.schedule.length, (index) {
-                final t = engine.schedule[index];
-                final now = DateTime.now();
-                final cellTime = DateTime(
-                  now.year,
-                  now.month,
-                  now.day,
-                  t.hour,
-                  t.minute,
-                );
-
-                // 智慧區間判定：檢查使用者的抽菸時間是否落在這格與下一格之間
-                bool thisCellIsSmoked = false;
-                if (engine.state.smokeRecords.isNotEmpty) {
-                  if (index == engine.schedule.length - 1) {
-                    thisCellIsSmoked =
-                        now.isAfter(cellTime) && engine.totalSmoked > index;
-                  } else {
-                    final nextT = engine.schedule[index + 1];
-                    final nextCellTime = DateTime(
-                      now.year,
-                      now.month,
-                      now.day,
-                      nextT.hour,
-                      nextT.minute,
-                    );
-                    thisCellIsSmoked = engine.state.smokeRecords.any(
-                      (rec) =>
-                          (rec.isAfter(cellTime) ||
-                              rec.isAtSameMomentAs(cellTime)) &&
-                          rec.isBefore(nextCellTime),
-                    );
-                  }
-                }
-
-                final isPast = now.isAfter(cellTime);
-                final hasSmoked = thisCellIsSmoked;
-
-                final chipBg = hasSmoked
-                    ? Colors.green.shade50
-                    : (isPast ? Colors.grey.shade200 : Colors.green.shade50);
-                final chipBorder = hasSmoked
-                    ? Colors.green.shade100
-                    : (isPast ? Colors.grey.shade300 : Colors.green.shade100);
-                final textColor = isPast && !hasSmoked
-                    ? Colors.grey.shade600
-                    : _ThemeColors.primary;
-
-                final timeStr =
-                    "${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}";
-
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: chipBg,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: chipBorder),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        timeStr,
-                        style: TextStyle(
-                          color: textColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ShopPage(),
+                          ),
+                        );
+                        _loadStoredData();
+                      },
+                      child: ListTile(
+                        leading: const Icon(
+                          Icons.stars,
+                          color: Colors.orange,
+                          size: 28,
+                        ),
+                        title: const Text(
+                          "目前擁有金幣庫存",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.orange,
+                          ),
+                        ),
+                        trailing: Text(
+                          "$_myCoins 💎",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.orange,
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 6),
-                      Icon(
-                        hasSmoked
-                            ? Icons.check_circle
-                            : (isPast
-                                  ? Icons.cancel_outlined
-                                  : Icons.lock_clock),
-                        size: 14,
-                        color: hasSmoked
-                            ? Colors.green
-                            : (isPast ? Colors.grey : Colors.grey.shade400),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        hasSmoked ? "已抽 ✓" : (isPast ? "未記錄" : "待解鎖"),
-                        style: TextStyle(
-                          fontSize: 11,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    height: 95,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: _ThemeColors.cardBg.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.grey.shade200),
+                    ),
+                    child: ListView.builder(
+                      itemCount: _messages.length,
+                      itemBuilder: (context, index) => Text(
+                        _messages[index],
+                        style: const TextStyle(
+                          fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: hasSmoked
-                              ? Colors.green
-                              : (isPast ? Colors.grey : Colors.grey.shade400),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildStatCard(
+                          "已抽支數",
+                          "${engine.totalSmoked} 支",
+                          Colors.red.shade400,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: _buildStatCard(
+                          "剩餘額度",
+                          "${engine.remaining} 支",
+                          _ThemeColors.primary,
                         ),
                       ),
                     ],
                   ),
-                );
-              }),
-            ),
-          ],
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 24,
+                      horizontal: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [_ThemeColors.primary, Color(0xFF0D3211)],
+                      ),
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: [
+                        BoxShadow(
+                          color: _ThemeColors.primary.withOpacity(0.3),
+                          blurRadius: 15,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        const Text(
+                          "距離下一次解鎖抽菸倒數",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFFE8F5E9),
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          countdownString,
+                          style: const TextStyle(
+                            fontSize: 52,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'monospace',
+                            color: Colors.white,
+                            letterSpacing: 3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 4,
+                            shadowColor: Colors.red.withOpacity(0.2),
+                          ),
+                          icon: const Icon(Icons.gpp_bad),
+                          label: const Text(
+                            "🚨 SOS 求協助",
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          onPressed: _triggerSOS,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: canSmoke
+                                ? _ThemeColors.accent
+                                : Colors.grey.shade400,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: canSmoke ? 4 : 0,
+                            shadowColor: _ThemeColors.accent.withOpacity(0.3),
+                          ),
+                          icon: Icon(
+                            canSmoke
+                                ? Icons.check_circle_outline
+                                : Icons.lock_outline,
+                          ),
+                          label: Text(
+                            canSmoke ? "🟢 記錄抽菸" : "🔒 尚未解鎖",
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          onPressed: canSmoke
+                              ? () {
+                                  _smoke();
+                                  _triggerVibration();
+                                }
+                              : null,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.blue,
+                            side: const BorderSide(color: Colors.blue),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ForumPage(),
+                            ),
+                          ),
+                          child: const Text("交流論壇"),
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.orange,
+                            side: const BorderSide(color: Colors.orange),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ShopPage(),
+                            ),
+                          ),
+                          child: const Text("金幣商城"),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 28),
+                  const Text(
+                    "📋 控菸今日排程表:",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: List.generate(engine.schedule.length, (index) {
+                      final t = engine.schedule[index];
+                      final now = DateTime.now();
+                      final cellTime = DateTime(
+                        now.year,
+                        now.month,
+                        now.day,
+                        t.hour,
+                        t.minute,
+                      );
+
+                      bool thisCellIsSmoked = false;
+                      if (engine.state.smokeRecords.isNotEmpty) {
+                        if (index == engine.schedule.length - 1) {
+                          thisCellIsSmoked =
+                              now.isAfter(cellTime) &&
+                              engine.totalSmoked > index;
+                        } else {
+                          final nextT = engine.schedule[index + 1];
+                          final nextCellTime = DateTime(
+                            now.year,
+                            now.month,
+                            now.day,
+                            nextT.hour,
+                            nextT.minute,
+                          );
+                          thisCellIsSmoked = engine.state.smokeRecords.any(
+                            (rec) =>
+                                (rec.isAfter(cellTime) ||
+                                    rec.isAtSameMomentAs(cellTime)) &&
+                                rec.isBefore(nextCellTime),
+                          );
+                        }
+                      }
+
+                      final isPast = now.isAfter(cellTime);
+                      final hasSmoked = thisCellIsSmoked;
+
+                      final chipBg = hasSmoked
+                          ? Colors.green.shade50
+                          : (isPast
+                                ? Colors.grey.shade200
+                                : Colors.green.shade50);
+                      final chipBorder = hasSmoked
+                          ? Colors.green.shade100
+                          : (isPast
+                                ? Colors.grey.shade300
+                                : Colors.green.shade100);
+                      final textColor = isPast && !hasSmoked
+                          ? Colors.grey.shade600
+                          : _ThemeColors.primary;
+                      final timeStr =
+                          "${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}";
+
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: chipBg,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: chipBorder),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              timeStr,
+                              style: TextStyle(
+                                color: textColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Icon(
+                              hasSmoked
+                                  ? Icons.check_circle
+                                  : (isPast
+                                        ? Icons.cancel_outlined
+                                        : Icons.lock_clock),
+                              size: 14,
+                              color: hasSmoked
+                                  ? Colors.green
+                                  : (isPast
+                                        ? Colors.grey
+                                        : Colors.grey.shade400),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              hasSmoked ? "已抽 ✓" : (isPast ? "未記錄" : "待解鎖"),
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: hasSmoked
+                                    ? Colors.green
+                                    : (isPast
+                                          ? Colors.grey
+                                          : Colors.grey.shade400),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ),
+                ],
+              ),
+
+              // 💡 3.2.1 頂部橫向自訂推播彈窗組件
+              if (_activeNotification != null)
+                Positioned(
+                  top: 12,
+                  left: 16,
+                  right: 16,
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 250),
+                    opacity: 1.0,
+                    child: Material(
+                      elevation: 8,
+                      shadowColor: Colors.black26,
+                      borderRadius: BorderRadius.circular(14),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1B5E20),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: const Color(0x33FFFFFF),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.notifications_active,
+                              color: Colors.amber,
+                              size: 22,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                _activeNotification!,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
