@@ -1,0 +1,30 @@
+[
+  {
+    "category": "Medical",
+    "language": "zh-tw",
+    "title": "後端測試：戒菸後 20 分鐘的生理變化",
+    "content": "這是一則從後端模擬載入的醫學文章，用來測試內建後端資料是否可正確顯示與連結。",
+    "link": "https://www.cdc.gov/tobacco/quit_smoking/"
+  },
+  {
+    "category": "Medical",
+    "language": "en",
+    "title": "Backend Test: Quitting Smoking After 20 Minutes",
+    "content": "This backend test article is loaded from built-in mock backend content for verification and link behavior.",
+    "link": "https://www.cdc.gov/tobacco/quit_smoking/"
+  },
+  {
+    "category": "Stories",
+    "language": "zh-tw",
+    "title": "後端測試故事：堅持不抽菸的一天",
+    "content": "這是一則後端模擬的故事文章，用來驗證是否只顯示標題與連結。",
+    "link": "https://www.mohw.gov.tw/"
+  },
+  {
+    "category": "Stories",
+    "language": "en",
+    "title": "Backend Test Story: A Smoke-Free Day",
+    "content": "This backend test story is loaded from mock built-in content to verify link-only display behavior.",
+    "link": "https://www.cdc.gov/tobacco/quit_smoking/"
+  }
+]

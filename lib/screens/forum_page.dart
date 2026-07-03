@@ -135,14 +135,14 @@ class _ForumPageState extends State<ForumPage> {
                   color: _ForumColors.cardBg,
                   elevation: isSOS ? 4 : 2,
                   shadowColor: isSOS
-                      ? Colors.redAccent.withOpacity(0.2)
+                      ? Colors.redAccent.withAlpha(51)
                       : Colors.black12,
                   margin: const EdgeInsets.only(bottom: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                     side: BorderSide(
                       color: isSOS
-                          ? Colors.redAccent.withOpacity(0.3)
+                          ? Colors.redAccent.withAlpha(77)
                           : Colors.grey.shade100,
                       width: isSOS ? 1.5 : 1,
                     ),

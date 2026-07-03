@@ -1,0 +1,72 @@
+[
+  {
+    "category": "Medical",
+    "language": "zh-tw",
+    "title": "戒菸後 20 分鐘內的血壓改善",
+    "content": "研究指出，戒菸後 20 分鐘內，血壓與心率開始回落，這是身體開始擺脫尼古丁刺激的第一個明顯指標。",
+    "link": "https://www.who.int/zh/news-room/fact-sheets/detail/tobacco"
+  },
+  {
+    "category": "Medical",
+    "language": "zh-tw",
+    "title": "12 小時內一氧化碳大幅下降",
+    "content": "戒菸 12 小時後，體內一氧化碳濃度明顯下降，血液中的氧氣運輸能力開始恢復。",
+    "link": "https://www.who.int/zh/news-room/fact-sheets/detail/tobacco"
+  },
+  {
+    "category": "Medical",
+    "language": "zh-tw",
+    "title": "一年後心血管疾病風險降低",
+    "content": "臨床證據顯示，戒菸 1 年後，心肌梗塞和中風的風險顯著降低，心血管系統進入穩定期。",
+    "link": "https://www.cdc.gov/tobacco/quit_smoking/index.htm"
+  },
+  {
+    "category": "Medical",
+    "language": "en",
+    "title": "Blood pressure drops within 20 minutes",
+    "content": "Medical sources note that within 20 minutes of quitting smoking, blood pressure and pulse begin to return to normal levels.",
+    "link": "https://www.cdc.gov/tobacco/quit_smoking/"
+  },
+  {
+    "category": "Medical",
+    "language": "en",
+    "title": "Carbon monoxide levels fall in 12 hours",
+    "content": "After 12 hours without smoking, carbon monoxide levels sharply decrease and oxygen transport in the blood improves.",
+    "link": "https://www.cdc.gov/tobacco/quit_smoking/"
+  },
+  {
+    "category": "Medical",
+    "language": "en",
+    "title": "One year later, cardiovascular risk is lower",
+    "content": "Evidence shows that one year after quitting smoking, the risk of heart disease and stroke drops significantly.",
+    "link": "https://www.who.int/news-room/fact-sheets/detail/tobacco"
+  },
+  {
+    "category": "Medical",
+    "language": "zh-cn",
+    "title": "戒烟 20 分钟后的生理变化",
+    "content": "临床资料显示，戒烟 20 分钟后，血压和心率开始趋于正常。",
+    "link": "https://www.who.int/zh/news-room/fact-sheets/detail/tobacco"
+  },
+  {
+    "category": "Medical",
+    "language": "ja",
+    "title": "禁煙後 20 分間の体の変化",
+    "content": "禁煙後 20 分で血圧と脈拍が低下し始めることが報告されています。",
+    "link": "https://www.who.int/news-room/fact-sheets/detail/tobacco"
+  },
+  {
+    "category": "Medical",
+    "language": "ko",
+    "title": "금연 후 20분 내 신체 변화",
+    "content": "금연 후 20분 안에 혈압과 맥박이 감소하기 시작한다는 사실이 알려져 있습니다。",
+    "link": "https://www.who.int/news-room/fact-sheets/detail/tobacco"
+  },
+  {
+    "category": "Medical",
+    "language": "all",
+    "title": "Health benefits start quickly after quitting",
+    "content": "Quitting smoking brings rapid health improvements, including lower blood pressure and better oxygen delivery.",
+    "link": "https://www.who.int/news-room/fact-sheets/detail/tobacco"
+  }
+]

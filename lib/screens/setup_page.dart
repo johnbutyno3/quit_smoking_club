@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screens/content_management_page.dart';
 import '../services/storage_service.dart';
 
 class SetupPage extends StatefulWidget {
@@ -265,6 +266,24 @@ class _SetupPageState extends State<SetupPage> {
               },
               child: const Text(
                 "Save and Apply Settings",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () async {
+                if (context.mounted) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ContentManagementPage(),
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blueGrey),
+              child: const Text(
+                "內容管理後台",
                 style: TextStyle(color: Colors.white),
               ),
             ),

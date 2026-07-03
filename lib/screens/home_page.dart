@@ -25,8 +25,9 @@ class _ThemeColors {
   static const cardBg = Colors.white;
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   late SmokingEngine engine;
+  bool _isLoaded = false;
   Timer? _timer;
   int _myCoins = 0;
 
@@ -48,12 +49,21 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    final now = DateTime.now();
+    engine = SmokingEngine(
+      SmokingState(
+        startTime: DateTime(now.year, now.month, now.day, 8, 0),
+        endTime: DateTime(now.year, now.month, now.day, 22, 0),
+        plannedCount: 5,
+      ),
+    );
+
     // 計時器每秒自動檢查是否該彈出提醒通知
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) {
-        setState(() {});
-        _checkCountdownUnlock();
-      }
+      if (!mounted || !_isLoaded) return;
+      setState(() {});
+      _checkCountdownUnlock();
     });
     _loadStoredData();
   }
@@ -61,6 +71,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     _timer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -69,6 +80,7 @@ class _HomePageState extends State<HomePage> {
     final sCount = await StorageService.getDailyCount();
     final sName = await StorageService.getUserName();
     var sCoins = await StorageService.getCoins();
+    final storedRecords = await StorageService.getSmokeRecordsForToday();
 
     final isPremium = await StorageService.getPremium();
     final lastDate = await StorageService.getLastResetDate();
@@ -87,14 +99,20 @@ class _HomePageState extends State<HomePage> {
 
     if (mounted) {
       setState(() {
+        _messages
+          ..clear()
+          ..add("歡迎來到戒菸俱樂部！挑戰正在進行中。")
+          ..add("Hi, $sName!");
         final state = SmokingState(
           startTime: DateTime(now.year, now.month, now.day, 8, 0),
           endTime: DateTime(now.year, now.month, now.day, 22, 0),
           plannedCount: sCount,
+          smokeRecords: storedRecords,
+          lastSmokeTime: storedRecords.isNotEmpty ? storedRecords.last : null,
         );
         engine = SmokingEngine(state);
         _myCoins = sCoins;
-        _messages.add("Hi, $sName!");
+        _isLoaded = true;
       });
     }
   }
@@ -122,7 +140,7 @@ class _HomePageState extends State<HomePage> {
     if (unlockTime == null) return;
     final diff = unlockTime.difference(DateTime.now());
 
-    if (diff.isNegative || diff.inSeconds == 0) {
+    if (diff.inSeconds <= 0) {
       if (!_hasTriggeredUnlockNotify) {
         _hasTriggeredUnlockNotify = true;
         _showTopBanner("🔔 控菸時間已到！新一輪配額已解鎖，您今天已成功少抽 2 支菸！");
@@ -132,7 +150,14 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _smoke() {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _loadStoredData();
+    }
+  }
+
+  Future<void> _smoke() async {
     final now = DateTime.now();
     int matchedIndex = 0;
     for (int i = 0; i < engine.schedule.length; i++) {
@@ -155,6 +180,8 @@ class _HomePageState extends State<HomePage> {
         "${now.minute.toString().padLeft(2, '0')}.",
       );
     });
+
+    await StorageService.saveSmokeRecords(engine.state.smokeRecords);
   }
 
   void _triggerSOS() {
@@ -317,7 +344,7 @@ class _HomePageState extends State<HomePage> {
               "戒菸俱樂部",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            backgroundColor: Colors.white.withOpacity(0.8),
+            backgroundColor: Colors.white.withAlpha(204),
             elevation: 0,
             actions: [
               IconButton(
@@ -345,7 +372,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 children: [
                   Card(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withAlpha(230),
                     elevation: 4,
                     shadowColor: Colors.black12,
                     shape: RoundedRectangleBorder(
@@ -396,7 +423,7 @@ class _HomePageState extends State<HomePage> {
                     height: 95,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: _ThemeColors.cardBg.withOpacity(0.8),
+                      color: _ThemeColors.cardBg.withAlpha(204),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: Colors.grey.shade200),
                     ),
@@ -444,7 +471,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(28),
                       boxShadow: [
                         BoxShadow(
-                          color: _ThemeColors.primary.withOpacity(0.3),
+                          color: _ThemeColors.primary.withAlpha(77),
                           blurRadius: 15,
                           offset: const Offset(0, 8),
                         ),
@@ -487,7 +514,7 @@ class _HomePageState extends State<HomePage> {
                               borderRadius: BorderRadius.circular(16),
                             ),
                             elevation: 4,
-                            shadowColor: Colors.red.withOpacity(0.2),
+                            shadowColor: Colors.red.withAlpha(51),
                           ),
                           icon: const Icon(Icons.gpp_bad),
                           label: const Text(
@@ -513,7 +540,7 @@ class _HomePageState extends State<HomePage> {
                               borderRadius: BorderRadius.circular(16),
                             ),
                             elevation: canSmoke ? 4 : 0,
-                            shadowColor: _ThemeColors.accent.withOpacity(0.3),
+                            shadowColor: _ThemeColors.accent.withAlpha(77),
                           ),
                           icon: Icon(
                             canSmoke
@@ -528,8 +555,8 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           onPressed: canSmoke
-                              ? () {
-                                  _smoke();
+                              ? () async {
+                                  await _smoke();
                                   _triggerVibration();
                                 }
                               : null,
@@ -772,7 +799,7 @@ class _HomePageState extends State<HomePage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withAlpha(5),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -809,7 +836,7 @@ class _HomePageState extends State<HomePage> {
     if (engine.totalSmoked >= engine.state.plannedCount) return false;
     final unlockTime = engine.nextUnlockTime;
     if (unlockTime == null) return true;
-    return now.isAfter(unlockTime);
+    return !now.isBefore(unlockTime);
   }
 
   String get countdownString {

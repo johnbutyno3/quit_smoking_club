@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class MitigationPage extends StatefulWidget {
   final String title;
@@ -10,35 +14,232 @@ class MitigationPage extends StatefulWidget {
 
 // 🎨 舒壓專用美工色彩：引入琥珀溫暖調性，洗去單調太空虛
 class _MitigateColors {
-  static const bgTop = Color(0xFFFFF8E1); // 溫暖琥珀金微漸層起點
-  static const bgBot = Color(0xFFFAFAFA); // 高級極簡優雅白
-  static const primary = Color(0xFFE65100); // 舒壓深橘主色
-  static const cardBg = Colors.white; // 純白懸浮卡片
+  static const bgTop = Color(0xFFFFF8E1);
+  static const bgBot = Color(0xFFFAFAFA);
+  static const primary = Color(0xFFE65100);
+  static const cardBg = Colors.white;
 }
 
 class _MitigationPageState extends State<MitigationPage> {
-  // 💡 根據傳入的類別，自動對齊大綱 3.2.5 的豐富實用緩解內容庫
-  String _getContentText() {
-    switch (widget.title) {
-      case "Medical":
-        return "💡 醫學實證：當菸癮犯了時，人體的尼古丁戒斷症狀其實只會達到巔峰 3 分鐘。此時透過深呼吸三次，或飲用一杯溫開水，就能成功讓血液含氧量回升，菸癮便會自然消退。";
-      case "Stories":
-        return "😂 舒壓笑話：小明跟上帝說：『主啊，請給我一個能讓我一秒忘記菸癮的超能力！』上帝想了想，給了他一張明天的期末考卷。小明看了一眼，當場嚇得連自己叫什麼都忘了，更別說想抽菸了！";
-      case "YouTube":
-        return "🎬 精選影片推薦：【5分鐘肺部呼吸淨化冥想導引】。建議您現在戴上耳機，跟著影片節奏深吸氣、深呼氣。新鮮的氧氣正在修復您的細胞，您比自己想像的更強大！";
-      case "Music":
-        return "🎵 療癒音樂清單：【3D大自然阿爾法腦波森林環境音】。閉上雙眼，想像自己正漫步在翠綠的阿里山森林中，聽著鳥鳴與溪流聲。這口空氣比任何香菸都更加純淨。";
-      case "Games":
-        return "🎮 內建舒壓小遊戲：【3分鐘手指泡泡糖大作戰】。請動動你的手指，快速點擊畫面上出現的彩色泡泡！透過手指的繁複運動，能完美移轉大腦對尼古丁的注意力！";
-      default:
-        return "🟢 戒菸艙防護罩已開啟，請跟著我們一起堅持下去！";
+  static const Map<String, String> _assetByTitle = {
+    'Medical': 'assets/medical_links.json',
+    'Stories': 'assets/stories_data.json',
+    'YouTube': 'assets/youtube_data.json',
+    'Music': 'assets/music_data.json',
+    'Games': 'assets/games_data.json',
+  };
+
+  final List<Map<String, String>> _tips = [];
+  String? _selectedTitle;
+  String? _selectedContent;
+  String? _selectedLink;
+  bool _isLoading = false;
+  bool _hasError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCategoryData();
+  }
+
+  Future<void> _loadCategoryData() async {
+    final assetPath = _assetByTitle[widget.title];
+    if (assetPath == null) {
+      _setError(
+        '資料未定義',
+        '此分類尚未對應資料檔案，請確認標題是否為 Medical、Stories、YouTube、Music 或 Games。',
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _hasError = false;
+    });
+
+    try {
+      final raw = await rootBundle.loadString(assetPath);
+      final localeString = WidgetsBinding.instance.platformDispatcher.locale
+          .toString()
+          .toLowerCase()
+          .replaceAll('_', '-');
+      final localeParts = localeString.split('-');
+      final shortLocale = localeParts.first;
+      final regionLocale = localeParts.length > 1
+          ? '${localeParts.first}-${localeParts.sublist(1).join('-')}'
+          : shortLocale;
+      final localeCandidates = [localeString, regionLocale, shortLocale];
+      final List<dynamic> data = json.decode(raw);
+      final entries = data
+          .whereType<Map<String, dynamic>>()
+          .map(
+            (item) => {
+              'category': item['category']?.toString() ?? '',
+              'language': item['language']?.toString().toLowerCase() ?? 'all',
+              'title': item['title']?.toString() ?? '',
+              'content': item['content']?.toString() ?? '',
+              'link': item['link']?.toString() ?? '',
+            },
+          )
+          .where(
+            (item) =>
+                item['title']!.isNotEmpty &&
+                item['content']!.isNotEmpty &&
+                item['link']!.isNotEmpty,
+          )
+          .toList();
+
+      final category = widget.title;
+      var filtered = entries
+          .where((item) => item['category'] == category)
+          .toList();
+
+      final localeMatches = filtered.where((item) {
+        final language = item['language']!.toLowerCase();
+        return localeCandidates.contains(language);
+      }).toList();
+      if (localeMatches.isNotEmpty) {
+        filtered = localeMatches;
+      } else {
+        final allMatches = filtered
+            .where((item) => item['language'] == 'all')
+            .toList();
+        if (allMatches.isNotEmpty) {
+          filtered = allMatches;
+        }
+      }
+
+      if (filtered.isEmpty) {
+        if (widget.title == 'Medical') {
+          _setError('醫學常識暫無資料', '請稍後更新或切換語言，並確保資料中包含 link。');
+        } else {
+          _setError('資料讀取失敗', '未能找到「${widget.title}」的對應內容，請檢查資料檔案是否正確。');
+        }
+        return;
+      }
+
+      _tips.clear();
+      _tips.addAll(filtered.cast<Map<String, String>>());
+      final index = DateTime.now().millisecondsSinceEpoch % _tips.length;
+      final selected = _tips[index];
+
+      setState(() {
+        _selectedTitle = selected['title'];
+        _selectedContent = selected['content'];
+        _selectedLink = selected['link'];
+      });
+    } catch (error) {
+      _setError('檔案解析失敗', '讀取資料時發生錯誤：$error');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _setError(String title, String message) {
+    setState(() {
+      _hasError = true;
+      _selectedTitle = title;
+      _selectedContent = message;
+      _selectedLink = null;
+      _tips.clear();
+      _isLoading = false;
+    });
+  }
+
+  void _showNextTip() {
+    if (_tips.isEmpty) return;
+    final current = _selectedTitle;
+    var currentIndex = _tips.indexWhere((item) => item['title'] == current);
+    if (currentIndex < 0) {
+      currentIndex = 0;
+    }
+    final next = _tips[(currentIndex + 1) % _tips.length];
+    setState(() {
+      _selectedTitle = next['title'];
+      _selectedContent = next['content'];
+      _selectedLink = next['link'];
+    });
+  }
+
+  void _showRandomTip() {
+    if (_tips.isEmpty) return;
+    final random = Random().nextInt(_tips.length);
+    final selected = _tips[random];
+    setState(() {
+      _selectedTitle = selected['title'];
+      _selectedContent = selected['content'];
+      _selectedLink = selected['link'];
+    });
+  }
+
+  Future<void> _openExternalLinkOrFallback() async {
+    if (_selectedLink == null || _selectedLink!.isEmpty) {
+      return;
+    }
+
+    final uri = Uri.tryParse(_selectedLink!);
+    if (uri == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('連結格式錯誤，已讀取內部資料。')));
+      }
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final actualLink = _selectedLink!.trim();
+      var finalLink = actualLink;
+      if (!actualLink.contains('://')) {
+        finalLink = 'https://$actualLink';
+      }
+      final uri = Uri.tryParse(finalLink);
+      if (uri == null) {
+        throw Exception('連結格式無效。');
+      }
+
+      final launched = await launchUrlString(
+        finalLink,
+        mode: LaunchMode.externalApplication,
+      ).timeout(const Duration(seconds: 10), onTimeout: () => false);
+
+      if (!launched) {
+        final fallbackLaunched = await launchUrlString(
+          finalLink,
+          mode: LaunchMode.platformDefault,
+        ).timeout(const Duration(seconds: 10), onTimeout: () => false);
+
+        if (!fallbackLaunched && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('外部連結無法在 10 秒內開啟，已改為顯示內部內容。')),
+          );
+        }
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('外部連結開啟失敗，已顯示內部資料。\n$error')));
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final canSwitchTip = !_isLoading && !_hasError && _tips.isNotEmpty;
     return Container(
-      // 💡 滿版琥珀金微漸層：洗去單調空虛，一秒撫平菸癮焦慮
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -50,16 +251,15 @@ class _MitigationPageState extends State<MitigationPage> {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           title: Text(
-            "${widget.title} 危機緩解中",
+            '${widget.title} 危機緩解中',
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-          backgroundColor: Colors.white.withOpacity(0.8),
+          backgroundColor: Colors.white.withAlpha(204),
           elevation: 0,
         ),
         body: ListView(
           padding: const EdgeInsets.all(24),
           children: [
-            // 💡 懸浮式磨砂資訊大圖卡
             Card(
               color: _MitigateColors.cardBg,
               elevation: 6,
@@ -71,24 +271,117 @@ class _MitigationPageState extends State<MitigationPage> {
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.spa, size: 48, color: _MitigateColors.primary),
-                    const SizedBox(height: 16),
-                    Text(
-                      _getContentText(),
-                      style: TextStyle(
-                        fontSize: 14,
-                        height: 1.6,
-                        color: Colors.grey.shade800,
-                        fontWeight: FontWeight.w500,
+                    Center(
+                      child: Icon(
+                        Icons.spa,
+                        size: 48,
+                        color: _MitigateColors.primary,
                       ),
                     ),
+                    const SizedBox(height: 16),
+                    if (_isLoading)
+                      const Center(child: CircularProgressIndicator())
+                    else ...[
+                      if (_selectedTitle != null)
+                        Text(
+                          _selectedTitle!,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      if (_selectedTitle != null) const SizedBox(height: 12),
+                      if (widget.title != 'Stories' && _selectedContent != null)
+                        Text(
+                          _selectedContent!,
+                          style: TextStyle(
+                            fontSize: 14,
+                            height: 1.6,
+                            color: Colors.grey.shade800,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      if (_selectedLink != null &&
+                          _selectedLink!.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        Center(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _MitigateColors.primary,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                                horizontal: 20,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            onPressed: _openExternalLinkOrFallback,
+                            child: Text(
+                              _selectedLink!,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 24),
-            // 💡 勵志退出返回按鈕：點擊流暢退出返回
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: canSwitchTip
+                          ? _MitigateColors.primary
+                          : Colors.grey.shade400,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    onPressed: canSwitchTip ? _showNextTip : null,
+                    child: const Text(
+                      '下一則',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: canSwitchTip
+                          ? _MitigateColors.primary
+                          : Colors.grey.shade400,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    onPressed: canSwitchTip ? _showRandomTip : null,
+                    child: const Text(
+                      '隨機',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: _MitigateColors.primary,
@@ -101,7 +394,7 @@ class _MitigationPageState extends State<MitigationPage> {
               ),
               icon: const Icon(Icons.check_circle_outline),
               label: const Text(
-                "🟢 我成功撐過去了！",
+                '🟢 我成功撐過去了！',
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
               onPressed: () {
@@ -109,9 +402,8 @@ class _MitigationPageState extends State<MitigationPage> {
               },
             ),
             const SizedBox(height: 16),
-
             const Text(
-              "💡 提示：菸癮犯了時，深呼吸 3 次可以大幅緩解不適喔！",
+              '💡 提示：菸癮犯了時，深呼吸 3 次可以大幅緩解不適喔！',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey, fontSize: 11),
             ),

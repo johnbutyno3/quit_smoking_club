@@ -11,7 +11,6 @@ class OnboardingPage extends StatefulWidget {
 
 class _OnboardColors {
   static const primary = Color(0xFF1B5E20); // 質感墨綠
-  static const accent = Color(0xFF4CAF50); // 活力嫩綠
   static const bgTop = Color(0xFFE8F5E9); // 頂部嫩綠暈染
   static const bgBot = Colors.white; // 底部純白
 }
@@ -123,7 +122,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       return Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withAlpha(230),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(color: Colors.green.shade100),
                         ),
@@ -186,7 +185,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.02),
+                          color: Colors.black.withAlpha(5),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),

@@ -171,14 +171,14 @@ class _ShopPageState extends State<ShopPage> {
               ),
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                const BoxShadow(
+                  color: Color(0x33000000),
                   blurRadius: 12,
-                  offset: const Offset(0, 6),
+                  offset: Offset(0, 6),
                 ),
               ],
               border: Border.all(
-                color: _ShopColors.vipGold.withOpacity(0.3),
+                color: _ShopColors.vipGold.withAlpha(77),
                 width: 1.5,
               ),
             ),
@@ -227,7 +227,7 @@ class _ShopPageState extends State<ShopPage> {
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          color: _ShopColors.vipGold.withOpacity(0.2),
+                          color: _ShopColors.vipGold.withAlpha(51),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: _ShopColors.vipGold),
                         ),

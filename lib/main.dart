@@ -6,15 +6,11 @@ import 'services/storage_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 💡 安全防禦：如果硬碟因為先前測試卡住，強制寫入基本安全數字
   final storedName = await StorageService.getUserName();
-  if (storedName == "User" || storedName.isEmpty) {
+  final isFirstTime = storedName.isEmpty;
+  if (isFirstTime) {
     await StorageService.saveDailyCount(5);
-    await StorageService.saveUserName("");
   }
-
-  final latestName = await StorageService.getUserName();
-  final isFirstTime = latestName.isEmpty;
 
   runApp(MyApp(isFirstTime: isFirstTime));
 }
