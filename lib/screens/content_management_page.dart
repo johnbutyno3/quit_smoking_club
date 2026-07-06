@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/content_service.dart';
+import '../services/content_service_firebase.dart';
+import 'package:quit_smoking_club/firebase_config.dart';
 
 class ContentManagementPage extends StatefulWidget {
   const ContentManagementPage({super.key});
@@ -9,7 +11,9 @@ class ContentManagementPage extends StatefulWidget {
 }
 
 class _ContentManagementPageState extends State<ContentManagementPage> {
-  final ContentService _service = ContentService();
+  final dynamic _service = firebaseEnabled
+      ? ContentServiceFirebase()
+      : ContentService();
   final List<String> _categories = [
     'Medical',
     'Stories',
@@ -144,7 +148,9 @@ class _ContentEditPageState extends State<ContentEditPage> {
   final _titleCtrl = TextEditingController();
   final _contentCtrl = TextEditingController();
   final _linkCtrl = TextEditingController();
-  final ContentService _service = ContentService();
+  final dynamic _service = firebaseEnabled
+      ? ContentServiceFirebase()
+      : ContentService();
 
   @override
   void initState() {

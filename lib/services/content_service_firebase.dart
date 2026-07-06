@@ -1,49 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:quit_smoking_club/supabase_config.dart';
+import 'content_service.dart';
+import 'package:quit_smoking_club/firebase_config.dart';
 
-class ContentItem {
-  final String category;
-  final String language;
-  final String title;
-  final String content;
-  final String link;
-
-  const ContentItem({
-    required this.category,
-    required this.language,
-    required this.title,
-    required this.content,
-    required this.link,
-  });
-
-  String get uniqueId => '$category|$language|$title';
-
-  factory ContentItem.fromJson(Map<String, dynamic> json) {
-    return ContentItem(
-      category: json['category']?.toString() ?? '',
-      language: json['language']?.toString().toLowerCase() ?? 'all',
-      title: json['title']?.toString() ?? '',
-      content: json['content']?.toString() ?? '',
-      link: json['link']?.toString() ?? '',
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'category': category,
-      'language': language,
-      'title': title,
-      'content': content,
-      'link': link,
-      'unique_id': uniqueId,
-    };
-  }
-}
-
-class ContentService {
+class ContentServiceFirebase {
   static const _contentOverridesKey = 'content_overrides_v1';
   static const Map<String, String> _assetPaths = {
     'Medical': 'assets/medical_links.json',
@@ -54,9 +16,7 @@ class ContentService {
   };
 
   static const String _backendMockAsset = 'assets/backend_content.json';
-  static const String _supabaseTable = 'content_items';
-
-  static bool get _remoteEnabled => supabaseEnabled;
+  static const String _collection = 'content_items';
 
   static Future<SharedPreferences> get _prefs async =>
       SharedPreferences.getInstance();
@@ -115,17 +75,14 @@ class ContentService {
   }
 
   Future<List<ContentItem>> _loadRemoteItems(String category) async {
-    if (!_remoteEnabled) return [];
-
+    if (!firebaseEnabled) return [];
     try {
-      final data = await Supabase.instance.client
-          .from(_supabaseTable)
-          .select()
-          .eq('category', category);
-      if (data is! List) return [];
-      return data
-          .whereType<Map<String, dynamic>>()
-          .map(ContentItem.fromJson)
+      final qs = await FirebaseFirestore.instance
+          .collection(_collection)
+          .where('category', isEqualTo: category)
+          .get();
+      return qs.docs
+          .map((d) => ContentItem.fromJson(d.data()))
           .where(
             (item) =>
                 item.title.isNotEmpty &&
@@ -139,40 +96,35 @@ class ContentService {
   }
 
   Future<void> _upsertRemoteItem(ContentItem item) async {
-    if (!_remoteEnabled) return;
-
+    if (!firebaseEnabled) return;
     try {
-      await Supabase.instance.client
-          .from(_supabaseTable)
-          .upsert(item.toJson(), onConflict: 'unique_id');
-    } catch (e) {
-      // ignore: avoid_print
-      print('❌ Supabase 寫入失敗！原因: $e');
+      await FirebaseFirestore.instance
+          .collection(_collection)
+          .doc(item.uniqueId)
+          .set(item.toJson());
+    } catch (_) {
+      // ignore
     }
   }
 
   Future<void> _deleteRemoteItem(String uniqueId) async {
-    if (!_remoteEnabled) return;
-
+    if (!firebaseEnabled) return;
     try {
-      await Supabase.instance.client
-          .from(_supabaseTable)
-          .delete()
-          .eq('unique_id', uniqueId);
+      await FirebaseFirestore.instance
+          .collection(_collection)
+          .doc(uniqueId)
+          .delete();
     } catch (_) {
-      // Ignore cloud errors.
+      // ignore
     }
   }
 
   Future<List<ContentItem>> _loadAllCloudItems() async {
-    if (!_remoteEnabled) return [];
-
+    if (!firebaseEnabled) return [];
     try {
-      final data = await Supabase.instance.client.from(_supabaseTable).select();
-      if (data is! List) return [];
-      return data
-          .whereType<Map<String, dynamic>>()
-          .map(ContentItem.fromJson)
+      final qs = await FirebaseFirestore.instance.collection(_collection).get();
+      return qs.docs
+          .map((d) => ContentItem.fromJson(d.data()))
           .where(
             (item) =>
                 item.title.isNotEmpty &&
@@ -190,17 +142,6 @@ class ContentService {
     final backendItems = await _loadBackendMockItems();
     final remoteItems = await _loadRemoteItems(category);
     final overrideItems = await _loadOverrideItems();
-    // 👇 自動同步：如果雲端沒資料，就把本地 JSON 的內容一筆筆灌進去
-    if (_remoteEnabled && remoteItems.isEmpty && assetItems.isNotEmpty) {
-      // ignore: avoid_print
-      print('⏳ 偵測到雲端資料庫目前是空的，開始自動把本地的 $category 資料同步到 Supabase...');
-      for (final item in assetItems) {
-        await _upsertRemoteItem(item);
-      }
-      // ignore: avoid_print
-      print('✅ $category 的本地資料已成功同步到雲端！');
-    }
-
     final merged = <String, ContentItem>{};
     for (final item in assetItems) {
       merged[item.uniqueId] = item;
@@ -284,5 +225,16 @@ class ContentService {
     updated[item.uniqueId] = item;
     await saveOverrideItems(updated.values.toList());
     await _upsertRemoteItem(item);
+  }
+
+  Future<void> seedSampleContent() async {
+    final sample = ContentItem(
+      category: 'Medical',
+      language: 'all',
+      title: 'Firebase Test Item',
+      content: 'This item was created to verify Firebase connectivity.',
+      link: 'https://firebase.google.com',
+    );
+    await _upsertRemoteItem(sample);
   }
 }
