@@ -17,34 +17,19 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for linux - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return linux;
       default:
         throw UnsupportedError(
           'DefaultFirebaseOptions are not supported for this platform.',
@@ -58,5 +43,47 @@ class DefaultFirebaseOptions {
     messagingSenderId: '940255703825',
     projectId: 'quitsmokingclub-ded45',
     storageBucket: 'quitsmokingclub-ded45.firebasestorage.app',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyAW-SM8xgrTxREtSZCVD2MmfkI8ZT2GmVA',
+    appId: '1:940255703825:ios:quitsmokingclub',
+    messagingSenderId: '940255703825',
+    projectId: 'quitsmokingclub-ded45',
+    storageBucket: 'quitsmokingclub-ded45.firebasestorage.app',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyAW-SM8xgrTxREtSZCVD2MmfkI8ZT2GmVA',
+    appId: '1:940255703825:macos:quitsmokingclub',
+    messagingSenderId: '940255703825',
+    projectId: 'quitsmokingclub-ded45',
+    storageBucket: 'quitsmokingclub-ded45.firebasestorage.app',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyAW-SM8xgrTxREtSZCVD2MmfkI8ZT2GmVA',
+    appId: '1:940255703825:windows:quitsmokingclub',
+    messagingSenderId: '940255703825',
+    projectId: 'quitsmokingclub-ded45',
+    storageBucket: 'quitsmokingclub-ded45.firebasestorage.app',
+  );
+
+  static const FirebaseOptions linux = FirebaseOptions(
+    apiKey: 'AIzaSyAW-SM8xgrTxREtSZCVD2MmfkI8ZT2GmVA',
+    appId: '1:940255703825:linux:quitsmokingclub',
+    messagingSenderId: '940255703825',
+    projectId: 'quitsmokingclub-ded45',
+    storageBucket: 'quitsmokingclub-ded45.firebasestorage.app',
+  );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyAW-SM8xgrTxREtSZCVD2MmfkI8ZT2GmVA',
+    appId: '1:940255703825:web:0000000000000000',
+    messagingSenderId: '940255703825',
+    projectId: 'quitsmokingclub-ded45',
+    authDomain: 'quitsmokingclub-ded45.firebaseapp.com',
+    storageBucket: 'quitsmokingclub-ded45.firebasestorage.app',
+    measurementId: 'G-0000000000',
   );
 }

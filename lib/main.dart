@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'screens/home_page.dart';
 import 'screens/onboarding_page.dart';
 import 'services/content_service_firebase.dart';
 import 'services/storage_service.dart';
-import 'supabase_config.dart';
 import 'firebase_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (supabaseEnabled) {
-    await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
-  }
 
   if (firebaseEnabled) {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    await ContentServiceFirebase().seedSampleContent();
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      await ContentServiceFirebase().seedSampleContent();
+    } catch (error, stackTrace) {
+      debugPrint('Firebase initialize failed: $error');
+      debugPrint('$stackTrace');
+    }
   }
 
   final storedName = await StorageService.getUserName();

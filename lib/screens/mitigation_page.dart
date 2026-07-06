@@ -1,8 +1,9 @@
-import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import '../services/content_service.dart';
+import '../services/content_service_firebase.dart';
+import 'package:quit_smoking_club/firebase_config.dart';
 
 class MitigationPage extends StatefulWidget {
   final String title;
@@ -21,15 +22,11 @@ class _MitigateColors {
 }
 
 class _MitigationPageState extends State<MitigationPage> {
-  static const Map<String, String> _assetByTitle = {
-    'Medical': 'assets/medical_links.json',
-    'Stories': 'assets/stories_data.json',
-    'YouTube': 'assets/youtube_data.json',
-    'Music': 'assets/music_data.json',
-    'Games': 'assets/games_data.json',
-  };
+  final List<ContentItem> _tips = [];
+  final dynamic _contentService = firebaseEnabled
+      ? ContentServiceFirebase()
+      : ContentService();
 
-  final List<Map<String, String>> _tips = [];
   String? _selectedTitle;
   String? _selectedContent;
   String? _selectedLink;
@@ -43,93 +40,45 @@ class _MitigationPageState extends State<MitigationPage> {
   }
 
   Future<void> _loadCategoryData() async {
-    final assetPath = _assetByTitle[widget.title];
-    if (assetPath == null) {
-      _setError(
-        '資料未定義',
-        '此分類尚未對應資料檔案，請確認標題是否為 Medical、Stories、YouTube、Music 或 Games。',
-      );
-      return;
-    }
-
     setState(() {
       _isLoading = true;
       _hasError = false;
     });
 
     try {
-      final raw = await rootBundle.loadString(assetPath);
       final localeString = WidgetsBinding.instance.platformDispatcher.locale
           .toString()
           .toLowerCase()
           .replaceAll('_', '-');
-      final localeParts = localeString.split('-');
-      final shortLocale = localeParts.first;
-      final regionLocale = localeParts.length > 1
-          ? '${localeParts.first}-${localeParts.sublist(1).join('-')}'
-          : shortLocale;
-      final localeCandidates = [localeString, regionLocale, shortLocale];
-      final List<dynamic> data = json.decode(raw);
-      final entries = data
-          .whereType<Map<String, dynamic>>()
-          .map(
-            (item) => {
-              'category': item['category']?.toString() ?? '',
-              'language': item['language']?.toString().toLowerCase() ?? 'all',
-              'title': item['title']?.toString() ?? '',
-              'content': item['content']?.toString() ?? '',
-              'link': item['link']?.toString() ?? '',
-            },
-          )
-          .where(
-            (item) =>
-                item['title']!.isNotEmpty &&
-                item['content']!.isNotEmpty &&
-                item['link']!.isNotEmpty,
-          )
-          .toList();
+      final items = await _contentService.getContentForCategoryAndLocale(
+        widget.title,
+        localeString,
+      );
 
-      final category = widget.title;
-      var filtered = entries
-          .where((item) => item['category'] == category)
-          .toList();
-
-      final localeMatches = filtered.where((item) {
-        final language = item['language']!.toLowerCase();
-        return localeCandidates.contains(language);
-      }).toList();
-      if (localeMatches.isNotEmpty) {
-        filtered = localeMatches;
-      } else {
-        final allMatches = filtered
-            .where((item) => item['language'] == 'all')
-            .toList();
-        if (allMatches.isNotEmpty) {
-          filtered = allMatches;
-        }
-      }
-
-      if (filtered.isEmpty) {
+      if (items.isEmpty) {
         if (widget.title == 'Medical') {
           _setError('醫學常識暫無資料', '請稍後更新或切換語言，並確保資料中包含 link。');
         } else {
-          _setError('資料讀取失敗', '未能找到「${widget.title}」的對應內容，請檢查資料檔案是否正確。');
+          _setError(
+            '資料讀取失敗',
+            '未能找到「${widget.title}」的對應內容，請確認 Firebase 或本地資料是否完整。',
+          );
         }
         return;
       }
 
       _tips.clear();
-      _tips.addAll(filtered.cast<Map<String, String>>());
+      _tips.addAll(items);
       final index = DateTime.now().millisecondsSinceEpoch % _tips.length;
       final selected = _tips[index];
 
       setState(() {
-        _selectedTitle = selected['title'];
-        _selectedContent = selected['content'];
-        _selectedLink = selected['link'];
+        _selectedTitle = selected.title;
+        _selectedContent = selected.content;
+        _selectedLink = selected.link;
       });
     } catch (error) {
-      _setError('檔案解析失敗', '讀取資料時發生錯誤：$error');
+      _setError('資料載入失敗', 'Firebase 讀取資料時發生錯誤：$error');
     } finally {
       setState(() {
         _isLoading = false;
@@ -151,15 +100,15 @@ class _MitigationPageState extends State<MitigationPage> {
   void _showNextTip() {
     if (_tips.isEmpty) return;
     final current = _selectedTitle;
-    var currentIndex = _tips.indexWhere((item) => item['title'] == current);
+    var currentIndex = _tips.indexWhere((item) => item.title == current);
     if (currentIndex < 0) {
       currentIndex = 0;
     }
     final next = _tips[(currentIndex + 1) % _tips.length];
     setState(() {
-      _selectedTitle = next['title'];
-      _selectedContent = next['content'];
-      _selectedLink = next['link'];
+      _selectedTitle = next.title;
+      _selectedContent = next.content;
+      _selectedLink = next.link;
     });
   }
 
@@ -168,9 +117,9 @@ class _MitigationPageState extends State<MitigationPage> {
     final random = Random().nextInt(_tips.length);
     final selected = _tips[random];
     setState(() {
-      _selectedTitle = selected['title'];
-      _selectedContent = selected['content'];
-      _selectedLink = selected['link'];
+      _selectedTitle = selected.title;
+      _selectedContent = selected.content;
+      _selectedLink = selected.link;
     });
   }
 

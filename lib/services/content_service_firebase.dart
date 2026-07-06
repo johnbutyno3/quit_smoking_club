@@ -228,13 +228,46 @@ class ContentServiceFirebase {
   }
 
   Future<void> seedSampleContent() async {
-    final sample = ContentItem(
-      category: 'Medical',
-      language: 'all',
-      title: 'Firebase Test Item',
-      content: 'This item was created to verify Firebase connectivity.',
-      link: 'https://firebase.google.com',
-    );
-    await _upsertRemoteItem(sample);
+    final sampleItems = <ContentItem>[
+      ContentItem(
+        category: 'Medical',
+        language: 'all',
+        title: 'Firebase Test Item',
+        content: 'This item was created to verify Firebase connectivity.',
+        link: 'https://firebase.google.com',
+      ),
+      ContentItem(
+        category: 'Stories',
+        language: 'all',
+        title: 'Firebase 測試短文：堅持不抽菸的第一天',
+        content: '這是一則測試短文，描述戒菸後第一天克服誘惑的真實心情。',
+        link: 'https://www.healthline.com/health/how-to-quit-smoking',
+      ),
+      ContentItem(
+        category: 'YouTube',
+        language: 'all',
+        title: 'Firebase 測試影片：戒菸動力短片',
+        content: '請點擊下方連結觀看戒菸勵志影片。',
+        link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      ),
+      ContentItem(
+        category: 'Music',
+        language: 'all',
+        title: 'Firebase 測試音樂：放鬆心情的戒菸歌單',
+        content: '這是一則測試音樂連結，用於驗證音樂類別是否能正確載入。',
+        link: 'https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq3LiO',
+      ),
+      ContentItem(
+        category: 'Games',
+        language: 'all',
+        title: 'Firebase 測試遊戲：戒菸小挑戰',
+        content: '這是一則測試遊戲項目，讓玩家透過互動分散菸癮注意力。',
+        link: 'https://example.com/game',
+      ),
+    ];
+
+    for (final item in sampleItems) {
+      await _upsertRemoteItem(item);
+    }
   }
 }

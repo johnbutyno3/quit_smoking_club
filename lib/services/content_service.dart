@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:quit_smoking_club/supabase_config.dart';
 
 class ContentItem {
   final String category;
@@ -54,9 +52,6 @@ class ContentService {
   };
 
   static const String _backendMockAsset = 'assets/backend_content.json';
-  static const String _supabaseTable = 'content_items';
-
-  static bool get _remoteEnabled => supabaseEnabled;
 
   static Future<SharedPreferences> get _prefs async =>
       SharedPreferences.getInstance();
@@ -114,92 +109,16 @@ class ContentService {
     }
   }
 
-  Future<List<ContentItem>> _loadRemoteItems(String category) async {
-    if (!_remoteEnabled) return [];
-
-    try {
-      final data = await Supabase.instance.client
-          .from(_supabaseTable)
-          .select()
-          .eq('category', category);
-      if (data is! List) return [];
-      return data
-          .whereType<Map<String, dynamic>>()
-          .map(ContentItem.fromJson)
-          .where(
-            (item) =>
-                item.title.isNotEmpty &&
-                item.content.isNotEmpty &&
-                item.link.isNotEmpty,
-          )
-          .toList();
-    } catch (_) {
-      return [];
-    }
-  }
-
-  Future<void> _upsertRemoteItem(ContentItem item) async {
-    if (!_remoteEnabled) return;
-
-    try {
-      await Supabase.instance.client
-          .from(_supabaseTable)
-          .upsert(item.toJson(), onConflict: 'unique_id');
-    } catch (e) {
-      // ignore: avoid_print
-      print('❌ Supabase 寫入失敗！原因: $e');
-    }
-  }
-
-  Future<void> _deleteRemoteItem(String uniqueId) async {
-    if (!_remoteEnabled) return;
-
-    try {
-      await Supabase.instance.client
-          .from(_supabaseTable)
-          .delete()
-          .eq('unique_id', uniqueId);
-    } catch (_) {
-      // Ignore cloud errors.
-    }
-  }
-
-  Future<List<ContentItem>> _loadAllCloudItems() async {
-    if (!_remoteEnabled) return [];
-
-    try {
-      final data = await Supabase.instance.client.from(_supabaseTable).select();
-      if (data is! List) return [];
-      return data
-          .whereType<Map<String, dynamic>>()
-          .map(ContentItem.fromJson)
-          .where(
-            (item) =>
-                item.title.isNotEmpty &&
-                item.content.isNotEmpty &&
-                item.link.isNotEmpty,
-          )
-          .toList();
-    } catch (_) {
-      return [];
-    }
+  Future<void> _saveOverrideItemsLocally(List<ContentItem> items) async {
+    final prefs = await _prefs;
+    final jsonList = items.map((item) => item.toJson()).toList();
+    await prefs.setString(_contentOverridesKey, json.encode(jsonList));
   }
 
   Future<List<ContentItem>> getContentItems(String category) async {
     final assetItems = await _loadAssetItems(category);
     final backendItems = await _loadBackendMockItems();
-    final remoteItems = await _loadRemoteItems(category);
     final overrideItems = await _loadOverrideItems();
-    // 👇 自動同步：如果雲端沒資料，就把本地 JSON 的內容一筆筆灌進去
-    if (_remoteEnabled && remoteItems.isEmpty && assetItems.isNotEmpty) {
-      // ignore: avoid_print
-      print('⏳ 偵測到雲端資料庫目前是空的，開始自動把本地的 $category 資料同步到 Supabase...');
-      for (final item in assetItems) {
-        await _upsertRemoteItem(item);
-      }
-      // ignore: avoid_print
-      print('✅ $category 的本地資料已成功同步到雲端！');
-    }
 
     final merged = <String, ContentItem>{};
     for (final item in assetItems) {
@@ -208,9 +127,6 @@ class ContentService {
     for (final item in backendItems.where(
       (item) => item.category == category,
     )) {
-      merged[item.uniqueId] = item;
-    }
-    for (final item in remoteItems) {
       merged[item.uniqueId] = item;
     }
     for (final item in overrideItems.where(
@@ -249,31 +165,21 @@ class ContentService {
 
   Future<List<ContentItem>> getAllOverrideItems() async {
     final overrideItems = await _loadOverrideItems();
-    final cloudItems = await _loadAllCloudItems();
     final merged = <String, ContentItem>{};
     for (final item in overrideItems) {
-      merged[item.uniqueId] = item;
-    }
-    for (final item in cloudItems) {
       merged[item.uniqueId] = item;
     }
     return merged.values.toList();
   }
 
   Future<void> saveOverrideItems(List<ContentItem> items) async {
-    final prefs = await _prefs;
-    final jsonList = items.map((item) => item.toJson()).toList();
-    await prefs.setString(_contentOverridesKey, json.encode(jsonList));
-    for (final item in items) {
-      await _upsertRemoteItem(item);
-    }
+    await _saveOverrideItemsLocally(items);
   }
 
   Future<void> deleteOverrideItem(String uniqueId) async {
     final items = await _loadOverrideItems();
     final updated = items.where((item) => item.uniqueId != uniqueId).toList();
     await saveOverrideItems(updated);
-    await _deleteRemoteItem(uniqueId);
   }
 
   Future<void> saveOverrideItem(ContentItem item) async {
@@ -283,6 +189,5 @@ class ContentService {
     };
     updated[item.uniqueId] = item;
     await saveOverrideItems(updated.values.toList());
-    await _upsertRemoteItem(item);
   }
 }

@@ -27,12 +27,12 @@ class _ContentManagementPageState extends State<ContentManagementPage> {
   @override
   void initState() {
     super.initState();
-    _itemsFuture = _service.getAllOverrideItems();
+    _itemsFuture = _service.getContentItems(_selectedCategory);
   }
 
   Future<void> _refreshItems() async {
     setState(() {
-      _itemsFuture = _service.getAllOverrideItems();
+      _itemsFuture = _service.getContentItems(_selectedCategory);
     });
   }
 
@@ -68,6 +68,7 @@ class _ContentManagementPageState extends State<ContentManagementPage> {
                 if (value != null) {
                   setState(() {
                     _selectedCategory = value;
+                    _itemsFuture = _service.getContentItems(_selectedCategory);
                   });
                 }
               },
