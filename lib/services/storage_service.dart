@@ -116,4 +116,26 @@ class StorageService {
     final prefs = await _prefs;
     return prefs.getString('last_reset_date') ?? "";
   }
+
+  // 💾 儲存第一支菸時間，格式 "HH:MM"，預設 "08:00"
+  static Future<void> saveFirstSmokeTime(String hhmm) async {
+    final prefs = await _prefs;
+    await prefs.setString('first_smoke_time', hhmm);
+  }
+
+  static Future<String> getFirstSmokeTime() async {
+    final prefs = await _prefs;
+    return prefs.getString('first_smoke_time') ?? '08:00';
+  }
+
+  // 💾 儲存最後一支菸時間，格式 "HH:MM"，預設 "22:00"
+  static Future<void> saveLastSmokeTime(String hhmm) async {
+    final prefs = await _prefs;
+    await prefs.setString('last_smoke_time', hhmm);
+  }
+
+  static Future<String> getLastSmokeTime() async {
+    final prefs = await _prefs;
+    return prefs.getString('last_smoke_time') ?? '22:00';
+  }
 }

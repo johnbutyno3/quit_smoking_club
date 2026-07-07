@@ -32,6 +32,8 @@ Future<void> main() async {
     throw Exception('Seeded document was not found after write.');
   }
 
-  print('✅ Firebase seed completed.');
+  // ignore: avoid_print
+  print('\u2705 Firebase seed completed.');
+  // ignore: avoid_print
   print(snapshot.data());
 }

@@ -79,7 +79,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyAW-SM8xgrTxREtSZCVD2MmfkI8ZT2GmVA',
-    appId: '1:940255703825:web:0000000000000000',
+    appId: '1:940255703825:web:75dd3c3c2407b02db492b0',
     messagingSenderId: '940255703825',
     projectId: 'quitsmokingclub-ded45',
     authDomain: 'quitsmokingclub-ded45.firebaseapp.com',

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../screens/content_management_page.dart';
 import '../services/storage_service.dart';
+import '../services/user_service.dart';
 
 class SetupPage extends StatefulWidget {
   const SetupPage({super.key});
@@ -34,13 +35,26 @@ class _SetupPageState extends State<SetupPage> {
     final count = await StorageService.getDailyCount();
     final age = await StorageService.getUserAge();
     final years = await StorageService.getUserYears();
+    final firstTimeStr = await StorageService.getFirstSmokeTime();
+    final lastTimeStr = await StorageService.getLastSmokeTime();
+
+    final fParts = firstTimeStr.split(':');
+    final lParts = lastTimeStr.split(':');
 
     setState(() {
       _nameCtrl.text = name;
       _countCtrl.text = count.toString();
       _ageCtrl.text = age.toString();
       _yearsCtrl.text = years.toString();
-      _currentPlanned = count; // 同步硬碟數值
+      _currentPlanned = count;
+      _firstTime = TimeOfDay(
+        hour: int.tryParse(fParts[0]) ?? 8,
+        minute: int.tryParse(fParts[1]) ?? 0,
+      );
+      _lastTime = TimeOfDay(
+        hour: int.tryParse(lParts[0]) ?? 22,
+        minute: int.tryParse(lParts[1]) ?? 0,
+      );
     });
   }
 
@@ -249,16 +263,74 @@ class _SetupPageState extends State<SetupPage> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
               onPressed: () async {
-                final name = _nameCtrl.text;
+                final name = _nameCtrl.text.trim();
                 final count = int.tryParse(_countCtrl.text) ?? 5;
                 final age = int.tryParse(_ageCtrl.text) ?? 28;
                 final years = int.tryParse(_yearsCtrl.text) ?? 8;
 
-                // 💾 同步寫入四大基本資料至硬碟
+                // ── 格式驗證 ──────────────────────────────────────
+                final fmtErr = UserService.validateNameFormat(name);
+                if (fmtErr != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('⚠️ $fmtErr'),
+                      backgroundColor: Colors.red.shade700,
+                    ),
+                  );
+                  return;
+                }
+
+                // ── 重複名稱檢查 ──────────────────────────────────
+                final uid = UserService.currentUid;
+                if (uid != null) {
+                  final service = UserService();
+                  final oldName = await StorageService.getUserName();
+                  if (name != oldName) {
+                    final available = await service.isNameAvailable(
+                      name,
+                      excludeUid: uid,
+                    );
+                    if (!available) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('⚠️ 「$name」已被使用，請換一個暱稱'),
+                            backgroundColor: Colors.red.shade700,
+                          ),
+                        );
+                      }
+                      return;
+                    }
+                    // 預訂新暱稱（釋放舊的）
+                    await service.reserveName(uid, name, oldName: oldName);
+                  }
+                }
+
+                // ── 儲存本機 ──────────────────────────────────────
                 await StorageService.saveUserName(name);
                 await StorageService.saveDailyCount(count);
                 await StorageService.saveUserAge(age);
                 await StorageService.saveUserYears(years);
+                final fh = _firstTime.hour.toString().padLeft(2, '0');
+                final fm = _firstTime.minute.toString().padLeft(2, '0');
+                final lh = _lastTime.hour.toString().padLeft(2, '0');
+                final lm = _lastTime.minute.toString().padLeft(2, '0');
+                await StorageService.saveFirstSmokeTime('$fh:$fm');
+                await StorageService.saveLastSmokeTime('$lh:$lm');
+
+                // ── 同步到 Firestore ──────────────────────────────
+                if (uid != null) {
+                  try {
+                    await UserService().saveProfile(uid, {
+                      'name': name,
+                      'daily_count': count,
+                      'user_age': age,
+                      'user_years': years,
+                      'first_smoke_time': '$fh:$fm',
+                      'last_smoke_time': '$lh:$lm',
+                    });
+                  } catch (_) {}
+                }
 
                 if (context.mounted) {
                   Navigator.pop(context);

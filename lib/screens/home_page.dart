@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../models/smoking_state.dart';
 import '../services/smoking_engine.dart';
 import '../services/storage_service.dart';
+import '../services/user_service.dart';
 import 'forum_page.dart';
 import 'shop_page.dart';
 import 'setup_page.dart';
@@ -81,6 +82,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final sName = await StorageService.getUserName();
     var sCoins = await StorageService.getCoins();
     final storedRecords = await StorageService.getSmokeRecordsForToday();
+    final firstTimeStr = await StorageService.getFirstSmokeTime();
+    final lastTimeStr = await StorageService.getLastSmokeTime();
+    final fParts = firstTimeStr.split(':');
+    final lParts = lastTimeStr.split(':');
+    final firstHour = int.tryParse(fParts[0]) ?? 8;
+    final firstMin = int.tryParse(fParts[1]) ?? 0;
+    final lastHour = int.tryParse(lParts[0]) ?? 22;
+    final lastMin = int.tryParse(lParts[1]) ?? 0;
 
     final isPremium = await StorageService.getPremium();
     final lastDate = await StorageService.getLastResetDate();
@@ -91,6 +100,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       sCoins += reward;
       await StorageService.saveCoins(sCoins);
       await StorageService.saveLastResetDate(todayStr);
+      final uid = UserService.currentUid;
+      if (uid != null) {
+        try {
+          await UserService().updateCoins(uid, sCoins);
+        } catch (_) {}
+      }
 
       final rankStr = isPremium ? "高級會員" : "一般會員";
       _messages.add("📆 跨天簽到：您目前為 [$rankStr]");
@@ -104,8 +119,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ..add("歡迎來到戒菸俱樂部！挑戰正在進行中。")
           ..add("Hi, $sName!");
         final state = SmokingState(
-          startTime: DateTime(now.year, now.month, now.day, 8, 0),
-          endTime: DateTime(now.year, now.month, now.day, 22, 0),
+          startTime: DateTime(
+            now.year,
+            now.month,
+            now.day,
+            firstHour,
+            firstMin,
+          ),
+          endTime: DateTime(now.year, now.month, now.day, lastHour, lastMin),
           plannedCount: sCount,
           smokeRecords: storedRecords,
           lastSmokeTime: storedRecords.isNotEmpty ? storedRecords.last : null,

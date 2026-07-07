@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/storage_service.dart';
+import '../services/user_service.dart';
 
 class ShopPage extends StatefulWidget {
   const ShopPage({super.key});
@@ -40,6 +41,12 @@ class _ShopPageState extends State<ShopPage> {
     final current = await StorageService.getCoins();
     final latest = current + amount;
     await StorageService.saveCoins(latest);
+    final uid = UserService.currentUid;
+    if (uid != null) {
+      try {
+        await UserService().updateCoins(uid, latest);
+      } catch (_) {}
+    }
     setState(() {
       _myCoins = latest;
     });
@@ -57,6 +64,12 @@ class _ShopPageState extends State<ShopPage> {
     if (_myCoins >= 50) {
       final latest = _myCoins - 50;
       await StorageService.saveCoins(latest);
+      final uid = UserService.currentUid;
+      if (uid != null) {
+        try {
+          await UserService().updateCoins(uid, latest);
+        } catch (_) {}
+      }
       setState(() {
         _myCoins = latest;
       });
