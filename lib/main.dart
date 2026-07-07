@@ -35,7 +35,7 @@ void main() async {
         } else {
           final localName = await StorageService.getUserName();
           if (localName.isEmpty) {
-            await StorageService.saveUserName('ªB¤Í');
+            await StorageService.saveUserName('ï¿½Bï¿½ï¿½');
             await StorageService.saveDailyCount(5);
             await StorageService.saveCoins(20);
             await StorageService.savePremium(false);
@@ -49,7 +49,7 @@ void main() async {
       debugPrint('$stackTrace');
       final storedName = await StorageService.getUserName();
       if (storedName.isEmpty) {
-        await StorageService.saveUserName('ªB¤Í');
+        await StorageService.saveUserName('ï¿½Bï¿½ï¿½');
         await StorageService.saveDailyCount(5);
         await StorageService.saveCoins(20);
         await StorageService.savePremium(false);
@@ -59,7 +59,7 @@ void main() async {
   } else {
     final storedName = await StorageService.getUserName();
     if (storedName.isEmpty) {
-      await StorageService.saveUserName('ªB¤Í');
+      await StorageService.saveUserName('ï¿½Bï¿½ï¿½');
       await StorageService.saveDailyCount(5);
       await StorageService.saveCoins(20);
       await StorageService.savePremium(false);
