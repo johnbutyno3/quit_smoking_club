@@ -138,4 +138,48 @@ class StorageService {
     final prefs = await _prefs;
     return prefs.getString('last_smoke_time') ?? '22:00';
   }
+
+  // 💾 儲存戈菸計畫開始日期（格式 "YYYY-MM-DD"）
+  static Future<void> savePlanStartDate(String date) async {
+    final prefs = await _prefs;
+    await prefs.setString('plan_start_date', date);
+  }
+
+  static Future<String> getPlanStartDate() async {
+    final prefs = await _prefs;
+    return prefs.getString('plan_start_date') ?? '';
+  }
+
+  // 💾 儲存戈菸計畫總天數（預設 90）
+  static Future<void> savePlanDurationDays(int days) async {
+    final prefs = await _prefs;
+    await prefs.setInt('plan_duration_days', days);
+  }
+
+  static Future<int> getPlanDurationDays() async {
+    final prefs = await _prefs;
+    return prefs.getInt('plan_duration_days') ?? 90;
+  }
+
+  // 💾 儲存指定日期的抽菸實際支數
+  static Future<void> saveDayActual(String dateKey, int count) async {
+    final prefs = await _prefs;
+    await prefs.setInt('actual_$dateKey', count);
+  }
+
+  static Future<int> getDayActual(String dateKey) async {
+    final prefs = await _prefs;
+    return prefs.getInt('actual_$dateKey') ?? -1; // -1 表示無記錄
+  }
+
+  // 💾 是否已顯示過 Intro 滑動介紹
+  static Future<void> saveIntroShown(bool shown) async {
+    final prefs = await _prefs;
+    await prefs.setBool('intro_shown', shown);
+  }
+
+  static Future<bool> getIntroShown() async {
+    final prefs = await _prefs;
+    return prefs.getBool('intro_shown') ?? false;
+  }
 }

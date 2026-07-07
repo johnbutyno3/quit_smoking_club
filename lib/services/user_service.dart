@@ -35,6 +35,32 @@ class UserService {
     return currentUid!;
   }
 
+  /// Email + 密碼註冊新帳號。
+  Future<String> registerWithEmail(String email, String password) async {
+    final cred = await _auth.createUserWithEmailAndPassword(
+      email: email.trim(),
+      password: password,
+    );
+    currentUid = cred.user!.uid;
+    return currentUid!;
+  }
+
+  /// Email + 密碼登入既有帳號。
+  Future<String> signInWithEmail(String email, String password) async {
+    final cred = await _auth.signInWithEmailAndPassword(
+      email: email.trim(),
+      password: password,
+    );
+    currentUid = cred.user!.uid;
+    return currentUid!;
+  }
+
+  /// 登出。
+  Future<void> signOut() async {
+    await _auth.signOut();
+    currentUid = null;
+  }
+
   /// Google 登入。Web 用 signInWithPopup，行動端用 signInWithProvider。
   /// 不需要 google_sign_in 套件，Firebase Auth 內建處理 OAuth 流程。
   Future<String> signInWithGoogle() async {

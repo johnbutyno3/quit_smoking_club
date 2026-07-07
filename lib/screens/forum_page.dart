@@ -24,6 +24,15 @@ class _ForumPageState extends State<ForumPage> {
   final List<ForumPost> _posts = [];
   bool _isLoading = true;
   int _myCoins = 0;
+  int _selectedCategory = 0; // 0=全部, 1=菸癮犯了, 2=心得分享, 3=健康交流, 4=互相鼓勵
+
+  static const _categories = ['全部', '菸癮犯了', '戒菸心得', '健康交流', '互相鼓勵'];
+
+  List<ForumPost> get _filteredPosts {
+    if (_selectedCategory == 0) return _posts;
+    if (_selectedCategory == 1) return _posts.where((p) => p.isSOS).toList();
+    return _posts.where((p) => !p.isSOS).toList();
+  }
 
   @override
   void initState() {
@@ -144,7 +153,7 @@ class _ForumPageState extends State<ForumPage> {
                 await _forumService.addPost(newPost);
                 if (context.mounted) Navigator.pop(context);
                 await _loadForumData();
-                _showSnack('✅ 成功扣除 20 金幣，貼文已發佈！');
+                _showSnack('✅ 成功扣除 10 金幣，貼文已發佈！');
               },
               child: const Text('發佈'),
             ),
@@ -172,19 +181,56 @@ class _ForumPageState extends State<ForumPage> {
     return Scaffold(
       backgroundColor: _ForumColors.bg,
       appBar: AppBar(
-        title: const Text(
-          '交流論壇',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: const Text('論壇', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.add_comment_outlined),
             onPressed: _showCreatePostDialog,
-            tooltip: '創建貼文 (20 金幣)',
+            tooltip: '創建貼文 (10 金幣)',
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(40),
+          child: SizedBox(
+            height: 40,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              itemCount: _categories.length,
+              itemBuilder: (_, i) {
+                final selected = _selectedCategory == i;
+                return GestureDetector(
+                  onTap: () => setState(() => _selectedCategory = i),
+                  child: Container(
+                    margin: const EdgeInsets.only(right: 8, bottom: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: selected
+                          ? const Color(0xFF1B5E20)
+                          : Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      _categories[i],
+                      style: TextStyle(
+                        color: selected ? Colors.white : Colors.grey,
+                        fontSize: 12,
+                        fontWeight: selected
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
       ),
       body: Column(
         children: [
