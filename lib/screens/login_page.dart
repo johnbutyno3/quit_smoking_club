@@ -7,7 +7,6 @@ import 'onboarding_setup_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
-
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
@@ -21,16 +20,13 @@ class _LC {
 class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabCtrl;
-
   final _regNameCtrl = TextEditingController();
   final _regEmailCtrl = TextEditingController();
   final _regPassCtrl = TextEditingController();
   bool _regPassVisible = false;
-
   final _loginEmailCtrl = TextEditingController();
   final _loginPassCtrl = TextEditingController();
   bool _loginPassVisible = false;
-
   bool _isLoading = false;
   String? _error;
 
@@ -56,21 +52,19 @@ class _LoginPageState extends State<LoginPage>
     final name = _regNameCtrl.text.trim();
     final email = _regEmailCtrl.text.trim();
     final pass = _regPassCtrl.text;
-
     final nameErr = UserService.validateNameFormat(name);
     if (nameErr != null) {
       setState(() => _error = nameErr);
       return;
     }
     if (email.isEmpty || !email.contains('@')) {
-      setState(() => _error = '½Ğ¿é¤J¦³®Äªº¹q¤l¶l¥ó');
+      setState(() => _error = 'è«‹è¼¸å…¥æ­£ç¢ºçš„é›»å­éƒµä»¶');
       return;
     }
     if (pass.length < 6) {
-      setState(() => _error = '±K½X¦Ü¤Ö»İ­n 6 ­Ó¦r¤¸');
+      setState(() => _error = 'å¯†ç¢¼è‡³å°‘éœ€è¦ 6 å€‹å­—å…ƒ');
       return;
     }
-
     setState(() {
       _isLoading = true;
       _error = null;
@@ -81,7 +75,7 @@ class _LoginPageState extends State<LoginPage>
       if (!available) {
         setState(() {
           _isLoading = false;
-          _error = '¡u$name¡v¤w³Q¨Ï¥Î¡A½Ğ´«¤@­Ó¼ÊºÙ';
+          _error = 'è©²åç¨±ã€Œ$nameã€å·²è¢«ä½¿ç”¨ï¼Œè«‹æ›ä¸€å€‹æš±ç¨±';
         });
         return;
       }
@@ -102,17 +96,20 @@ class _LoginPageState extends State<LoginPage>
       }
     } on Exception catch (e) {
       String msg = e.toString();
-      if (msg.contains('email-already-in-use'))
-        msg = '¦¹¹q¤l¶l¥ó¤w³Qµù¥U¡A½Ğª½±µµn¤J';
-      else if (msg.contains('weak-password'))
-        msg = '±K½X±j«×¤£¨¬';
-      else if (msg.contains('invalid-email'))
-        msg = '¹q¤l¶l¥ó®æ¦¡¤£¥¿½T';
-      else
-        msg = 'µù¥U¥¢±Ñ¡A½Ğµy«á¦A¸Õ';
+      if (msg.contains('email-already-in-use')) {
+        msg = 'æ­¤é›»å­éƒµä»¶å·²è¢«è¨»å†Šï¼Œè«‹ç›´æ¥ç™»å…¥';
+      } else if (msg.contains('weak-password')) {
+        msg = 'å¯†ç¢¼å¼·åº¦ä¸è¶³';
+      } else if (msg.contains('invalid-email')) {
+        msg = 'é›»å­éƒµä»¶æ ¼å¼ä¸æ­£ç¢º';
+      } else {
+        msg = 'è¨»å†Šå¤±æ•—ï¼Œè«‹ç¨å¾Œå†è©¦';
+      }
       setState(() => _error = msg);
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -120,7 +117,7 @@ class _LoginPageState extends State<LoginPage>
     final email = _loginEmailCtrl.text.trim();
     final pass = _loginPassCtrl.text;
     if (email.isEmpty || pass.isEmpty) {
-      setState(() => _error = '½Ğ¶ñ¼g¹q¤l¶l¥ó»P±K½X');
+      setState(() => _error = 'è«‹å¡«å¯«é›»å­éƒµä»¶èˆ‡å¯†ç¢¼');
       return;
     }
     setState(() {
@@ -135,7 +132,7 @@ class _LoginPageState extends State<LoginPage>
         await service.syncCloudToLocal(uid);
         _goHome();
       } else {
-        if (mounted)
+        if (mounted) {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -146,21 +143,24 @@ class _LoginPageState extends State<LoginPage>
               ),
             ),
           );
+        }
       }
     } on Exception catch (e) {
       String msg = e.toString();
       if (msg.contains('user-not-found') ||
           msg.contains('wrong-password') ||
           msg.contains('invalid-credential')) {
-        msg = '¹q¤l¶l¥ó©Î±K½X¤£¥¿½T';
+        msg = 'é›»å­éƒµä»¶æˆ–å¯†ç¢¼ä¸æ­£ç¢º';
       } else if (msg.contains('too-many-requests')) {
-        msg = '¹Á¸Õ¦¸¼Æ¹L¦h¡A½Ğµy«á¦A¸Õ';
+        msg = 'å˜—è©¦æ¬¡æ•¸éå¤šï¼Œè«‹ç¨å¾Œå†è©¦';
       } else {
-        msg = 'µn¤J¥¢±Ñ¡A½Ğµy«á¦A¸Õ';
+        msg = 'ç™»å…¥å¤±æ•—ï¼Œè«‹ç¨å¾Œå†è©¦';
       }
       setState(() => _error = msg);
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -177,21 +177,25 @@ class _LoginPageState extends State<LoginPage>
         await service.syncCloudToLocal(uid);
         _goHome();
       } else {
-        final displayName = service.googleDisplayName ?? '';
-        _goOnboarding(service, uid, prefill: displayName);
+        _goOnboarding(service, uid, prefill: service.googleDisplayName ?? '');
       }
     } catch (e) {
       debugPrint('[LoginPage] Google signIn error: $e');
       setState(() {
-        _error = e.toString().contains('¨ú®ø') ? null : 'µn¤J¥¢±Ñ¡G$e';
+        _error = e.toString().contains('å–æ¶ˆ') ? null : 'ç™»å…¥å¤±æ•—ï¼š$e';
       });
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   void _goOnboarding(UserService service, String uid, {String prefill = ''}) {
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -205,7 +209,10 @@ class _LoginPageState extends State<LoginPage>
   }
 
   void _goHome() {
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const HomePage()),
@@ -219,12 +226,10 @@ class _LoginPageState extends State<LoginPage>
     bool obscure = false,
     bool? showPass,
     VoidCallback? togglePass,
-    TextInputType? keyboardType,
   }) {
     return TextField(
       controller: ctrl,
       obscureText: obscure && !(showPass ?? false),
-      keyboardType: keyboardType,
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon, size: 20),
@@ -240,11 +245,129 @@ class _LoginPageState extends State<LoginPage>
               )
             : null,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 14,
+        ),
       ),
       onChanged: (_) {
-        if (_error != null) setState(() => _error = null);
+        if (_error != null) {
+          setState(() => _error = null);
+        }
       },
+    );
+  }
+
+  Widget _buildLoginFields() {
+    return Column(
+      children: [
+        const SizedBox(height: 16),
+        _buildField(
+          ctrl: _loginEmailCtrl,
+          label: 'é›»å­éƒµä»¶',
+          icon: Icons.email_outlined,
+        ),
+        const SizedBox(height: 16),
+        _buildField(
+          ctrl: _loginPassCtrl,
+          label: 'å¯†ç¢¼',
+          icon: Icons.lock_outlined,
+          obscure: true,
+          showPass: _loginPassVisible,
+          togglePass: () =>
+              setState(() => _loginPassVisible = !_loginPassVisible),
+        ),
+        if (_error != null) ...[
+          const SizedBox(height: 12),
+          Text(
+            _error!,
+            style: const TextStyle(color: Colors.red, fontSize: 13),
+            textAlign: TextAlign.center,
+          ),
+        ],
+        const SizedBox(height: 24),
+        _isLoading
+            ? CircularProgressIndicator(color: _LC.primary)
+            : ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _LC.primary,
+                  minimumSize: const Size(double.infinity, 48),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: _handleLogin,
+                child: const Text(
+                  'ä¿¡ç®±ç™»å…¥',
+                  style: TextStyle(color: Colors.white, fontSize: 15),
+                ),
+              ),
+        const SizedBox(height: 16),
+        OutlinedButton.icon(
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size(double.infinity, 48),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          icon: const Icon(Icons.login, size: 20),
+          label: const Text('ä½¿ç”¨ Google å¸³è™Ÿç™»å…¥', style: TextStyle(fontSize: 15)),
+          onPressed: _handleGoogleSignIn,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRegisterFields() {
+    return Column(
+      children: [
+        const SizedBox(height: 16),
+        _buildField(
+          ctrl: _regNameCtrl,
+          label: 'æš±ç¨±',
+          icon: Icons.person_outline,
+        ),
+        const SizedBox(height: 16),
+        _buildField(
+          ctrl: _regEmailCtrl,
+          label: 'é›»å­éƒµä»¶',
+          icon: Icons.email_outlined,
+        ),
+        const SizedBox(height: 16),
+        _buildField(
+          ctrl: _regPassCtrl,
+          label: 'å¯†ç¢¼ (è‡³å°‘6ç¢¼)',
+          icon: Icons.lock_outlined,
+          obscure: true,
+          showPass: _regPassVisible,
+          togglePass: () => setState(() => _regPassVisible = !_regPassVisible),
+        ),
+        if (_error != null) ...[
+          const SizedBox(height: 12),
+          Text(
+            _error!,
+            style: const TextStyle(color: Colors.red, fontSize: 13),
+            textAlign: TextAlign.center,
+          ),
+        ],
+        const SizedBox(height: 24),
+        _isLoading
+            ? const CircularProgressIndicator(color: _LC.primary)
+            : ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _LC.primary,
+                  minimumSize: const Size(double.infinity, 48),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: _handleRegister,
+                child: const Text(
+                  'è¨»å†Šæ–°å¸³è™Ÿ',
+                  style: TextStyle(color: Colors.white, fontSize: 15),
+                ),
+              ),
+      ],
     );
   }
 
@@ -252,192 +375,65 @@ class _LoginPageState extends State<LoginPage>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: _LC.bg,
-      body: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: 32),
-            const Icon(Icons.smoke_free, size: 48, color: _LC.primary),
-            const SizedBox(height: 8),
-            const Text(
-              '§ÙµÒ¦nÀ°¤â',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: _LC.primary,
-              ),
-            ),
-            const Text(
-              '»P§A¦P¦æ¡A¤@¨B¤@¨B§ÙµÒ',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-            const SizedBox(height: 24),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 32),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.shade200),
-              ),
-              child: TabBar(
-                controller: _tabCtrl,
-                indicator: BoxDecoration(
-                  color: _LC.primary,
-                  borderRadius: BorderRadius.circular(10),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 420),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.smoke_free, size: 56, color: _LC.primary),
+                const SizedBox(height: 12),
+                const Text(
+                  'æˆ’è¸å¥½ç¿’æ…£',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: _LC.primary,
+                  ),
                 ),
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.grey,
-                dividerColor: Colors.transparent,
-                tabs: const [
-                  Tab(text: '«Ø¥ß±b¸¹'),
-                  Tab(text: 'µn¤J'),
-                ],
-              ),
+                const SizedBox(height: 4),
+                const Text(
+                  'é™ªä½ æ¯å¤©ä¸€æ­¥ä¸€æ­¥æˆ’è¸',
+                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                ),
+                const SizedBox(height: 28),
+                Container(
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: TabBar(
+                    controller: _tabCtrl,
+                    indicator: BoxDecoration(
+                      color: _LC.primary,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    labelColor: Colors.white,
+                    unselectedLabelColor: Colors.black54,
+                    tabs: const [
+                      Tab(text: 'ç™»å…¥'),
+                      Tab(text: 'è¨»å†Š'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                AnimatedBuilder(
+                  animation: _tabCtrl,
+                  builder: (context, _) {
+                    return _tabCtrl.index == 0
+                        ? _buildLoginFields()
+                        : _buildRegisterFields();
+                  },
+                ),
+              ],
             ),
-            Expanded(
-              child: TabBarView(
-                controller: _tabCtrl,
-                children: [_buildRegisterTab(), _buildLoginTab()],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
-    );
-  }
-
-  Widget _buildRegisterTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
-      child: Column(
-        children: [
-          _buildField(
-            ctrl: _regNameCtrl,
-            label: '¼ÊºÙ',
-            icon: Icons.person_outline,
-          ),
-          const SizedBox(height: 12),
-          _buildField(
-            ctrl: _regEmailCtrl,
-            label: '¹q¤l¶l¥ó',
-            icon: Icons.email_outlined,
-            keyboardType: TextInputType.emailAddress,
-          ),
-          const SizedBox(height: 12),
-          _buildField(
-            ctrl: _regPassCtrl,
-            label: '±K½X¡]¦Ü¤Ö 6 ½X¡^',
-            icon: Icons.lock_outline,
-            obscure: true,
-            showPass: _regPassVisible,
-            togglePass: () =>
-                setState(() => _regPassVisible = !_regPassVisible),
-          ),
-          const SizedBox(height: 20),
-          if (_error != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Text(
-                _error!,
-                style: const TextStyle(color: Colors.red, fontSize: 13),
-              ),
-            ),
-          _buildPrimaryButton('«Ø¥ß±b¸¹ ¡÷', _isLoading ? null : _handleRegister),
-          const SizedBox(height: 12),
-          if (kIsWeb) _buildGoogleButton(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLoginTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
-      child: Column(
-        children: [
-          _buildField(
-            ctrl: _loginEmailCtrl,
-            label: '¹q¤l¶l¥ó',
-            icon: Icons.email_outlined,
-            keyboardType: TextInputType.emailAddress,
-          ),
-          const SizedBox(height: 12),
-          _buildField(
-            ctrl: _loginPassCtrl,
-            label: '±K½X',
-            icon: Icons.lock_outline,
-            obscure: true,
-            showPass: _loginPassVisible,
-            togglePass: () =>
-                setState(() => _loginPassVisible = !_loginPassVisible),
-          ),
-          const SizedBox(height: 20),
-          if (_error != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Text(
-                _error!,
-                style: const TextStyle(color: Colors.red, fontSize: 13),
-              ),
-            ),
-          _buildPrimaryButton('µn¤J', _isLoading ? null : _handleLogin),
-          const SizedBox(height: 12),
-          if (kIsWeb) _buildGoogleButton(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPrimaryButton(String label, VoidCallback? onPressed) {
-    return SizedBox(
-      width: double.infinity,
-      height: 50,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _LC.primary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        onPressed: onPressed,
-        child: _isLoading
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-              )
-            : Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-      ),
-    );
-  }
-
-  Widget _buildGoogleButton() {
-    return OutlinedButton.icon(
-      style: OutlinedButton.styleFrom(
-        minimumSize: const Size(double.infinity, 48),
-        side: BorderSide(color: Colors.grey.shade300),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      icon: Image.network(
-        'https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg',
-        width: 20,
-        height: 20,
-        errorBuilder: (_, __, ___) => const Icon(Icons.login, size: 20),
-      ),
-      label: const Text(
-        '¥H Google ±b¸¹Ä~Äò',
-        style: TextStyle(color: Colors.black87),
-      ),
-      onPressed: _isLoading ? null : _handleGoogleSignIn,
     );
   }
 }

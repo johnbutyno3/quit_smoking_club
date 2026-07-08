@@ -3,6 +3,7 @@ import '../models/forum_post.dart';
 import '../services/forum_service.dart';
 import '../services/storage_service.dart';
 import '../services/user_service.dart';
+import 'forum_detail_page.dart';
 
 class ForumPage extends StatefulWidget {
   const ForumPage({super.key});
@@ -265,7 +266,7 @@ class _ForumPageState extends State<ForumPage> {
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : _posts.isEmpty
+            : _filteredPosts.isEmpty
                 ? Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -280,151 +281,176 @@ class _ForumPageState extends State<ForumPage> {
                     ),
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _posts.length,
-                    itemBuilder: (context, index) {
-                      final post = _posts[index];
-                      return Card(
-                        color: _ForumColors.cardBg,
-                        elevation: post.isSOS ? 4 : 2,
-                        shadowColor: post.isSOS
-                            ? Colors.redAccent.withAlpha(51)
-                            : Colors.black12,
-                        margin: const EdgeInsets.only(bottom: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          side: BorderSide(
-                            color: post.isSOS
-                                ? Colors.redAccent.withAlpha(77)
-                                : Colors.grey.shade100,
-                            width: post.isSOS ? 1.5 : 1,
+                                     padding: const EdgeInsets.all(16),
+                  itemCount: _filteredPosts.length,
+                  itemBuilder: (context, index) {
+                    final post = _filteredPosts[index];
+                    return GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ForumDetailPage(
+                              post: post,
+                              currentCoins: _myCoins,
+                              currentUserName: post.name ?? '測試使用者',
+                            ),
                           ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(14),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.account_circle,
-                                    size: 36,
-                                    color: post.isSOS
-                                        ? Colors.redAccent
-                                        : Colors.grey.shade400,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          post.name,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 13,
-                                            color: post.isSOS
-                                                ? Colors.redAccent
-                                                : Colors.black87,
+                        );
+
+                        if (result != null && result is int) {
+                          setState(() {
+                            _myCoins = result; 
+                          });
+                        }
+                      },
+                      child: Card(
+
+                        child: Card(
+                          color: _ForumColors.cardBg,
+                          elevation: post.isSOS ? 4 : 2,
+                          shadowColor: post.isSOS
+                              ? Colors.redAccent.withAlpha(51)
+                              : Colors.black12,
+                          margin: const EdgeInsets.only(bottom: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            side: BorderSide(
+                              color: post.isSOS
+                                  ? Colors.redAccent.withAlpha(77)
+                                  : Colors.grey.shade100,
+                              width: post.isSOS ? 1.5 : 1,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(14),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.account_circle,
+                                      size: 36,
+                                      color: post.isSOS
+                                          ? Colors.redAccent
+                                          : Colors.grey.shade400,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            post.name,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 13,
+                                              color: post.isSOS
+                                                  ? Colors.redAccent
+                                                  : Colors.black87,
+                                            ),
+                                          ),
+                                          Text(
+                                            _getRelativeTime(post.createdAt),
+                                            style: const TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 11,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    if (post.isSOS)
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.shade50,
+                                          borderRadius: BorderRadius.circular(
+                                            8,
                                           ),
                                         ),
-                                        Text(
-                                          _getRelativeTime(post.createdAt),
-                                          style: const TextStyle(
-                                            color: Colors.grey,
+                                        child: const Text(
+                                          '🚨 求助文',
+                                          style: TextStyle(
+                                            color: Colors.red,
+                                            fontWeight: FontWeight.bold,
                                             fontSize: 11,
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  post.content,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    height: 1.4,
+                                    color: Colors.grey.shade800,
+                                    fontWeight: post.isSOS
+                                        ? FontWeight.w500
+                                        : FontWeight.normal,
                                   ),
-                                  if (post.isSOS)
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
+                                ),
+                                const SizedBox(height: 14),
+                                const Divider(height: 1),
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    TextButton.icon(
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: _ForumColors.heart,
                                       ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.red.shade50,
-                                        borderRadius: BorderRadius.circular(8),
+                                      icon: const Icon(
+                                        Icons.favorite_border,
+                                        size: 18,
                                       ),
-                                      child: const Text(
-                                        '🚨 求助文',
-                                        style: TextStyle(
-                                          color: Colors.red,
+                                      label: Text(
+                                        '${post.likes} 讚',
+                                        style: const TextStyle(
+                                          fontSize: 12,
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 11,
                                         ),
                                       ),
+                                      onPressed: () => _handleLike(index),
                                     ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                post.content,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  height: 1.4,
-                                  color: Colors.grey.shade800,
-                                  fontWeight: post.isSOS
-                                      ? FontWeight.w500
-                                      : FontWeight.normal,
-                                ),
-                              ),
-                              const SizedBox(height: 14),
-                              const Divider(height: 1),
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  TextButton.icon(
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: _ForumColors.heart,
-                                    ),
-                                    icon: const Icon(
-                                      Icons.favorite_border,
-                                      size: 18,
-                                    ),
-                                    label: Text(
-                                      '${post.likes} 讚',
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
+                                    TextButton.icon(
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: _ForumColors.gift,
                                       ),
-                                    ),
-                                    onPressed: () => _handleLike(index),
-                                  ),
-                                  TextButton.icon(
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: _ForumColors.gift,
-                                    ),
-                                    icon: const Icon(
-                                      Icons.card_giftcard,
-                                      size: 18,
-                                    ),
-                                    label: Text(
-                                      '${post.gifts} 禮物',
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    onPressed: () => _handleSendGift(index),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-          ),
-        ],
+                                      icon: const Icon(
+                                                     Icons.card_giftcard,
+              size: 18,
+            ), // Icon
+            label: Text(
+              '${post.gifts} 禮物',
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ), // TextStyle
+            ), // Text
+            onPressed: () => _handleSendGift(index),
+          ), // TextButton.icon
+        ], // Row
+      ), // Row
+    ], // Column
+  ), // Padding
+), // Card
       ),
-    );
-  }
-}
+    ),
+  
+                  ), // GestureDetector
+      }, // 這裡關閉 itemBuilder 的大括號
+    ), // 這裡關閉 ListView.builder 的小括號
+  ), // 這裡關閉 Expanded (或 Container) 的小括號
+); // 這裡關閉 Column (或 Scaffold) 的小括號與分號
+  } // 這裡關閉 Widget build(BuildContext context) 的大括號
+} // 這裡關閉 class _ForumPageState 的大括號

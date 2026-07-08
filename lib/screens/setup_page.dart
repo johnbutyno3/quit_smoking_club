@@ -43,8 +43,14 @@ class _SetupPageState extends State<SetupPage> {
       _ageCtrl.text = age.toString();
       _yearsCtrl.text = years.toString();
       _days = durationDays.toDouble();
-      _firstTime = TimeOfDay(hour: int.tryParse(fParts[0]) ?? 8, minute: int.tryParse(fParts[1]) ?? 0);
-      _lastTime = TimeOfDay(hour: int.tryParse(lParts[0]) ?? 22, minute: int.tryParse(lParts[1]) ?? 0);
+      _firstTime = TimeOfDay(
+        hour: int.tryParse(fParts[0]) ?? 8,
+        minute: int.tryParse(fParts[1]) ?? 0,
+      );
+      _lastTime = TimeOfDay(
+        hour: int.tryParse(lParts[0]) ?? 22,
+        minute: int.tryParse(lParts[1]) ?? 0,
+      );
     });
   }
 
@@ -57,100 +63,214 @@ class _SetupPageState extends State<SetupPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7F6),
       appBar: AppBar(
-        backgroundColor: Colors.white, elevation: 0,
-        leading: IconButton(icon: const Icon(Icons.arrow_back_ios, size: 18), onPressed: () => Navigator.pop(context)),
-        title: const Text('≥]©w', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, size: 18),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Ë®≠ÂÆö',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
       ),
-      body: ListView(padding: const EdgeInsets.all(16), children: [
-        _SectionCard(title: '∞Ú•ª∏ÍÆ∆',
-          trailing: TextButton(onPressed: () => _showEditDialog(context),
-              child: const Text('ΩsøË', style: TextStyle(color: Color(0xFF1B5E20)))),
-          children: [
-            _InfoRow(label: '©m¶W', value: _nameCtrl.text.isEmpty ? '°X' : _nameCtrl.text),
-            _InfoRow(label: '¶~ƒ÷', value: '${_ageCtrl.text} ∑≥'),
-            _InfoRow(label: 'µ“ƒ÷', value: '${_yearsCtrl.text} ¶~'),
-            _InfoRow(label: '®C§È©‚µ“', value: '${_countCtrl.text} §‰'),
-          ]),
-        const SizedBox(height: 12),
-        _SectionCard(title: 'ßŸµ“≠pµe', children: [
-          _InfoRow(label: 'ßŸ¬_§—º∆', value: '${_days.round()} §—'),
-          _InfoRow(label: '≤ƒ§@§‰µ“', value: '$fh:$fm'),
-          _InfoRow(label: '≥Ã´·§@§‰', value: '$lh:$lm'),
-        ]),
-        const SizedBox(height: 12),
-        _ActionTile(icon: Icons.calendar_today_outlined, label: '¨d¨›ßŸµ“±∆µ{',
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SchedulePage()))),
-        const SizedBox(height: 8),
-        _ActionTile(icon: Icons.manage_search, label: '§∫Æe∫ﬁ≤z´·•x',
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ContentManagementPage()))),
-        const SizedBox(height: 24),
-        OutlinedButton(
-          style: OutlinedButton.styleFrom(minimumSize: const Size(double.infinity, 48),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _SectionCard(
+            title: 'Âü∫Êú¨Ë≥áÊñô',
+            trailing: TextButton(
+              onPressed: () => _showEditDialog(context),
+              child: const Text(
+                'Á∑®ËºØ',
+                style: TextStyle(color: Color(0xFF1B5E20)),
+              ),
+            ),
+            children: [
+              _InfoRow(
+                label: 'Êö±Á®±',
+                value: _nameCtrl.text.isEmpty ? 'ÁÑ°' : _nameCtrl.text,
+              ),
+              _InfoRow(label: 'Âπ¥ÈΩ°', value: '${_ageCtrl.text} Ê≠≤'),
+              _InfoRow(label: 'Ëè∏ÈΩ°', value: '${_yearsCtrl.text} Âπ¥'),
+              _InfoRow(label: 'ÊØèÊó•ÊäΩËè∏Èáè', value: '${_countCtrl.text} ÊîØ'),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _SectionCard(
+            title: 'ÊàíËè∏Ë®àÁï´',
+            children: [
+              _InfoRow(label: 'Ë®àÁï´Â§©Êï∏', value: '${_days.round()} Â§©'),
+              _InfoRow(label: 'Á¨¨‰∏ÄÊîØËè∏ÊôÇÈñì', value: '$fh:$fm'),
+              _InfoRow(label: 'ÊúÄÂæå‰∏ÄÊîØËè∏ÊôÇÈñì', value: '$lh:$lm'),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _ActionTile(
+            icon: Icons.calendar_today_outlined,
+            label: 'Êü•Ë©¢ÊàíËè∏Ë°åÁ®ã',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SchedulePage()),
+            ),
+          ),
+          const SizedBox(height: 8),
+          _ActionTile(
+            icon: Icons.manage_search,
+            label: 'ÂÖßÂÆπÁÆ°ÁêÜÂæåÂè∞',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ContentManagementPage()),
+            ),
+          ),
+          const SizedBox(height: 24),
+          OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(double.infinity, 48),
               side: const BorderSide(color: Colors.redAccent),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-          onPressed: () async {
-            final confirm = await showDialog<bool>(context: context,
-              builder: (_) => AlertDialog(title: const Text('ΩTª{µn•X'),
-                content: const Text('µn•X´·∏ÍÆ∆§¥´OØd¶b∂≥∫›°A§U¶∏µn§J•i´Ï¥_°C'),
-                actions: [
-                  TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('®˙Æ¯')),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-                    onPressed: () => Navigator.pop(context, true),
-                    child: const Text('µn•X', style: TextStyle(color: Colors.white))),
-                ]));
-            if (confirm == true && context.mounted) {
-              await UserService().signOut();
-              Navigator.pushAndRemoveUntil(context,
-                  MaterialPageRoute(builder: (_) => const LoginPage()), (_) => false);
-            }
-          },
-          child: const Text('µn•X', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold))),
-      ]),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onPressed: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: const Text('Á¢∫Ë™çÁôªÂá∫'),
+                  content: const Text('ÁôªÂá∫ÂæåË≥áÊñôÂ∞á‰øùÁïôÂú®Èõ≤Á´ØÔºå‰∏ãÊ¨°ÁôªÂÖ•Âç≥ÂèØÂêåÊ≠•Âõû‰æÜ„ÄÇ'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('ÂèñÊ∂à'),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.redAccent,
+                      ),
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text(
+                        'ÁôªÂá∫',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+              if (confirm == true && context.mounted) {
+                await UserService().signOut();
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                  (_) => false,
+                );
+              }
+            },
+            child: const Text(
+              'ÁôªÂá∫Â∏≥Ëôü',
+              style: TextStyle(
+                color: Colors.redAccent,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Future<void> _showEditDialog(BuildContext context) async {
-    await showDialog<void>(context: context,
-      builder: (ctx) => AlertDialog(title: const Text('ΩsøË∞Ú•ª∏ÍÆ∆'),
-        content: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
-          _dialogField(_nameCtrl, 'º ∫Ÿ'),
-          const SizedBox(height: 8),
-          _dialogField(_ageCtrl, '¶~ƒ÷', type: TextInputType.number),
-          const SizedBox(height: 8),
-          _dialogField(_yearsCtrl, 'µ“ƒ÷°]¶~°^', type: TextInputType.number),
-          const SizedBox(height: 8),
-          _dialogField(_countCtrl, '®C§È©‚µ“º∆', type: TextInputType.number),
-          const SizedBox(height: 16),
-          Row(children: [
-            Expanded(child: OutlinedButton.icon(
-              icon: const Icon(Icons.wb_sunny_outlined, size: 16),
-              label: Text('≤ƒ§@§‰\n${_firstTime.format(ctx)}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 11)),
-              onPressed: () async {
-                final p = await showTimePicker(context: ctx, initialTime: _firstTime);
-                if (p != null) setState(() => _firstTime = p);
-              })),
-            const SizedBox(width: 8),
-            Expanded(child: OutlinedButton.icon(
-              icon: const Icon(Icons.nightlight_outlined, size: 16),
-              label: Text('≥Ã´·§@§‰\n${_lastTime.format(ctx)}', textAlign: TextAlign.center, style: const TextStyle(fontSize: 11)),
-              onPressed: () async {
-                final p = await showTimePicker(context: ctx, initialTime: _lastTime);
-                if (p != null) setState(() => _lastTime = p);
-              })),
-          ]),
-          const SizedBox(height: 8),
-          StatefulBuilder(builder: (ctx2, setS) => Row(children: [
-            const Text('ßŸµ“§—º∆°G', style: TextStyle(fontSize: 13)),
-            Expanded(child: Slider(value: _days, min: 30, max: 360, divisions: 11, label: '${_days.round()} §—',
-              onChanged: (v) { setState(() => _days = v); setS(() {}); })),
-            Text('${_days.round()}§—', style: const TextStyle(fontSize: 12)),
-          ])),
-        ])),
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Á∑®ËºØÂü∫Êú¨Ë≥áÊñô'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _dialogField(_nameCtrl, 'Êö±Á®±'),
+              const SizedBox(height: 8),
+              _dialogField(_ageCtrl, 'Âπ¥ÈΩ°', type: TextInputType.number),
+              const SizedBox(height: 8),
+              _dialogField(_yearsCtrl, 'Ëè∏ÈΩ° (Âπ¥)', type: TextInputType.number),
+              const SizedBox(height: 8),
+              _dialogField(_countCtrl, 'ÊØèÊó•Âê∏Ëè∏ÊîØÊï∏', type: TextInputType.number),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.wb_sunny_outlined, size: 16),
+                      label: Text(
+                        'Á¨¨‰∏ÄÊîØËè∏\n${_firstTime.format(ctx)}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 11),
+                      ),
+                      onPressed: () async {
+                        final p = await showTimePicker(
+                          context: ctx,
+                          initialTime: _firstTime,
+                        );
+                        if (p != null) setState(() => _firstTime = p);
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.nightlight_outlined, size: 16),
+                      label: Text(
+                        'ÊúÄÂæå‰∏ÄÊîØËè∏\n${_lastTime.format(ctx)}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 11),
+                      ),
+                      onPressed: () async {
+                        final p = await showTimePicker(
+                          context: ctx,
+                          initialTime: _lastTime,
+                        );
+                        if (p != null) setState(() => _lastTime = p);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              StatefulBuilder(
+                builder: (ctx2, setS) => Row(
+                  children: [
+                    const Text('Ë®àÁï´Â§©Êï∏Ôºö', style: TextStyle(fontSize: 13)),
+                    Expanded(
+                      child: Slider(
+                        value: _days,
+                        min: 30,
+                        max: 360,
+                        divisions: 11,
+                        label: '${_days.round()} Â§©',
+                        onChanged: (v) {
+                          setState(() => _days = v);
+                          setS(() {});
+                        },
+                      ),
+                    ),
+                    Text(
+                      '${_days.round()}Â§©',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('®˙Æ¯')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('ÂèñÊ∂à'),
+          ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1B5E20)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1B5E20),
+            ),
             onPressed: () async {
               final name = _nameCtrl.text.trim();
               final count = int.tryParse(_countCtrl.text) ?? 5;
@@ -158,46 +278,55 @@ class _SetupPageState extends State<SetupPage> {
               final years = int.tryParse(_yearsCtrl.text) ?? 8;
               final fmtErr = UserService.validateNameFormat(name);
               if (fmtErr != null) {
-                ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text('?? $fmtErr'))); return;
+                ScaffoldMessenger.of(
+                  ctx,
+                ).showSnackBar(SnackBar(content: Text('Ê†ºÂºèÈåØË™§: $fmtErr')));
+                return;
               }
               final uid = UserService.currentUid;
               if (uid != null) {
                 final service = UserService();
-                final oldName = await StorageService.getUserName();
-                if (name != oldName) {
-                  final ok = await service.isNameAvailable(name, excludeUid: uid);
-                  if (!ok) {
-                    if (ctx.mounted) ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text('?? °u$name°v§w≥Q®œ•Œ')));
-                    return;
-                  }
-                  await service.reserveName(uid, name, oldName: oldName);
-                }
+                await StorageService.saveUserName(name);
+                await StorageService.saveDailyCount(count);
+                await StorageService.saveUserAge(age);
+                await StorageService.saveUserYears(years);
+                await StorageService.savePlanDurationDays(_days.round());
+                await service.saveProfile(uid, {
+                  'name': name,
+                  'daily_count': count,
+                  'user_age': age,
+                  'user_years': years,
+                  'plan_days': _days.round(),
+                  'first_smoke': '${_firstTime.hour}:${_firstTime.minute}',
+                  'last_smoke': '${_lastTime.hour}:${_lastTime.minute}',
+                });
               }
-              await StorageService.saveUserName(name);
-              await StorageService.saveDailyCount(count);
-              await StorageService.saveUserAge(age);
-              await StorageService.saveUserYears(years);
-              await StorageService.savePlanDurationDays(_days.round());
-              final fh2 = _firstTime.hour.toString().padLeft(2, '0');
-              final fm2 = _firstTime.minute.toString().padLeft(2, '0');
-              final lh2 = _lastTime.hour.toString().padLeft(2, '0');
-              final lm2 = _lastTime.minute.toString().padLeft(2, '0');
-              await StorageService.saveFirstSmokeTime('$fh2:$fm2');
-              await StorageService.saveLastSmokeTime('$lh2:$lm2');
-              if (uid != null) {
-                try { await UserService().saveProfile(uid, {'name': name, 'daily_count': count, 'user_age': age, 'user_years': years, 'first_smoke_time': '$fh2:$fm2', 'last_smoke_time': '$lh2:$lm2'}); } catch (_) {}
-              }
-              setState(() {});
               if (ctx.mounted) Navigator.pop(ctx);
             },
-            child: const Text('¿x¶s', style: TextStyle(color: Colors.white))),
-        ]));
+            child: const Text('ÂÑ≤Â≠ò', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
   }
 
-  Widget _dialogField(TextEditingController ctrl, String label, {TextInputType? type}) {
-    return TextField(controller: ctrl, keyboardType: type,
-        decoration: InputDecoration(labelText: label, border: const OutlineInputBorder(),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10)));
+  Widget _dialogField(
+    TextEditingController ctrl,
+    String label, {
+    TextInputType? type,
+  }) {
+    return TextField(
+      controller: ctrl,
+      keyboardType: type,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 10,
+        ),
+      ),
+    );
   }
 }
 
@@ -205,20 +334,39 @@ class _SectionCard extends StatelessWidget {
   final String title;
   final Widget? trailing;
   final List<Widget> children;
-  const _SectionCard({required this.title, this.trailing, required this.children});
-
+  const _SectionCard({
+    required this.title,
+    this.trailing,
+    required this.children,
+  });
   @override
   Widget build(BuildContext context) {
-    return Container(padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-          if (trailing != null) trailing!,
-        ]),
-        const Divider(height: 16),
-        ...children,
-      ]));
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                if (trailing != null) trailing!,
+              ],
+            ),
+            const Divider(),
+            ...children,
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -226,14 +374,21 @@ class _InfoRow extends StatelessWidget {
   final String label;
   final String value;
   const _InfoRow({required this.label, required this.value});
-
   @override
   Widget build(BuildContext context) {
-    return Padding(padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13)),
-        Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-      ]));
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+          Text(
+            value,
+            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -241,18 +396,25 @@ class _ActionTile extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
-  const _ActionTile({required this.icon, required this.label, required this.onTap});
-
+  const _ActionTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(onTap: onTap,
-      child: Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-        child: Row(children: [
-          Icon(icon, size: 20, color: const Color(0xFF1B5E20)),
-          const SizedBox(width: 12),
-          Expanded(child: Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500))),
-          const Icon(Icons.chevron_right, color: Colors.grey),
-        ])));
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        leading: Icon(icon, color: const Color(0xFF1B5E20)),
+        title: Text(label, style: const TextStyle(fontSize: 14)),
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          size: 14,
+          color: Colors.grey,
+        ),
+        onTap: onTap,
+      ),
+    );
   }
 }

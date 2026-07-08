@@ -24,7 +24,11 @@ class ContentServiceFirebase {
   Future<List<ContentItem>> _loadAssetItems(String category) async {
     final assetPath = _assetPaths[category];
     if (assetPath == null) return [];
-    final raw = await rootBundle.loadString(assetPath);
+
+    // 🔥 關鍵修正：改用 load 讀取二進位，再強制以 UTF-8 解碼，根除網頁版亂碼
+    final bytes = await rootBundle.load(assetPath);
+    final raw = utf8.decode(bytes.buffer.asUint8List());
+
     final List<dynamic> data = json.decode(raw);
     return data
         .whereType<Map<String, dynamic>>()
@@ -80,7 +84,9 @@ class ContentServiceFirebase {
       final qs = await FirebaseFirestore.instance
           .collection(_collection)
           .where('category', isEqualTo: category)
+          .limit(20) // 🌟 只加這行，確保不撈過量資料
           .get();
+
       return qs.docs
           .map((d) => ContentItem.fromJson(d.data()))
           .where(
