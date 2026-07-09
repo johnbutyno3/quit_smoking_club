@@ -17,6 +17,7 @@ void main() async {
   bool alreadySignedIn = false;
   bool introShown = await StorageService.getIntroShown();
 
+  // ignore_for_file: unused_local_variable, unused_import
   if (firebaseEnabled) {
     try {
       await Firebase.initializeApp(

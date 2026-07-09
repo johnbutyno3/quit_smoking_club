@@ -266,7 +266,7 @@ class _ForumPageState extends State<ForumPage> {
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
-            : _filteredPosts.isEmpty
+                : _posts.isEmpty
                 ? Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -281,31 +281,37 @@ class _ForumPageState extends State<ForumPage> {
                     ),
                   )
                 : ListView.builder(
-                                     padding: const EdgeInsets.all(16),
-                  itemCount: _filteredPosts.length,
-                  itemBuilder: (context, index) {
-                    final post = _filteredPosts[index];
-                    return GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () async {
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ForumDetailPage(
-                              post: post,
-                              currentCoins: _myCoins,
-                              currentUserName: post.name ?? '測試使用者',
-                            ),
-                          ),
-                        );
+                    padding: const EdgeInsets.all(16),
+                    itemCount: _filteredPosts.length, // 👈 改成用 _filteredPosts
+                    itemBuilder: (context, index) {
+                      final post =
+                          _filteredPosts[index]; // 👈 這裡也改成用 _filteredPosts
 
-                        if (result != null && result is int) {
-                          setState(() {
-                            _myCoins = result; 
-                          });
-                        }
-                      },
-                      child: Card(
+                      // 💡 原本只有 return Card(
+                      // 🛠️ 請直接手動改成在前面加上 GestureDetector 外殼：
+                      return GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () async {
+                          // 👈 這裡加上 async
+                          final result = await Navigator.push(
+                            // 👈 加上 await 接收結果
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ForumDetailPage(
+                                post: post,
+                                currentCoins: _myCoins,
+                                currentUserName: post.name ?? '測試使用者',
+                              ),
+                            ),
+                          );
+
+                          // 👈 精簡判斷式，把重複或矛盾的 null 判定拿掉，解決 Dead code 警告
+                          if (result != null && result is int) {
+                            setState(() {
+                              _myCoins = result; // 真正把內頁扣完的金幣同步更新回首頁
+                            });
+                          }
+                        },
 
                         child: Card(
                           color: _ForumColors.cardBg,
@@ -427,30 +433,30 @@ class _ForumPageState extends State<ForumPage> {
                                         foregroundColor: _ForumColors.gift,
                                       ),
                                       icon: const Icon(
-                                                     Icons.card_giftcard,
-              size: 18,
-            ), // Icon
-            label: Text(
-              '${post.gifts} 禮物',
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ), // TextStyle
-            ), // Text
-            onPressed: () => _handleSendGift(index),
-          ), // TextButton.icon
-        ], // Row
-      ), // Row
-    ], // Column
-  ), // Padding
-), // Card
+                                        Icons.card_giftcard,
+                                        size: 18,
+                                      ),
+                                      label: Text(
+                                        '${post.gifts} 禮物',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      onPressed: () => _handleSendGift(index),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
-    ),
-  
-                  ), // GestureDetector
-      }, // 這裡關閉 itemBuilder 的大括號
-    ), // 這裡關閉 ListView.builder 的小括號
-  ), // 這裡關閉 Expanded (或 Container) 的小括號
-); // 這裡關閉 Column (或 Scaffold) 的小括號與分號
-  } // 這裡關閉 Widget build(BuildContext context) 的大括號
-} // 這裡關閉 class _ForumPageState 的大括號
+    );
+  }
+}
