@@ -156,8 +156,12 @@ class _SetupPageState extends State<SetupPage> {
                   ],
                 ),
               );
-              if (confirm == true && context.mounted) {
+              if (confirm == true) {
                 await UserService().signOut();
+
+                // 必須在這裡加上檢查！如果等待結束後畫面已經不存在，就直接結束不執行導頁
+                if (!context.mounted) return;
+
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (_) => const LoginPage()),
@@ -358,7 +362,7 @@ class _SectionCard extends StatelessWidget {
                     fontSize: 14,
                   ),
                 ),
-                if (trailing != null) trailing!,
+                ?trailing,
               ],
             ),
             const Divider(),

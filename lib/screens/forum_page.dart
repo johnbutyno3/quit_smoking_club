@@ -300,7 +300,8 @@ class _ForumPageState extends State<ForumPage> {
                               builder: (context) => ForumDetailPage(
                                 post: post,
                                 currentCoins: _myCoins,
-                                currentUserName: post.name ?? '測試使用者',
+                                currentUserName: post.name,
+                                currentUid: UserService.currentUid,
                               ),
                             ),
                           );

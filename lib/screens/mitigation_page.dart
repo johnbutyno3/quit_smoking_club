@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import '../services/content_service.dart';
 import '../services/content_service_firebase.dart';
 import 'package:quit_smoking_club/firebase_config.dart';
+import 'game_hub_page.dart';
 
 class MitigationPage extends StatefulWidget {
   final String title;
@@ -209,6 +210,31 @@ class _MitigationPageState extends State<MitigationPage> {
         body: ListView(
           padding: const EdgeInsets.all(24),
           children: [
+            // 遊戲大廳：頂部加入內建 2048 快捷卡片
+            if (widget.title == 'Games') ...[
+              _BuiltInGameCard(
+                emoji: '🧩',
+                title: '2048',
+                subtitle: '滑動合併數字，挑戰 2048！離線可玩',
+                color: const Color(0xFFEDC22E),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const GameHubPage()),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Padding(
+                padding: EdgeInsets.only(bottom: 8),
+                child: Text(
+                  '🌐 線上遊戲推薦',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: Color(0xFFE65100),
+                  ),
+                ),
+              ),
+            ],
             Card(
               color: _MitigateColors.cardBg,
               elevation: 6,
@@ -357,6 +383,107 @@ class _MitigationPageState extends State<MitigationPage> {
               style: TextStyle(color: Colors.grey, fontSize: 11),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── 內建遊戲快捷卡片 ──────────────────────────────────────
+
+class _BuiltInGameCard extends StatelessWidget {
+  final String emoji;
+  final String title;
+  final String subtitle;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _BuiltInGameCard({
+    required this.emoji,
+    required this.title,
+    required this.subtitle,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      shadowColor: color.withAlpha(80),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              colors: [color.withAlpha(40), Colors.white],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: color.withAlpha(50),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: color.withAlpha(100), width: 1.5),
+                ),
+                child: Center(
+                  child: Text(emoji, style: const TextStyle(fontSize: 28)),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1B5E20).withAlpha(20),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text(
+                        '✅ 完全內建 · 離線可玩',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Color(0xFF1B5E20),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.arrow_forward_ios,
+                  size: 14, color: Colors.grey.shade400),
+            ],
+          ),
         ),
       ),
     );

@@ -9,6 +9,7 @@ import 'forum_page.dart';
 import 'shop_page.dart';
 import 'setup_page.dart';
 import 'mitigation_page.dart';
+import 'game_hub_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -630,6 +631,30 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 10),
+                  // 遊戲大廳獨立按鈕
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: const Color(0xFF1B5E20),
+                        side: const BorderSide(color: Color(0xFF4CAF50)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      icon: const Text('🎮', style: TextStyle(fontSize: 16)),
+                      label: const Text('遊戲大廳'),
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const GameHubPage(),
+                        ),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 28),
                   const Text(

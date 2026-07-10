@@ -57,7 +57,6 @@ class _SchedulePageState extends State<SchedulePage> {
   }
 
   List<_DayRow> get _rows {
-    final now = DateTime.now();
     int start, end;
     if (_viewMode == 0) {
       // 本週：以當天為中心，顯示 ±3 天 (共7天)

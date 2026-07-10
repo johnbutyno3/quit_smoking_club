@@ -25,7 +25,7 @@ class OnboardingSetupPage extends StatefulWidget {
 
 class _OC {
   static const primary = Color(0xFF1B5E20);
-  static const accent = Color(0xFF4CAF50);
+
   static const bg = Color(0xFFE8F5E9);
   static const cardBg = Colors.white;
 }

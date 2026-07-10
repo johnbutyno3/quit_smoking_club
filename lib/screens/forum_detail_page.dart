@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/forum_post.dart';
+import '../services/storage_service.dart';
+import '../services/user_service.dart';
 
 class ForumDetailPage extends StatefulWidget {
-  // 👈 2. 將 dynamic 改成妳們專案真實的物件類別名稱 ForumPost
   final ForumPost post;
   final int currentCoins;
   final String currentUserName;
+  final String? currentUid;
 
   const ForumDetailPage({
     super.key,
     required this.post,
     required this.currentCoins,
     required this.currentUserName,
+    this.currentUid,
   });
 
   @override
@@ -24,11 +27,28 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
 
   List<dynamic> _comments = [];
   bool _isLoadingComments = true;
+  late int _coins; // 本地追蹤金幣，避免每次都重讀
 
   @override
   void initState() {
     super.initState();
+    _coins = widget.currentCoins;
     _loadComments();
+  }
+
+  // 扣除 1 金幣並同步到本機與 Firebase
+  Future<void> _deductOneCoin() async {
+    final newCoins = (_coins - 1).clamp(0, 999999);
+    setState(() => _coins = newCoins);
+    await StorageService.saveCoins(newCoins);
+    final uid = widget.currentUid ?? UserService.currentUid;
+    if (uid != null) {
+      try {
+        await UserService().updateCoins(uid, newCoins);
+      } catch (e) {
+        debugPrint('扣幣同步 Firebase 失敗: $e');
+      }
+    }
   }
 
   // 核心：從 Firebase 撈取歷史留言
@@ -48,7 +68,7 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
       });
     } catch (e) {
       setState(() => _isLoadingComments = false);
-      print("撈取留言失敗: $e");
+      debugPrint("撈取留言失敗: $e");
     }
   }
 
@@ -88,7 +108,7 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                post.name ?? '匿名朋友',
+                                post.name,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 15,
@@ -109,7 +129,7 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
 
                       // 文章內文
                       Text(
-                        post.content ?? '',
+                        post.content,
                         style: const TextStyle(fontSize: 16, height: 1.5),
                       ),
                       const SizedBox(height: 24),
@@ -228,11 +248,10 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                     String commentText = _commentController.text.trim();
                     if (commentText.isEmpty) return;
 
-                    int userCoins = widget.currentCoins;
-
-                    if (userCoins >= 1) {
+                    if (_coins >= 1) {
                       try {
-                        // 1. 直接留言：正式寫入真實姓名與內容到 Firebase
+                        final messenger = ScaffoldMessenger.of(context);
+                        // 1. 寫入留言到 Firebase
                         await FirebaseFirestore.instance
                             .collection('forum_posts')
                             .doc(widget.post.id)
@@ -240,21 +259,23 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                             .add({
                               'content': commentText,
                               'created_at': DateTime.now().toIso8601String(),
-                              'userName': widget.currentUserName, // 使用真實登入名字
+                              'userName': widget.currentUserName,
                             });
 
-                        // 當下重拉 Firebase 資料，達成秒速重新整理
+                        // 2. 扣除 1 金幣並同步
+                        await _deductOneCoin();
+
                         _loadComments();
                         _commentController.clear();
 
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        messenger.showSnackBar(
                           const SnackBar(
-                            content: Text('💬 留言成功！'),
+                            content: Text('💬 留言成功！已扣除 1 金幣'),
                             backgroundColor: Colors.green,
                           ),
                         );
                       } catch (e) {
-                        print('❌ Firebase 儲存失敗: $e');
+                        debugPrint('❌ Firebase 儲存失敗: $e');
                       }
                     } else {
                       // 金幣不足跳出彈窗
@@ -296,7 +317,8 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                                 ),
                                 onPressed: () {
                                   Navigator.pop(dialogContext);
-                                  ScaffoldMessenger.of(context).showSnackBar(
+                                  final messenger = ScaffoldMessenger.of(context);
+                                  messenger.showSnackBar(
                                     const SnackBar(
                                       content: Text('🎬 廣告播放中...（請等待2秒）'),
                                       duration: Duration(seconds: 2),
@@ -324,16 +346,14 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                                         _loadComments();
                                         _commentController.clear();
 
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
+                                        messenger.showSnackBar(
                                           const SnackBar(
                                             content: Text('🎉 廣告觀看完成！留言已儲存'),
                                             backgroundColor: Colors.green,
                                           ),
                                         );
                                       } catch (e) {
-                                        print('廣告留言寫入失敗: $e');
+                                        debugPrint('廣告留言寫入失敗: $e');
                                       }
                                     },
                                   );
