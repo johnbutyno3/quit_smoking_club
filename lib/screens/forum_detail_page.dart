@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/forum_post.dart';
 
 class ForumDetailPage extends StatefulWidget {
-  final dynamic post;
+  // 👈 2. 將 dynamic 改成妳們專案真實的物件類別名稱 ForumPost
+  final ForumPost post;
   final int currentCoins;
-  final String currentUserName; // 👈 1. 加上這行，接收目前登入者的名字
+  final String currentUserName;
 
-  // 👈 2. 建構子改為這樣：
   const ForumDetailPage({
     super.key,
     required this.post,
@@ -33,22 +34,18 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
   // 核心：從 Firebase 撈取歷史留言
   Future<void> _loadComments() async {
     try {
-      if (widget.post.id != null) {
-        final snapshot = await FirebaseFirestore.instance
-            .collection('forum_posts')
-            .doc(widget.post.id)
-            .collection('comments')
-            .orderBy('created_at', descending: false)
-            .get();
+      final snapshot = await FirebaseFirestore.instance
+          .collection('forum_posts')
+          .doc(widget.post.id)
+          .collection('comments')
+          .orderBy('created_at', descending: false)
+          .get();
 
-        setState(() {
-          _comments = snapshot.docs.map((doc) => doc.data()).toList();
+      setState(() {
+        _comments = snapshot.docs.map((doc) => doc.data()).toList();
 
-          _isLoadingComments = false;
-        });
-      } else {
-        setState(() => _isLoadingComments = false);
-      }
+        _isLoadingComments = false;
+      });
     } catch (e) {
       setState(() => _isLoadingComments = false);
       print("撈取留言失敗: $e");
