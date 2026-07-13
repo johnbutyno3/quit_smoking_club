@@ -11,20 +11,104 @@ import 'package:flutter/services.dart';
 
 // 等級對照（value 1=腳踏車 … 14=太空飛船，value 用 2^n 表示）
 const _kLevels = [
-  _Level(value: 2,     emoji: '🚲', name: '腳踏車',   bg: Color(0xFFD4E8C2), fg: Color(0xFF3A5A1C)),
-  _Level(value: 4,     emoji: '🛵', name: '機車',     bg: Color(0xFFC8E6C9), fg: Color(0xFF2E7D32)),
-  _Level(value: 8,     emoji: '🚗', name: '汽車',     bg: Color(0xFFFFE082), fg: Color(0xFF5D4037)),
-  _Level(value: 16,    emoji: '🚚', name: '貨車',     bg: Color(0xFFFFCC80), fg: Color(0xFF4E342E)),
-  _Level(value: 32,    emoji: '🚛', name: '大卡車',   bg: Color(0xFFFFAB91), fg: Color(0xFF4E342E)),
-  _Level(value: 64,    emoji: '🚌', name: '遊覽車',   bg: Color(0xFFEF9A9A), fg: Color(0xFFFFFFFF)),
-  _Level(value: 128,   emoji: '🪖', name: '戰車',     bg: Color(0xFF80CBC4), fg: Color(0xFF004D40)),
-  _Level(value: 256,   emoji: '🪂', name: '滑翔機',   bg: Color(0xFF80DEEA), fg: Color(0xFF006064)),
-  _Level(value: 512,   emoji: '🚁', name: '直升機',   bg: Color(0xFF81D4FA), fg: Color(0xFF01579B)),
-  _Level(value: 1024,  emoji: '✈️',  name: '老飛機',   bg: Color(0xFF90CAF9), fg: Color(0xFF0D47A1)),
-  _Level(value: 2048,  emoji: '🛩️',  name: '戰機',    bg: Color(0xFFCE93D8), fg: Color(0xFF4A148C)),
-  _Level(value: 4096,  emoji: '🛫', name: '空中巴士', bg: Color(0xFFF48FB1), fg: Color(0xFF880E4F)),
-  _Level(value: 8192,  emoji: '🛸', name: '航空母艦', bg: Color(0xFFFFD54F), fg: Color(0xFF4E342E)),
-  _Level(value: 16384, emoji: '🚀', name: '太空飛船', bg: Color(0xFFFFD700), fg: Color(0xFF212121)),
+  _Level(
+    value: 2,
+    emoji: '🚲',
+    name: '腳踏車',
+    bg: Color(0xFFD4E8C2),
+    fg: Color(0xFF3A5A1C),
+  ),
+  _Level(
+    value: 4,
+    emoji: '🛵',
+    name: '機車',
+    bg: Color(0xFFC8E6C9),
+    fg: Color(0xFF2E7D32),
+  ),
+  _Level(
+    value: 8,
+    emoji: '🚗',
+    name: '汽車',
+    bg: Color(0xFFFFE082),
+    fg: Color(0xFF5D4037),
+  ),
+  _Level(
+    value: 16,
+    emoji: '🚚',
+    name: '貨車',
+    bg: Color(0xFFFFCC80),
+    fg: Color(0xFF4E342E),
+  ),
+  _Level(
+    value: 32,
+    emoji: '🚛',
+    name: '大卡車',
+    bg: Color(0xFFFFAB91),
+    fg: Color(0xFF4E342E),
+  ),
+  _Level(
+    value: 64,
+    emoji: '🚌',
+    name: '遊覽車',
+    bg: Color(0xFFEF9A9A),
+    fg: Color(0xFFFFFFFF),
+  ),
+  _Level(
+    value: 128,
+    emoji: '🪖',
+    name: '戰車',
+    bg: Color(0xFF80CBC4),
+    fg: Color(0xFF004D40),
+  ),
+  _Level(
+    value: 256,
+    emoji: '🪂',
+    name: '滑翔機',
+    bg: Color(0xFF80DEEA),
+    fg: Color(0xFF006064),
+  ),
+  _Level(
+    value: 512,
+    emoji: '🚁',
+    name: '直升機',
+    bg: Color(0xFF81D4FA),
+    fg: Color(0xFF01579B),
+  ),
+  _Level(
+    value: 1024,
+    emoji: '✈️',
+    name: '老飛機',
+    bg: Color(0xFF90CAF9),
+    fg: Color(0xFF0D47A1),
+  ),
+  _Level(
+    value: 2048,
+    emoji: '🛩️',
+    name: '戰機',
+    bg: Color(0xFFCE93D8),
+    fg: Color(0xFF4A148C),
+  ),
+  _Level(
+    value: 4096,
+    emoji: '🛫',
+    name: '空中巴士',
+    bg: Color(0xFFF48FB1),
+    fg: Color(0xFF880E4F),
+  ),
+  _Level(
+    value: 8192,
+    emoji: '🛸',
+    name: '航空母艦',
+    bg: Color(0xFFFFD54F),
+    fg: Color(0xFF4E342E),
+  ),
+  _Level(
+    value: 16384,
+    emoji: '🚀',
+    name: '太空飛船',
+    bg: Color(0xFFFFD700),
+    fg: Color(0xFF212121),
+  ),
 ];
 
 _Level? _levelOf(int value) {
@@ -81,16 +165,24 @@ class _Game2048PageState extends State<Game2048Page>
 
   @override
   void dispose() {
-    for (final c in _popControllers.values) { c.dispose(); }
-    for (final c in _mergeControllers.values) { c.dispose(); }
+    for (final c in _popControllers.values) {
+      c.dispose();
+    }
+    for (final c in _mergeControllers.values) {
+      c.dispose();
+    }
     super.dispose();
   }
 
   // ── 遊戲邏輯 ──────────────────────────────────────────
 
   void _newGame() {
-    for (final c in _popControllers.values) { c.dispose(); }
-    for (final c in _mergeControllers.values) { c.dispose(); }
+    for (final c in _popControllers.values) {
+      c.dispose();
+    }
+    for (final c in _mergeControllers.values) {
+      c.dispose();
+    }
     _popControllers.clear();
     _mergeControllers.clear();
     _board = List.generate(_size, (_) => List.filled(_size, null));
@@ -119,20 +211,33 @@ class _Game2048PageState extends State<Game2048Page>
   }
 
   void _triggerPop(String key) {
-    final ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 200));
+    final ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
     _popControllers[key] = ctrl;
-    ctrl.forward().then((_) { if (mounted) setState(() {}); });
+    ctrl.forward().then((_) {
+      if (mounted) setState(() {});
+    });
   }
 
   void _triggerMerge(String key) {
-    final ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 150));
+    final ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+    );
     _mergeControllers[key] = ctrl;
-    ctrl.forward(from: 0).then((_) { if (mounted) setState(() {}); });
+    ctrl.forward(from: 0).then((_) {
+      if (mounted) setState(() {});
+    });
   }
 
   bool _move(Direction dir) {
     bool moved = false;
-    final newBoard = List.generate(_size, (_) => List<_Tile?>.filled(_size, null));
+    final newBoard = List.generate(
+      _size,
+      (_) => List<_Tile?>.filled(_size, null),
+    );
 
     for (int i = 0; i < _size; i++) {
       final line = <_Tile>[];
@@ -145,7 +250,8 @@ class _Game2048PageState extends State<Game2048Page>
       while (idx < line.length) {
         if (idx + 1 < line.length && line[idx].value == line[idx + 1].value) {
           final newVal = line[idx].value * 2;
-          final newKey = '${i}_${merged.length}_${DateTime.now().microsecondsSinceEpoch}';
+          final newKey =
+              '${i}_${merged.length}_${DateTime.now().microsecondsSinceEpoch}';
           merged.add(_Tile(value: newVal, key: newKey, merged: true));
           _score += newVal;
           if (newVal == 2048 && !_continueAfterWin) _won = true;
@@ -175,19 +281,37 @@ class _Game2048PageState extends State<Game2048Page>
 
   _Tile? _getTile(Direction dir, int i, int j) {
     switch (dir) {
-      case Direction.left:  return _board[i][j];
-      case Direction.right: return _board[i][_size - 1 - j];
-      case Direction.up:    return _board[j][i];
-      case Direction.down:  return _board[_size - 1 - j][i];
+      case Direction.left:
+        return _board[i][j];
+      case Direction.right:
+        return _board[i][_size - 1 - j];
+      case Direction.up:
+        return _board[j][i];
+      case Direction.down:
+        return _board[_size - 1 - j][i];
     }
   }
 
-  void _setTile(List<List<_Tile?>> b, Direction dir, int i, int j, _Tile? tile) {
+  void _setTile(
+    List<List<_Tile?>> b,
+    Direction dir,
+    int i,
+    int j,
+    _Tile? tile,
+  ) {
     switch (dir) {
-      case Direction.left:  b[i][j] = tile; break;
-      case Direction.right: b[i][_size - 1 - j] = tile; break;
-      case Direction.up:    b[j][i] = tile; break;
-      case Direction.down:  b[_size - 1 - j][i] = tile; break;
+      case Direction.left:
+        b[i][j] = tile;
+        break;
+      case Direction.right:
+        b[i][_size - 1 - j] = tile;
+        break;
+      case Direction.up:
+        b[j][i] = tile;
+        break;
+      case Direction.down:
+        b[_size - 1 - j][i] = tile;
+        break;
     }
   }
 
@@ -195,8 +319,12 @@ class _Game2048PageState extends State<Game2048Page>
     for (int r = 0; r < _size; r++) {
       for (int c = 0; c < _size; c++) {
         if (_board[r][c] == null) return true;
-        if (r + 1 < _size && _board[r][c]!.value == _board[r + 1][c]!.value) { return true; }
-        if (c + 1 < _size && _board[r][c]!.value == _board[r][c + 1]!.value) { return true; }
+        if (r + 1 < _size && _board[r][c]!.value == _board[r + 1][c]!.value) {
+          return true;
+        }
+        if (c + 1 < _size && _board[r][c]!.value == _board[r][c + 1]!.value) {
+          return true;
+        }
       }
     }
     return false;
@@ -216,31 +344,47 @@ class _Game2048PageState extends State<Game2048Page>
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         backgroundColor: const Color(0xFFFAF8EF),
-        title: const Text('😢 遊戲結束', textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22)),
-        content: Text('最終分數：$_score', textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 16)),
+        title: const Text(
+          '😢 遊戲結束',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22),
+        ),
+        content: Text(
+          '最終分數：$_score',
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 16),
+        ),
         actionsAlignment: MainAxisAlignment.center,
         actions: [
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF8F7A66),
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             icon: const Icon(Icons.refresh),
             label: const Text('再玩一次'),
-            onPressed: () { Navigator.pop(ctx); setState(_newGame); },
+            onPressed: () {
+              Navigator.pop(ctx);
+              setState(_newGame);
+            },
           ),
           const SizedBox(width: 8),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
               foregroundColor: const Color(0xFF776E65),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             icon: const Icon(Icons.arrow_back),
             label: const Text('回上一頁'),
-            onPressed: () { Navigator.pop(ctx); Navigator.pop(context); },
+            onPressed: () {
+              Navigator.pop(ctx);
+              Navigator.pop(context);
+            },
           ),
         ],
       ),
@@ -254,18 +398,25 @@ class _Game2048PageState extends State<Game2048Page>
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         backgroundColor: const Color(0xFFFFF9C4),
-        title: const Text('🚀 你解鎖太空飛船！', textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20)),
-        content: Text('分數：$_score\n恭喜完成所有等級！繼續挑戰更高分？',
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14)),
+        title: const Text(
+          '🚀 你解鎖太空飛船！',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20),
+        ),
+        content: Text(
+          '分數：$_score\n恭喜完成所有等級！繼續挑戰更高分？',
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 14),
+        ),
         actionsAlignment: MainAxisAlignment.center,
         actions: [
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFEDC22E),
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             icon: const Text('🚀'),
             label: const Text('繼續挑戰'),
@@ -278,11 +429,16 @@ class _Game2048PageState extends State<Game2048Page>
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
               foregroundColor: const Color(0xFF776E65),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             icon: const Icon(Icons.refresh),
             label: const Text('重新開始'),
-            onPressed: () { Navigator.pop(ctx); setState(_newGame); },
+            onPressed: () {
+              Navigator.pop(ctx);
+              setState(_newGame);
+            },
           ),
         ],
       ),
@@ -353,10 +509,15 @@ class _Game2048PageState extends State<Game2048Page>
                       backgroundColor: const Color(0xFF8F7A66),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     icon: const Icon(Icons.refresh, size: 18),
-                    label: const Text('重新開始', style: TextStyle(fontWeight: FontWeight.bold)),
+                    label: const Text(
+                      '重新開始',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     onPressed: () => setState(_newGame),
                   ),
                 ),
@@ -367,10 +528,15 @@ class _Game2048PageState extends State<Game2048Page>
                       foregroundColor: const Color(0xFF776E65),
                       side: const BorderSide(color: Color(0xFF776E65)),
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-                    label: const Text('回上一頁', style: TextStyle(fontWeight: FontWeight.bold)),
+                    label: const Text(
+                      '回上一頁',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ),
@@ -437,10 +603,7 @@ class _Game2048PageState extends State<Game2048Page>
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _scoreBox('分數', _score),
-          _scoreBox('最高', _best),
-        ],
+        children: [_scoreBox('分數', _score), _scoreBox('最高', _best)],
       ),
     );
   }
@@ -454,8 +617,22 @@ class _Game2048PageState extends State<Game2048Page>
       ),
       child: Column(
         children: [
-          Text(label, style: const TextStyle(color: Color(0xFFEEE4DA), fontSize: 11, fontWeight: FontWeight.bold)),
-          Text('$value', style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFFEEE4DA),
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            '$value',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
         ],
       ),
     );
@@ -479,10 +656,15 @@ class _Game2048PageState extends State<Game2048Page>
         focusNode: FocusNode()..requestFocus(),
         onKeyEvent: (event) {
           if (event is KeyDownEvent) {
-            if (event.logicalKey == LogicalKeyboardKey.arrowLeft) { _handleSwipe(Direction.left); }
-            else if (event.logicalKey == LogicalKeyboardKey.arrowRight) { _handleSwipe(Direction.right); }
-            else if (event.logicalKey == LogicalKeyboardKey.arrowUp) { _handleSwipe(Direction.up); }
-            else if (event.logicalKey == LogicalKeyboardKey.arrowDown) { _handleSwipe(Direction.down); }
+            if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+              _handleSwipe(Direction.left);
+            } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+              _handleSwipe(Direction.right);
+            } else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+              _handleSwipe(Direction.up);
+            } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+              _handleSwipe(Direction.down);
+            }
           }
         },
         child: AspectRatio(
@@ -494,12 +676,7 @@ class _Game2048PageState extends State<Game2048Page>
               color: const Color(0xFFBBADA0),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Stack(
-              children: [
-                _buildEmptyGrid(),
-                _buildTiles(),
-              ],
-            ),
+            child: Stack(children: [_buildEmptyGrid(), _buildTiles()]),
           ),
         ),
       ),
@@ -508,65 +685,84 @@ class _Game2048PageState extends State<Game2048Page>
 
   Widget _buildEmptyGrid() {
     return GridView.builder(
+      shrinkWrap: true, // ✨ 加上這一行，強制 GridView 計算自身尺寸
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: _size, crossAxisSpacing: 8, mainAxisSpacing: 8,
+        crossAxisCount: _size,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
       ),
       itemCount: _size * _size,
       itemBuilder: (context, index) => Container(
-        decoration: BoxDecoration(color: const Color(0xFFCDC1B4), borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFCDC1B4),
+          borderRadius: BorderRadius.circular(8),
+        ),
       ),
     );
   }
 
   Widget _buildTiles() {
-    return LayoutBuilder(builder: (context, constraints) {
-      final gap = 8.0;
-      final cellSize = (constraints.maxWidth - gap * (_size + 1)) / _size;
-      final widgets = <Widget>[];
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final gap = 8.0;
+        final cellSize = (constraints.maxWidth - gap * (_size + 1)) / _size;
+        final widgets = <Widget>[];
 
-      for (int r = 0; r < _size; r++) {
-        for (int c = 0; c < _size; c++) {
-          final tile = _board[r][c];
-          if (tile == null) continue;
-          final left = gap + c * (cellSize + gap);
-          final top  = gap + r * (cellSize + gap);
-          final popCtrl   = _popControllers[tile.key];
-          final mergeCtrl = _mergeControllers[tile.key];
+        for (int r = 0; r < _size; r++) {
+          for (int c = 0; c < _size; c++) {
+            final tile = _board[r][c];
+            if (tile == null) continue;
 
-          Widget w = _buildTileWidget(tile, cellSize);
+            final left = gap + c * (cellSize + gap);
+            final top = gap + r * (cellSize + gap);
 
-          if (popCtrl != null) {
-            w = AnimatedBuilder(
-              animation: popCtrl,
-              builder: (_, child) => Transform.scale(
-                scale: Curves.elasticOut.transform(popCtrl.value),
-                child: child,
+            final popCtrl = _popControllers[tile.key];
+            final mergeCtrl = _mergeControllers[tile.key];
+
+            Widget w = _buildTileWidget(tile, cellSize);
+
+            if (popCtrl != null) {
+              w = AnimatedBuilder(
+                animation: popCtrl,
+                builder: (_, child) => Transform.scale(
+                  scale: Curves.elasticOut.transform(popCtrl.value),
+                  child: child,
+                ),
+                child: w,
+              );
+            } else if (mergeCtrl != null) {
+              w = AnimatedBuilder(
+                animation: mergeCtrl,
+                builder: (context, innerChild) {
+                  final t = mergeCtrl.value;
+                  final scale = t < 0.5
+                      ? 1.0 + t * 0.25
+                      : 1.25 - (t - 0.5) * 0.5;
+                  return Transform.scale(scale: scale, child: innerChild);
+                },
+                child: w,
+              );
+            }
+
+            // ✨ 核心修正：使用絕對不重複的複合式 Key 組合
+            // 加上方塊本身 ID、當前的橫縱座標、以及當前數值，確保在多步數或連鎖合併時 UI 不會隱形！
+            widgets.add(
+              AnimatedPositioned(
+                key: ValueKey('${tile.key}_r${r}_c${c}_v${tile.value}'),
+                duration: const Duration(milliseconds: 80),
+                left: left,
+                top: top,
+                width: cellSize,
+                height: cellSize,
+                child: w,
               ),
-              child: w,
-            );
-          } else if (mergeCtrl != null) {
-            w = AnimatedBuilder(
-              animation: mergeCtrl,
-              builder: (_, child) {
-                final t = mergeCtrl.value;
-                final scale = t < 0.5 ? 1.0 + t * 0.25 : 1.25 - (t - 0.5) * 0.5;
-                return Transform.scale(scale: scale, child: child);
-              },
-              child: w,
             );
           }
-
-          widgets.add(AnimatedPositioned(
-            key: ValueKey(tile.key),
-            duration: const Duration(milliseconds: 80),
-            left: left, top: top, width: cellSize, height: cellSize,
-            child: w,
-          ));
         }
-      }
-      return Stack(children: widgets);
-    });
+        return Stack(children: widgets);
+      },
+    );
   }
 
   Widget _buildTileWidget(_Tile tile, double size) {
@@ -574,22 +770,35 @@ class _Game2048PageState extends State<Game2048Page>
     final bg = lv?.bg ?? const Color(0xFF3C3A32);
     final fg = lv?.fg ?? Colors.white;
     final emoji = lv?.emoji ?? '❓';
-    final name  = lv?.name  ?? '${tile.value}';
+    final name = lv?.name ?? '${tile.value}';
 
     return Container(
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(10),
-        boxShadow: [BoxShadow(color: bg.withAlpha(140), blurRadius: 8, offset: const Offset(0, 3))],
+        boxShadow: [
+          BoxShadow(
+            color: bg.withAlpha(140),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(emoji, style: TextStyle(fontSize: size * 0.38)),
+          Text(
+            emoji,
+            style: TextStyle(fontSize: (size * 0.38).clamp(10.0, 100.0)),
+          ),
           const SizedBox(height: 2),
           Text(
             name,
-            style: TextStyle(color: fg, fontSize: size * 0.16, fontWeight: FontWeight.w800),
+            style: TextStyle(
+              color: fg,
+              fontSize: (size * 0.16).clamp(10.0, 100.0),
+              fontWeight: FontWeight.w800,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
