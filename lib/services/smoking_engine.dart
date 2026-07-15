@@ -5,8 +5,17 @@ class SmokingEngine {
 
   SmokingEngine(this.state);
 
-  int get totalSmoked => state.totalSmoked;
-  int get remaining => state.plannedCount - totalSmoked;
+  int get totalSmoked => state.smokeRecords.length;
+
+  int get remaining {
+    final value = state.plannedCount - totalSmoked;
+    return value > 0 ? value : 0;
+  }
+
+  int get overCount {
+    final value = totalSmoked - state.plannedCount;
+    return value > 0 ? value : 0;
+  }
 
   // 計算每一支菸的標準固定間隔 (分鐘)
   int get intervalMinutes {

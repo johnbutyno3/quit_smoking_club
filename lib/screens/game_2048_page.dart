@@ -695,7 +695,7 @@ class _Game2048PageState extends State<Game2048Page>
       itemCount: _size * _size,
       itemBuilder: (context, index) => Container(
         decoration: BoxDecoration(
-          color: const Color(0xFFFCDC1B4),
+          color: const Color.fromARGB(255, 209, 195, 180),
           borderRadius: BorderRadius.circular(8),
         ),
       ),

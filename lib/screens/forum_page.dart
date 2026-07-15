@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/forum_post.dart';
-import '../services/forum_service.dart';
+import '../repositories/forum_repository.dart';
 import '../services/storage_service.dart';
 import '../services/user_service.dart';
 import 'forum_detail_page.dart';
@@ -21,7 +21,7 @@ class _ForumColors {
 }
 
 class _ForumPageState extends State<ForumPage> {
-  final ForumService _forumService = ForumService();
+  final ForumRepository _forumRepository = ForumRepository();
   final List<ForumPost> _posts = [];
   bool _isLoading = true;
   int _myCoins = 0;
@@ -47,7 +47,7 @@ class _ForumPageState extends State<ForumPage> {
     });
 
     final coins = await StorageService.getCoins();
-    final posts = await _forumService.fetchPosts();
+    final posts = await _forumRepository.fetchPosts();
 
     setState(() {
       _myCoins = coins;
@@ -59,7 +59,7 @@ class _ForumPageState extends State<ForumPage> {
 
   Future<void> _handleLike(int index) async {
     final post = _posts[index];
-    await _forumService.likePost(post.id);
+    await _forumRepository.likePost(post.id);
     setState(() {
       _posts[index] = post.copyWith(likes: post.likes + 1);
     });
@@ -76,8 +76,7 @@ class _ForumPageState extends State<ForumPage> {
         } catch (_) {}
       }
       final post = _posts[index];
-      await _forumService.giftPost(post.id);
-
+      await _forumRepository.giftPost(post.id);
       setState(() {
         _myCoins = latestCoins;
         _posts[index] = post.copyWith(gifts: post.gifts + 1);
@@ -151,7 +150,7 @@ class _ForumPageState extends State<ForumPage> {
                   isSOS: false,
                 );
 
-                await _forumService.addPost(newPost);
+                await _forumRepository.addPost(newPost);
                 if (context.mounted) Navigator.pop(context);
                 await _loadForumData();
                 _showSnack('✅ 成功扣除 10 金幣，貼文已發佈！');
