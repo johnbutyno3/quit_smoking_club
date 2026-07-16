@@ -57,6 +57,18 @@ class StorageService {
     return prefs.getInt('user_years') ?? 8;
   }
 
+  // 💾 儲存每包香菸價格
+  static Future<void> saveCigarettePrice(int price) async {
+    final prefs = await _prefs;
+    await prefs.setInt('cigarette_price', price);
+  }
+
+  // 📡 讀取每包香菸價格
+  static Future<int> getCigarettePrice() async {
+    final prefs = await _prefs;
+    return prefs.getInt('cigarette_price') ?? 120;
+  }
+
   static Future<void> saveSmokeRecords(List<DateTime> records) async {
     final prefs = await _prefs;
     final todayKey = _formatDateKey(DateTime.now());

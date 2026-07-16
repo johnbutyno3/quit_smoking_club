@@ -16,6 +16,7 @@ class _SetupPageState extends State<SetupPage> {
   final _ageCtrl = TextEditingController();
   final _yearsCtrl = TextEditingController();
   final _countCtrl = TextEditingController();
+  final _priceCtrl = TextEditingController();
 
   double _days = 90.0;
   TimeOfDay _firstTime = const TimeOfDay(hour: 8, minute: 0);
@@ -27,9 +28,20 @@ class _SetupPageState extends State<SetupPage> {
     _loadStoredSettings();
   }
 
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _ageCtrl.dispose();
+    _yearsCtrl.dispose();
+    _countCtrl.dispose();
+    _priceCtrl.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadStoredSettings() async {
     final name = await StorageService.getUserName();
     final count = await StorageService.getDailyCount();
+    final price = await StorageService.getCigarettePrice();
     final age = await StorageService.getUserAge();
     final years = await StorageService.getUserYears();
     final firstTimeStr = await StorageService.getFirstSmokeTime();
@@ -40,6 +52,7 @@ class _SetupPageState extends State<SetupPage> {
     setState(() {
       _nameCtrl.text = name;
       _countCtrl.text = count.toString();
+      _priceCtrl.text = price.toString();
       _ageCtrl.text = age.toString();
       _yearsCtrl.text = years.toString();
       _days = durationDays.toDouble();
@@ -94,6 +107,7 @@ class _SetupPageState extends State<SetupPage> {
               _InfoRow(label: '年齡', value: '${_ageCtrl.text} 歲'),
               _InfoRow(label: '菸齡', value: '${_yearsCtrl.text} 年'),
               _InfoRow(label: '每日抽菸量', value: '${_countCtrl.text} 支'),
+              _InfoRow(label: '香菸單價', value: '${_priceCtrl.text} 元／包'),
             ],
           ),
           const SizedBox(height: 12),
@@ -198,6 +212,9 @@ class _SetupPageState extends State<SetupPage> {
               _dialogField(_yearsCtrl, '菸齡 (年)', type: TextInputType.number),
               const SizedBox(height: 8),
               _dialogField(_countCtrl, '每日吸菸支數', type: TextInputType.number),
+              const SizedBox(height: 8),
+
+              _dialogField(_priceCtrl, '香菸單價（每包）', type: TextInputType.number),
               const SizedBox(height: 16),
               Row(
                 children: [
@@ -278,6 +295,7 @@ class _SetupPageState extends State<SetupPage> {
             onPressed: () async {
               final name = _nameCtrl.text.trim();
               final count = int.tryParse(_countCtrl.text) ?? 5;
+              final price = int.tryParse(_priceCtrl.text) ?? 120;
               final age = int.tryParse(_ageCtrl.text) ?? 28;
               final years = int.tryParse(_yearsCtrl.text) ?? 8;
               final fmtErr = UserService.validateNameFormat(name);
@@ -292,15 +310,21 @@ class _SetupPageState extends State<SetupPage> {
                 final service = UserService();
                 await StorageService.saveUserName(name);
                 await StorageService.saveDailyCount(count);
+                await StorageService.saveCigarettePrice(price);
                 await StorageService.saveUserAge(age);
                 await StorageService.saveUserYears(years);
                 await StorageService.savePlanDurationDays(_days.round());
+                await StorageService.savePlanStartDate(
+                  DateTime.now().toIso8601String(),
+                );
                 await service.saveProfile(uid, {
                   'name': name,
                   'daily_count': count,
+                  'cigarette_price': price,
                   'user_age': age,
                   'user_years': years,
                   'plan_days': _days.round(),
+                  'plan_start_date': DateTime.now().toIso8601String(),
                   'first_smoke': '${_firstTime.hour}:${_firstTime.minute}',
                   'last_smoke': '${_lastTime.hour}:${_lastTime.minute}',
                 });

@@ -45,6 +45,7 @@ class _OnboardingSetupPageState extends State<OnboardingSetupPage> {
 
   // Step 3：排程
   final _countCtrl = TextEditingController(text: '10');
+  final _priceCtrl = TextEditingController(text: '120');
   TimeOfDay _firstTime = const TimeOfDay(hour: 8, minute: 0);
   TimeOfDay _lastTime = const TimeOfDay(hour: 22, minute: 0);
   double _months = 3;
@@ -62,6 +63,7 @@ class _OnboardingSetupPageState extends State<OnboardingSetupPage> {
     _ageCtrl.dispose();
     _yearsCtrl.dispose();
     _countCtrl.dispose();
+    _priceCtrl.dispose();
     super.dispose();
   }
 
@@ -130,6 +132,7 @@ class _OnboardingSetupPageState extends State<OnboardingSetupPage> {
     final age = int.tryParse(_ageCtrl.text) ?? 30;
     final years = int.tryParse(_yearsCtrl.text) ?? 5;
     final count = int.tryParse(_countCtrl.text) ?? 10;
+    final price = int.tryParse(_priceCtrl.text) ?? 120;
     final fh = _firstTime.hour.toString().padLeft(2, '0');
     final fm = _firstTime.minute.toString().padLeft(2, '0');
     final lh = _lastTime.hour.toString().padLeft(2, '0');
@@ -158,6 +161,7 @@ class _OnboardingSetupPageState extends State<OnboardingSetupPage> {
     await StorageService.saveUserAge(age);
     await StorageService.saveUserYears(years);
     await StorageService.saveDailyCount(count);
+    await StorageService.saveCigarettePrice(price);
     await StorageService.saveFirstSmokeTime('$fh:$fm');
     await StorageService.saveLastSmokeTime('$lh:$lm');
     await StorageService.saveCoins(20);
@@ -170,6 +174,7 @@ class _OnboardingSetupPageState extends State<OnboardingSetupPage> {
       'user_age': age,
       'user_years': years,
       'daily_count': count,
+      'cigarette_price': price,
       'first_smoke_time': '$fh:$fm',
       'last_smoke_time': '$lh:$lm',
       'coins': 20,
@@ -378,7 +383,20 @@ class _OnboardingSetupPageState extends State<OnboardingSetupPage> {
             ),
           ),
           const SizedBox(height: 16),
+          const SizedBox(height: 16),
 
+          TextField(
+            controller: _priceCtrl,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: '每包香菸價格',
+              hintText: '例如：120',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.payments_outlined),
+              suffixText: '元',
+              helperText: '用來計算每天、省下多少錢',
+            ),
+          ),
           // 抽菸時間窗口
           Row(
             children: [

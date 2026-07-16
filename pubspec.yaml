@@ -30,7 +30,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  flutter_localizations:
+    sdk: flutter
+  intl: any
   cupertino_icons: ^1.0.8
   shared_preferences: ^2.5.5
   url_launcher: ^6.1.12
@@ -56,6 +58,7 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   uses-material-design: true
+  generate: true
 
   assets:
     - assets/medical_links.json

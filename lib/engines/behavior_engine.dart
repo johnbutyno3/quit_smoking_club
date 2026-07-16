@@ -4,7 +4,7 @@ class BehaviorEngine {
   // 對齊最新動態引擎數據
   int calculateScore(SmokingEngine engine) {
     final smoked = engine.totalSmoked;
-    final planned = engine.state.plannedCount;
+    final planned = engine.todayPlannedCount;
     if (smoked <= planned) {
       return 100 - (smoked * 10);
     }

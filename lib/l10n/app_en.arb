@@ -1,0 +1,11 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "Quit Smoking Club",
+  "settings": "Settings",
+  "quitPlan": "Quit Plan",
+  "dailyCount": "Daily Cigarettes",
+  "cigarettePrice": "Cigarette Price",
+  "save": "Save",
+  "cancel": "Cancel"
+}

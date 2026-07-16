@@ -10,6 +10,8 @@ import 'shop_page.dart';
 import 'setup_page.dart';
 import 'mitigation_page.dart';
 import 'game_hub_page.dart';
+import '../l10n/app_localizations.dart';
+import '../models/smoking_plan.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -32,9 +34,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   bool _isLoaded = false;
   Timer? _timer;
   int _myCoins = 0;
+  int _cigarettePrice = 120;
 
-  final List<String> _messages = ["歡迎來到戒菸俱樂部！挑戰正在進行中。"];
-
+  final List<String> _messages = [];
   final List<String> _quotes = [
     "每少抽一支菸都是勝利，你正在奪回生命的掌控權！",
     "深呼吸！這口新鮮空氣比尼古丁更有力量！",
@@ -51,22 +53,35 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addObserver(this);
+
     final now = DateTime.now();
-    engine = SmokingEngine(
-      SmokingState(
-        startTime: DateTime(now.year, now.month, now.day, 8, 0),
-        endTime: DateTime(now.year, now.month, now.day, 22, 0),
-        plannedCount: 5,
-      ),
+
+    final state = SmokingState(
+      planStartDate: DateTime.now(),
+      startTime: DateTime(now.year, now.month, now.day, 8, 0),
+      endTime: DateTime(now.year, now.month, now.day, 22, 0),
+      plannedCount: 5,
     );
+
+    final plan = SmokingPlan(
+      startTime: state.startTime,
+      endTime: state.endTime,
+      plannedCount: state.plannedCount,
+    );
+
+    engine = SmokingEngine(state, plan);
 
     // 計時器每秒自動檢查是否該彈出提醒通知
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted || !_isLoaded) return;
+
       setState(() {});
+
       _checkCountdownUnlock();
     });
+
     _loadStoredData();
   }
 
@@ -81,6 +96,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final now = DateTime.now();
     final sCount = await StorageService.getDailyCount();
     final sName = await StorageService.getUserName();
+    final sPrice = await StorageService.getCigarettePrice();
+    final planStartDateStr = await StorageService.getPlanStartDate();
+
+    final planStartDate = planStartDateStr.isNotEmpty
+        ? DateTime.parse(planStartDateStr)
+        : now;
     var sCoins = await StorageService.getCoins();
     final storedRecords = await StorageService.getSmokeRecordsForToday();
     final firstTimeStr = await StorageService.getFirstSmokeTime();
@@ -116,10 +137,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     if (mounted) {
       setState(() {
         _messages
-          ..clear()
-          ..add("歡迎來到戒菸俱樂部！挑戰正在進行中。")
-          ..add("Hi, $sName!");
+          ..add(AppLocalizations.of(context)!.welcomeMessage)
+          ..add("${AppLocalizations.of(context)!.hello}, $sName!");
         final state = SmokingState(
+          planStartDate: planStartDate,
+
           startTime: DateTime(
             now.year,
             now.month,
@@ -127,13 +149,23 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             firstHour,
             firstMin,
           ),
+
           endTime: DateTime(now.year, now.month, now.day, lastHour, lastMin),
+
           plannedCount: sCount,
           smokeRecords: storedRecords,
           lastSmokeTime: storedRecords.isNotEmpty ? storedRecords.last : null,
         );
-        engine = SmokingEngine(state);
+
+        final plan = SmokingPlan(
+          startTime: state.startTime,
+          endTime: state.endTime,
+          plannedCount: sCount,
+        );
+
+        engine = SmokingEngine(state, plan);
         _myCoins = sCoins;
+        _cigarettePrice = sPrice;
         _isLoaded = true;
       });
     }
@@ -362,9 +394,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: const Text(
-              "戒菸俱樂部",
-              style: TextStyle(fontWeight: FontWeight.bold),
+            title: Text(
+              AppLocalizations.of(context)!.appTitle,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             backgroundColor: Colors.white.withAlpha(204),
             elevation: 0,
@@ -387,12 +419,19 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           // 💡 3.2.1 堆疊最上層：預留自訂頂部推播彈窗空間
           body: Stack(
             children: [
+              _buildQuitProgressCard(),
+
+              const SizedBox(height: 16),
               ListView(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
                   vertical: 16,
                 ),
                 children: [
+                  _buildQuitProgressCard(),
+
+                  const SizedBox(height: 16),
+
                   Card(
                     color: Colors.white.withAlpha(230),
                     elevation: 4,
@@ -480,6 +519,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 14),
+
+                  _buildStatCard("今日省下", "$todaySavedMoney 元", Colors.green),
                   const SizedBox(height: 20),
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -837,6 +879,42 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
+  Widget _buildQuitProgressCard() {
+    final currentDay =
+        DateTime.now().difference(engine.state.planStartDate).inDays + 1;
+
+    final totalDays = engine.plan.durationDays;
+
+    return Card(
+      color: Colors.white.withAlpha(230),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "戒菸進度",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+
+            const SizedBox(height: 8),
+
+            Text(
+              "Day $currentDay / $totalDays",
+              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+            ),
+
+            const SizedBox(height: 8),
+
+            Text("今日目標：${engine.todayPlannedCount} 支"),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildStatCard(String label, String value, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -878,11 +956,23 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   bool get canSmoke {
-    final now = DateTime.now();
-    if (engine.totalSmoked >= engine.state.plannedCount) return false;
-    final unlockTime = engine.nextUnlockTime;
-    if (unlockTime == null) return true;
-    return !now.isBefore(unlockTime);
+    if (engine.totalSmoked >= engine.state.plannedCount) {
+      return false;
+    }
+
+    return engine.availableSlots > engine.totalSmoked;
+  }
+
+  int get cigaretteUnitPrice {
+    return (_cigarettePrice / 20).round();
+  }
+
+  int get todaySavedMoney {
+    final savedCount = engine.todayPlannedCount - engine.totalSmoked;
+
+    if (savedCount <= 0) return 0;
+
+    return savedCount * cigaretteUnitPrice;
   }
 
   String get countdownString {

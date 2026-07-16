@@ -9,6 +9,7 @@ import 'services/content_service_firebase.dart';
 import 'services/storage_service.dart';
 import 'services/user_service.dart';
 import 'firebase_config.dart';
+import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -93,6 +94,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Quit Smoking Club',
       debugShowCheckedModeBanner: false,
+
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+
+      supportedLocales: AppLocalizations.supportedLocales,
 
       // 🎨 全局暗色系與質感風格設定
       theme: ThemeData(

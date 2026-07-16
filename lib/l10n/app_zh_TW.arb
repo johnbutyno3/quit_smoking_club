@@ -1,0 +1,23 @@
+{
+  "appTitle": "戒菸俱樂部",
+  
+  "settings": "設定",
+  "quitPlan": "戒菸計畫",
+  "welcomeMessage": "歡迎來到戒菸俱樂部！挑戰正在進行中。",
+  "hello": "你好",
+  "dailyCount": "每日抽菸量",
+  "cigarettePrice": "香菸單價",
+  "save": "儲存",
+  "cancel": "取消",
+
+  "forum": "交流論壇",
+  "shop": "金幣商城",
+  "gameHub": "遊戲大廳",
+  "recordSmoke": "記錄抽菸",
+  "locked": "尚未解鎖",
+  "sos": "SOS 求協助",
+  "smokedCount": "已抽支數",
+  "remaining": "剩餘額度",
+  "countdown": "距離下一次解鎖抽菸倒數",
+  "todaySchedule": "控菸今日排程表"
+}
