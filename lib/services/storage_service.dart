@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/smoking_plan.dart';
 
 class StorageService {
   static final Future<SharedPreferences> _prefsInstance =
@@ -193,5 +194,51 @@ class StorageService {
   static Future<bool> getIntroShown() async {
     final prefs = await _prefs;
     return prefs.getBool('intro_shown') ?? false;
+  }
+
+  static Future<void> saveSmokingPlan(SmokingPlan plan) async {
+    await saveDailyCount(plan.plannedCount);
+    await savePlanDurationDays(plan.durationDays);
+
+    final start =
+        "${plan.startTime.hour.toString().padLeft(2, '0')}:${plan.startTime.minute.toString().padLeft(2, '0')}";
+
+    final end =
+        "${plan.endTime.hour.toString().padLeft(2, '0')}:${plan.endTime.minute.toString().padLeft(2, '0')}";
+
+    await saveFirstSmokeTime(start);
+    await saveLastSmokeTime(end);
+  }
+
+  static Future<SmokingPlan> loadSmokingPlan() async {
+    final daily = await getDailyCount();
+    final days = await getPlanDurationDays();
+
+    final first = await getFirstSmokeTime();
+    final last = await getLastSmokeTime();
+
+    final now = DateTime.now();
+
+    final firstParts = first.split(':');
+    final lastParts = last.split(':');
+
+    return SmokingPlan(
+      startTime: DateTime(
+        now.year,
+        now.month,
+        now.day,
+        int.parse(firstParts[0]),
+        int.parse(firstParts[1]),
+      ),
+      endTime: DateTime(
+        now.year,
+        now.month,
+        now.day,
+        int.parse(lastParts[0]),
+        int.parse(lastParts[1]),
+      ),
+      plannedCount: daily,
+      durationDays: days,
+    );
   }
 }

@@ -56,6 +56,31 @@ class SmokingState {
     );
   }
 
+  SmokingState updatePlan({
+    required DateTime newStartTime,
+    required DateTime newEndTime,
+    required int newPlannedCount,
+    required DateTime newPlanStartDate,
+  }) {
+    return SmokingState(
+      planStartDate: newPlanStartDate,
+
+      startTime: newStartTime,
+
+      endTime: newEndTime,
+
+      plannedCount: newPlannedCount,
+
+      smokeRecords: const [],
+
+      unlockTimes: const [],
+
+      currentIndex: 0,
+
+      lastSmokeTime: null,
+    );
+  }
+
   int get totalSmoked => smokeRecords.length;
 
   bool get finished => totalSmoked >= plannedCount;

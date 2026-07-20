@@ -12,6 +12,10 @@ import 'mitigation_page.dart';
 import 'game_hub_page.dart';
 import '../l10n/app_localizations.dart';
 import '../models/smoking_plan.dart';
+import '../services/recovery_engine.dart';
+import '../services/achievement_engine.dart';
+import '../widgets/achievement_card.dart';
+import '../pages/quit_plan_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -31,6 +35,8 @@ class _ThemeColors {
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   late SmokingEngine engine;
+  late AchievementEngine achievement;
+  late RecoveryEngine recovery;
   bool _isLoaded = false;
   Timer? _timer;
   int _myCoins = 0;
@@ -72,7 +78,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
 
     engine = SmokingEngine(state, plan);
-
+    recovery = RecoveryEngine(state);
+    achievement = AchievementEngine(smoking: engine, recovery: recovery);
     // 計時器每秒自動檢查是否該彈出提醒通知
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted || !_isLoaded) return;
@@ -116,7 +123,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final isPremium = await StorageService.getPremium();
     final lastDate = await StorageService.getLastResetDate();
     final todayStr = "${now.year}-${now.month}-${now.day}";
-
     if (lastDate != todayStr) {
       final reward = isPremium ? 100 : 20;
       sCoins += reward;
@@ -164,6 +170,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         );
 
         engine = SmokingEngine(state, plan);
+        recovery = RecoveryEngine(state);
+        achievement = AchievementEngine(smoking: engine, recovery: recovery);
         _myCoins = sCoins;
         _cigarettePrice = sPrice;
         _isLoaded = true;
@@ -307,16 +315,77 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       "5. 遊戲大廳 (內建小遊戲)",
                       "Games",
                     ),
+
+                    // ===== 在這裡貼戒菸計畫 =====
                     Card(
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
+
+                      child: ListTile(
+                        dense: true,
+
+                        leading: const Icon(
+                          Icons.event_note,
+                          color: Colors.green,
+                        ),
+
+                        title: const Text(
+                          "6. 戒菸計畫",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 12),
+
+                        onTap: () async {
+                          Navigator.pop(context);
+
+                          final newPlan = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const QuitPlanPage(),
+                            ),
+                          );
+
+                          if (newPlan != null && newPlan is SmokingPlan) {
+                            final newState = SmokingState(
+                              planStartDate: DateTime.now(),
+                              startTime: newPlan.startTime,
+                              endTime: newPlan.endTime,
+                              plannedCount: newPlan.plannedCount,
+                            );
+
+                            setState(() {
+                              engine = SmokingEngine(newState, newPlan);
+
+                              recovery = RecoveryEngine(newState);
+
+                              achievement = AchievementEngine(
+                                smoking: engine,
+                                recovery: recovery,
+                              );
+                            });
+                          }
+                        },
+                      ),
+                    ),
+
+                    // ===== 原本論壇 Card 從這裡開始 =====
+                    Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+
                       child: ListTile(
                         dense: true,
                         leading: const Icon(Icons.forum, color: Colors.blue),
                         title: const Text(
-                          "6. 前往論壇大廳",
+                          "7. 前往論壇大廳",
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
@@ -325,10 +394,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         trailing: const Icon(Icons.arrow_forward_ios, size: 12),
                         onTap: () {
                           Navigator.pop(context);
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const ForumPage(),
+                              builder: (_) => const ForumPage(),
                             ),
                           );
                         },
@@ -522,6 +592,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   const SizedBox(height: 14),
 
                   _buildStatCard("今日省下", "$todaySavedMoney 元", Colors.green),
+                  const SizedBox(height: 20),
+
+                  AchievementCard(achievement: achievement),
                   const SizedBox(height: 20),
                   Container(
                     padding: const EdgeInsets.symmetric(

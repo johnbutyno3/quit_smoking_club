@@ -15,6 +15,20 @@ class PlanGenerator {
   const PlanGenerator(this.plan);
 
   /// 產生整個戒菸計畫
+  List<DailyPlan> generateQuitPlan(int startCount, int days) {
+    final result = <DailyPlan>[];
+
+    for (int day = 1; day <= days; day++) {
+      final progress = (day - 1) / (days - 1);
+
+      final count = (startCount * (1 - progress)).round();
+
+      result.add(DailyPlan(day: day, plannedCount: count));
+    }
+
+    return result;
+  }
+
   List<DailyPlan> generate() {
     final List<DailyPlan> plans = [];
 
