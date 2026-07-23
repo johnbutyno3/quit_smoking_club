@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/storage_service.dart';
 import '../services/user_service.dart';
+import '../services/coin_service.dart';
 
 class ShopPage extends StatefulWidget {
   const ShopPage({super.key});
@@ -8,6 +9,8 @@ class ShopPage extends StatefulWidget {
   @override
   State<ShopPage> createState() => _ShopPageState();
 }
+
+final CoinService coinService = CoinService();
 
 // 🎨 商城奢華美工色彩：引入 VIP 黑金與寶箱亮橘
 class _ShopColors {
@@ -21,7 +24,7 @@ class _ShopColors {
 class _ShopPageState extends State<ShopPage> {
   int _myCoins = 0;
   bool _isPremiumUser = false;
-
+  final CoinService coinService = CoinService();
   @override
   void initState() {
     super.initState();
@@ -38,15 +41,20 @@ class _ShopPageState extends State<ShopPage> {
   }
 
   Future<void> _buyCoins(int amount) async {
-    final current = await StorageService.getCoins();
-    final latest = current + amount;
-    await StorageService.saveCoins(latest);
+    await coinService.loadBalance();
+
+    await coinService.addCoin(amount, '購買 COIN');
+
+    final latest = coinService.balance;
+
     final uid = UserService.currentUid;
+
     if (uid != null) {
       try {
         await UserService().updateCoins(uid, latest);
       } catch (_) {}
     }
+
     setState(() {
       _myCoins = latest;
     });
@@ -61,8 +69,8 @@ class _ShopPageState extends State<ShopPage> {
   }
 
   Future<void> _createForum() async {
-    if (_myCoins >= 50) {
-      final latest = _myCoins - 50;
+    if (_myCoins >= 30) {
+      final latest = _myCoins - 30;
       await StorageService.saveCoins(latest);
       final uid = UserService.currentUid;
       if (uid != null) {
@@ -73,7 +81,7 @@ class _ShopPageState extends State<ShopPage> {
       setState(() {
         _myCoins = latest;
       });
-      _showMsg("成功扣除 50 金幣，送交管理員審核！");
+      _showMsg("成功扣除 30 金幣，送交管理員審核！");
     } else {
       _showMsg("❌ 金幣不足！請購買金幣包！");
     }

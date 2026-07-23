@@ -1,3 +1,5 @@
+import '../engines/reward_engine.dart';
+import '../services/coin_service.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -16,6 +18,7 @@ import '../services/recovery_engine.dart';
 import '../services/achievement_engine.dart';
 import '../widgets/achievement_card.dart';
 import '../pages/quit_plan_page.dart';
+import '../pages/coin_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -34,7 +37,9 @@ class _ThemeColors {
 }
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
+  final CoinService coinService = CoinService();
   late SmokingEngine engine;
+  late RewardEngine rewardEngine;
   late AchievementEngine achievement;
   late RecoveryEngine recovery;
   bool _isLoaded = false;
@@ -59,7 +64,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-
+    coinService.claimDailyLogin();
     WidgetsBinding.instance.addObserver(this);
 
     final now = DateTime.now();
@@ -236,13 +241,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     setState(() {
       engine.state = engine.state.addSmoke(now);
-      _messages.add(
-        "Recorded smoke at "
-        "${now.hour.toString().padLeft(2, '0')}:"
-        "${now.minute.toString().padLeft(2, '0')}.",
-      );
     });
-
+    if (engine.remaining == 0) {
+      coinService.claimDailyPlanReward();
+    }
     await StorageService.saveSmokeRecords(engine.state.smokeRecords);
   }
 
@@ -471,6 +473,28 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             backgroundColor: Colors.white.withAlpha(204),
             elevation: 0,
             actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Center(
+                  child: Text(
+                    '🪙 ${coinService.balance}',
+                    style: const TextStyle(
+                      color: _ThemeColors.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.monetization_on, color: Colors.amber),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CoinPage()),
+                  );
+                },
+              ),
               IconButton(
                 icon: const Icon(
                   Icons.settings_outlined,

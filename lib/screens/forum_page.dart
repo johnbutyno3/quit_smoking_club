@@ -4,6 +4,7 @@ import '../repositories/forum_repository.dart';
 import '../services/storage_service.dart';
 import '../services/user_service.dart';
 import 'forum_detail_page.dart';
+import '../services/coin_service.dart';
 
 class ForumPage extends StatefulWidget {
   const ForumPage({super.key});
@@ -22,6 +23,7 @@ class _ForumColors {
 
 class _ForumPageState extends State<ForumPage> {
   final ForumRepository _forumRepository = ForumRepository();
+  final CoinService coinService = CoinService();
   final List<ForumPost> _posts = [];
   bool _isLoading = true;
   int _myCoins = 0;
@@ -125,21 +127,31 @@ class _ForumPageState extends State<ForumPage> {
                 if (content.isEmpty) {
                   return;
                 }
+                if (!coinService.canSpend(30)) {
+                  if (!coinService.canSpend(30)) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('COIN不足，請前往商城購買 COIN')),
+                    );
 
-                if (_myCoins < 20) {
-                  Navigator.pop(context);
-                  _showSnack('❌ 金幣不足，創建貼文需要 20 金幣。');
+                    return;
+                  }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('COIN不足，請前往商城購買 COIN')),
+                  );
+
                   return;
                 }
 
-                final latestCoins = _myCoins - 20;
-                await StorageService.saveCoins(latestCoins);
-                final uid = UserService.currentUid;
-                if (uid != null) {
-                  try {
-                    await UserService().updateCoins(uid, latestCoins);
-                  } catch (_) {}
+                if (!await coinService.spendCoin(30, '發表貼文')) {
+                  return;
                 }
+                final latestCoins = await StorageService.getCoins();
+
+                if (!mounted) return;
+
+                setState(() {
+                  _myCoins = latestCoins;
+                });
                 final newPost = ForumPost(
                   id: '',
                   name: name,
@@ -149,11 +161,10 @@ class _ForumPageState extends State<ForumPage> {
                   gifts: 0,
                   isSOS: false,
                 );
-
                 await _forumRepository.addPost(newPost);
                 if (context.mounted) Navigator.pop(context);
                 await _loadForumData();
-                _showSnack('✅ 成功扣除 10 金幣，貼文已發佈！');
+                _showSnack('✅ 成功扣除 1 金幣，貼文已發佈！');
               },
               child: const Text('發佈'),
             ),

@@ -27,7 +27,13 @@ void main() async {
       await ContentServiceFirebase().seedSampleContent();
       firebaseOk = true;
 
-      final currentUser = FirebaseAuth.instance.currentUser;
+      User? currentUser = FirebaseAuth.instance.currentUser;
+
+      if (currentUser == null) {
+        final credential = await FirebaseAuth.instance.signInAnonymously();
+
+        currentUser = credential.user;
+      }
       if (currentUser != null) {
         UserService.currentUid = currentUser.uid;
         final service = UserService();
