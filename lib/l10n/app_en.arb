@@ -2,10 +2,81 @@
   "@@locale": "en",
 
   "appTitle": "Quit Smoking Club",
+
   "settings": "Settings",
   "quitPlan": "Quit Plan",
+  "welcomeMessage": "Welcome to Quit Smoking Club! Your challenge is underway.",
+  "hello": "Hello",
+
   "dailyCount": "Daily Cigarettes",
   "cigarettePrice": "Cigarette Price",
   "save": "Save",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+
+  "forum": "Community Forum",
+  "shop": "Coin Shop",
+  "gameHub": "Game Center",
+
+  "recordSmoke": "Record Smoking",
+  "locked": "Locked",
+  "sos": "SOS Help",
+
+  "smokedCount": "Smoked",
+  "remaining": "Remaining",
+  "countdown": "Countdown to next unlock",
+  "todaySchedule": "Today's Smoking Schedule",
+
+  "createPost": "Create Post",
+  "postName": "Nickname",
+  "postContent": "Post Content",
+  "publish": "Publish",
+  "myCoins": "My COIN",
+
+  "giftSent": "Gift sent successfully",
+  "insufficientCoins": "Insufficient COIN",
+
+  "postCreated": "Post created successfully",
+
+  "anonymousUser": "Anonymous Friend",
+
+  "like": "Like",
+  "gift": "Gift",
+
+  "now": "Just now",
+  "minutesAgo": "{count} minutes ago",
+  "hoursAgo": "{count} hours ago",
+  "daysAgo": "{count} days ago",
+
+  "emptyForum": "No posts yet. Create the first one!",
+
+  "sosPost": "Help Request",
+
+  "coinHistory": "COIN History",
+  "currentBalance": "Current Balance",
+  "noTransactionHistory": "No transaction history",
+
+  "purchaseSuccess": "Purchase successful",
+  "premiumActivated": "Premium membership activated",
+
+  "achievementDay1Title": "First Day",
+  "achievementDay1Description": "Start your quitting journey",
+
+  "achievementDay7Title": "One Week Completed",
+  "achievementDay7Description": "Quit smoking for 7 days",
+
+  "achievementDay30Title": "One Month Completed",
+  "achievementDay30Description": "Quit smoking for 30 days",
+
+  "achievementMoney1000Title": "Saved 1000",
+  "achievementMoney1000Description": "Saved 1000 in smoking costs",
+
+  "achievementRecoveryTitle": "Health Recovery",
+  "achievementRecoveryDescription": "Completed the first recovery milestone",
+  "achievementDay7Progress": "7-day quit goal not completed yet",
+   "achievementDay7Progress": "7-day quit goal is not completed yet",
+  "achievementDay30Progress": "30-day quit goal is not completed yet",
+  "achievementMoney1000Progress": "1000 savings goal is not completed yet",
+  "achievementRecoveryProgress": "Recovery milestone is not completed yet",
+  "todayAchievement": "Today's Achievements",
+"achievementCompleted": "Completed {completed} / {total}"
 }

@@ -1,0 +1,112 @@
+﻿列出磁碟區 OS 的資料夾 PATH
+磁碟區序號為 00000227 6ECD:6EE1
+C:\USERS\USER\QUIT_SMOKING_CLUB\LIB
+│  app.dart
+│  firebase_config.dart
+│  firebase_options.dart
+│  main.dart
+│  
+├─config
+│      app_constants.dart
+│      coin_config.dart
+│      firebase_paths.dart
+│      forum_config.dart
+│      reward_config.dart
+│      
+├─controllers
+├─core
+│  │  dialog_service.dart
+│  │  loading_service.dart
+│  │  snackbar_service.dart
+│  │  
+│  ├─constants
+│  ├─router
+│  ├─theme
+│  └─utils
+├─datasources
+├─engines
+│      behavior_engine.dart
+│      intervention_engine.dart
+│      reward_engine.dart
+│      score_engine.dart
+│      social_engine.dart
+│      
+├─l10n
+│      app_en.arb
+│      app_localizations.dart
+│      app_localizations_en.dart
+│      app_localizations_zh.dart
+│      app_zh.arb
+│      app_zh_TW.arb
+│      
+├─models
+│  │  coin_transaction.dart
+│  │  forum_post.dart
+│  │  quit_plan_result.dart
+│  │  smoking_log.dart
+│  │  smoking_plan.dart
+│  │  smoking_state.dart
+│  │  
+│  ├─ai
+│  ├─coin
+│  ├─forum
+│  ├─health
+│  ├─membership
+│  ├─shop
+│  ├─smoking
+│  └─user
+├─pages
+│      coin_page.dart
+│      quit_plan_page.dart
+│      
+├─repositories
+│  │  content_repository.dart
+│  │  forum_repository.dart
+│  │  smoking_repository.dart
+│  │  user_repository.dart
+│  │  
+│  └─coin
+│          coin_repository.dart
+│          
+├─screens
+│      content_management_page.dart
+│      forum_detail_page.dart
+│      forum_page.dart
+│      game_2048_page.dart
+│      game_hub_page.dart
+│      home_page.dart
+│      intro_page.dart
+│      login_page.dart
+│      mitigation_page.dart
+│      onboarding_page.dart
+│      onboarding_setup_page.dart
+│      schedule_page.dart
+│      setup_page.dart
+│      shop_page.dart
+│      
+├─services
+│  │  achievement_engine.dart
+│  │  coin_service.dart
+│  │  content_service.dart
+│  │  content_service_firebase.dart
+│  │  forum_service.dart
+│  │  plan_generator.dart
+│  │  recovery_engine.dart
+│  │  smoking_engine.dart
+│  │  storage_service.dart
+│  │  user_service.dart
+│  │  
+│  ├─auth
+│  ├─coin
+│  ├─forum
+│  ├─health
+│  └─smoking
+├─usecases
+│  └─coin
+│          get_coin_balance_usecase.dart
+│          spend_coin_usecase.dart
+│          
+└─widgets
+        achievement_card.dart
+        hero_card.dart
+        

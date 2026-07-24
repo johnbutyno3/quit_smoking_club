@@ -20,6 +20,10 @@ class CoinService {
 
   Future<void> loadBalance() async {
     _balance = await StorageService.getCoins();
+
+    _history
+      ..clear()
+      ..addAll(await StorageService.getCoinHistory());
   }
 
   Future<void> addCoin(int amount, String reason) async {
@@ -39,6 +43,7 @@ class CoinService {
         createdAt: DateTime.now(),
       ),
     );
+    await StorageService.saveCoinHistory(_history);
   }
 
   Future<bool> canSpend(int amount) async {
@@ -47,12 +52,12 @@ class CoinService {
   }
 
   Future<bool> claimDailyLogin() async {
-    await addCoin(10, '每日登入');
+    await addCoin(10, 'daily_login');
     return true;
   }
 
   Future<bool> claimDailyPlanReward() async {
-    await addCoin(20, '完成每日戒菸計畫');
+    await addCoin(20, 'daily_plan_reward');
     return true;
   }
 
@@ -77,12 +82,12 @@ class CoinService {
         createdAt: DateTime.now(),
       ),
     );
-
+    await StorageService.saveCoinHistory(_history);
     return true;
   }
 
   Future<bool> spendForPost() async {
-    return spendCoin(30, '建立論壇貼文');
+    return spendCoin(30, 'forum_create_post');
   }
 
   void clear() {

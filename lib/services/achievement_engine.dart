@@ -1,19 +1,27 @@
 import 'recovery_engine.dart';
 import 'smoking_engine.dart';
+import 'coin_service.dart';
+import 'storage_service.dart';
 
 class Achievement {
   final String id;
-  final String title;
-  final String description;
+
+  final String titleKey;
+
+  final String descriptionKey;
+
   final String icon;
+
   final bool unlocked;
 
+  final String? progressKey;
   const Achievement({
     required this.id,
-    required this.title,
-    required this.description,
+    required this.titleKey,
+    required this.descriptionKey,
     required this.icon,
     required this.unlocked,
+    this.progressKey,
   });
 }
 
@@ -25,42 +33,55 @@ class AchievementEngine {
 
   int get quitDays =>
       DateTime.now().difference(smoking.state.planStartDate).inDays + 1;
+  int get savedMoney {
+    final days = quitDays;
+
+    final daily = smoking.state.plannedCount;
+
+    return days * daily * 10;
+  }
 
   List<Achievement> get achievements => [
     Achievement(
       id: "day1",
-      title: "第一天",
-      description: "開始戒菸旅程",
+      titleKey: "achievementDay1Title",
+      descriptionKey: "achievementDay1Description",
       icon: "🎉",
       unlocked: quitDays >= 1,
     ),
     Achievement(
       id: "day7",
-      title: "一週達成",
-      description: "連續戒菸 7 天",
+      titleKey: "achievementDay7Title",
+      descriptionKey: "achievementDay7Description",
       icon: "🔥",
       unlocked: quitDays >= 7,
+      progressKey: quitDays >= 7 ? null : "achievementDay7Progress",
     ),
     Achievement(
       id: "day30",
-      title: "一個月達成",
-      description: "連續戒菸 30 天",
+      titleKey: "achievementDay30Title",
+      descriptionKey: "achievementDay30Description",
       icon: "🏆",
       unlocked: quitDays >= 30,
+      progressKey: quitDays >= 30 ? null : "achievementDay30Progress",
     ),
     Achievement(
       id: "money1000",
-      title: "省下 1000 元",
-      description: "累積省下 1000 元",
+      titleKey: "achievementMoney1000Title",
+      descriptionKey: "achievementMoney1000Description",
       icon: "💰",
-      unlocked: false,
+      unlocked: savedMoney >= 1000,
+      progressKey: savedMoney >= 1000 ? null : "achievementMoney1000Progress",
     ),
     Achievement(
       id: "recovery",
-      title: "健康恢復",
-      description: "完成第一個身體恢復里程碑",
+      titleKey: "achievementRecoveryTitle",
+      descriptionKey: "achievementRecoveryDescription",
       icon: "❤️",
       unlocked: recovery.completedStages.isNotEmpty,
+      progressKey: recovery.completedStages.isNotEmpty
+          ? null
+          : "achievementRecoveryProgress",
     ),
   ];
 
@@ -75,4 +96,43 @@ class AchievementEngine {
   int get totalCount => achievements.length;
 
   double get progress => totalCount == 0 ? 0 : completedCount / totalCount;
+  Future<void> claimAchievementRewards() async {
+    final claimed = await StorageService.getClaimedAchievements();
+
+    final coinService = CoinService();
+
+    for (final achievement in achievements) {
+      if (achievement.unlocked && !claimed.contains(achievement.id)) {
+        int reward = 0;
+
+        switch (achievement.id) {
+          case "day1":
+            reward = 10;
+            break;
+
+          case "day7":
+            reward = 50;
+            break;
+
+          case "day30":
+            reward = 100;
+            break;
+
+          case "money1000":
+            reward = 100;
+            break;
+
+          case "recovery":
+            reward = 50;
+            break;
+        }
+
+        if (reward > 0) {
+          await coinService.addCoin(reward, 'achievement_${achievement.id}');
+
+          await StorageService.saveClaimedAchievement(achievement.id);
+        }
+      }
+    }
+  }
 }

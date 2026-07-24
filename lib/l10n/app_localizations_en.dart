@@ -18,10 +18,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quitPlan => 'Quit Plan';
 
   @override
-  String get welcomeMessage => '歡迎來到戒菸俱樂部！挑戰正在進行中。';
+  String get welcomeMessage =>
+      'Welcome to Quit Smoking Club! Your challenge is underway.';
 
   @override
-  String get hello => '你好';
+  String get hello => 'Hello';
 
   @override
   String get dailyCount => 'Daily Cigarettes';
@@ -36,32 +37,158 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cancel => 'Cancel';
 
   @override
-  String get forum => '交流論壇';
+  String get forum => 'Community Forum';
 
   @override
-  String get shop => '金幣商城';
+  String get shop => 'Coin Shop';
 
   @override
-  String get gameHub => '遊戲大廳';
+  String get gameHub => 'Game Center';
 
   @override
-  String get recordSmoke => '記錄抽菸';
+  String get recordSmoke => 'Record Smoking';
 
   @override
-  String get locked => '尚未解鎖';
+  String get locked => 'Locked';
 
   @override
-  String get sos => 'SOS 求協助';
+  String get sos => 'SOS Help';
 
   @override
-  String get smokedCount => '已抽支數';
+  String get smokedCount => 'Smoked';
 
   @override
-  String get remaining => '剩餘額度';
+  String get remaining => 'Remaining';
 
   @override
-  String get countdown => '距離下一次解鎖抽菸倒數';
+  String get countdown => 'Countdown to next unlock';
 
   @override
-  String get todaySchedule => '控菸今日排程表';
+  String get todaySchedule => 'Today\'s Smoking Schedule';
+
+  @override
+  String get createPost => 'Create Post';
+
+  @override
+  String get postName => 'Nickname';
+
+  @override
+  String get postContent => 'Post Content';
+
+  @override
+  String get publish => 'Publish';
+
+  @override
+  String get myCoins => 'My COIN';
+
+  @override
+  String get giftSent => 'Gift sent successfully';
+
+  @override
+  String get insufficientCoins => 'Insufficient COIN';
+
+  @override
+  String get postCreated => 'Post created successfully';
+
+  @override
+  String get anonymousUser => 'Anonymous Friend';
+
+  @override
+  String get like => 'Like';
+
+  @override
+  String get gift => 'Gift';
+
+  @override
+  String get now => 'Just now';
+
+  @override
+  String minutesAgo(Object count) {
+    return '$count minutes ago';
+  }
+
+  @override
+  String hoursAgo(Object count) {
+    return '$count hours ago';
+  }
+
+  @override
+  String daysAgo(Object count) {
+    return '$count days ago';
+  }
+
+  @override
+  String get emptyForum => 'No posts yet. Create the first one!';
+
+  @override
+  String get sosPost => 'Help Request';
+
+  @override
+  String get coinHistory => 'COIN History';
+
+  @override
+  String get currentBalance => 'Current Balance';
+
+  @override
+  String get noTransactionHistory => 'No transaction history';
+
+  @override
+  String get purchaseSuccess => 'Purchase successful';
+
+  @override
+  String get premiumActivated => 'Premium membership activated';
+
+  @override
+  String get achievementDay1Title => 'First Day';
+
+  @override
+  String get achievementDay1Description => 'Start your quitting journey';
+
+  @override
+  String get achievementDay7Title => 'One Week Completed';
+
+  @override
+  String get achievementDay7Description => 'Quit smoking for 7 days';
+
+  @override
+  String get achievementDay30Title => 'One Month Completed';
+
+  @override
+  String get achievementDay30Description => 'Quit smoking for 30 days';
+
+  @override
+  String get achievementMoney1000Title => 'Saved 1000';
+
+  @override
+  String get achievementMoney1000Description => 'Saved 1000 in smoking costs';
+
+  @override
+  String get achievementRecoveryTitle => 'Health Recovery';
+
+  @override
+  String get achievementRecoveryDescription =>
+      'Completed the first recovery milestone';
+
+  @override
+  String get achievementDay7Progress => '7-day quit goal is not completed yet';
+
+  @override
+  String get achievementDay30Progress =>
+      '30-day quit goal is not completed yet';
+
+  @override
+  String get achievementMoney1000Progress =>
+      '1000 savings goal is not completed yet';
+
+  @override
+  String get achievementRecoveryProgress =>
+      'Recovery milestone is not completed yet';
+
+  @override
+  String get todayAchievement => 'Today\'s Achievements';
+
+  @override
+  String achievementCompleted(Object completed, Object total) {
+    return 'Completed $completed / $total';
+  }
 }

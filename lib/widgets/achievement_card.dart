@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/achievement_engine.dart';
+import '../core/utils/achievement_localizer.dart';
+import '../l10n/app_localizations.dart';
 
 class AchievementCard extends StatelessWidget {
   final AchievementEngine achievement;
@@ -8,6 +10,8 @@ class AchievementCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -38,12 +42,36 @@ class AchievementCard extends StatelessWidget {
 
             const SizedBox(height: 10),
 
-            ...achievement.unlocked.map(
+            ...achievement.achievements.map(
               (item) => Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Text(
-                  "${item.icon} ${item.title}",
-                  style: const TextStyle(fontSize: 15),
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "${item.icon} ${AchievementLocalizer.title(item, l10n)}",
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+
+                    const SizedBox(height: 3),
+
+                    Text(
+                      AchievementLocalizer.description(item, l10n),
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+
+                    if (item.progressKey != null)
+                      Text(
+                        AchievementLocalizer.progress(item, l10n),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                  ],
                 ),
               ),
             ),

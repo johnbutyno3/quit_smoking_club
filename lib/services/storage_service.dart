@@ -1,5 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+
 import '../models/smoking_plan.dart';
+import '../models/coin_transaction.dart';
 
 class StorageService {
   static final Future<SharedPreferences> _prefsInstance =
@@ -9,7 +12,8 @@ class StorageService {
 
   static const _smokeRecordsKey = 'smoke_records';
   static const _smokeRecordsDateKey = 'smoke_records_date';
-
+  static const _coinHistoryKey = 'coin_history';
+  static const _achievementClaimedKey = 'achievement_claimed';
   static String _formatDateKey(DateTime date) {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
@@ -104,6 +108,32 @@ class StorageService {
   static Future<int> getCoins() async {
     final prefs = await _prefs;
     return prefs.getInt('user_coins') ?? 50;
+  }
+
+  // ⭐ COIN交易紀錄讀取
+  static Future<List<CoinTransaction>> getCoinHistory() async {
+    final prefs = await _prefs;
+
+    final data = prefs.getStringList(_coinHistoryKey);
+
+    if (data == null) {
+      return [];
+    }
+
+    return data.map((e) {
+      return CoinTransaction.fromJson(jsonDecode(e));
+    }).toList();
+  }
+
+  // ⭐ COIN交易紀錄保存
+  static Future<void> saveCoinHistory(List<CoinTransaction> history) async {
+    final prefs = await _prefs;
+
+    final data = history.map((e) {
+      return jsonEncode(e.toJson());
+    }).toList();
+
+    await prefs.setStringList(_coinHistoryKey, data);
   }
 
   // 💾 儲存會員身份 (true 代表高級會員, false 代表一般)
@@ -240,5 +270,23 @@ class StorageService {
       plannedCount: daily,
       durationDays: days,
     );
+  }
+
+  static Future<List<String>> getClaimedAchievements() async {
+    final prefs = await _prefs;
+
+    return prefs.getStringList(_achievementClaimedKey) ?? [];
+  }
+
+  static Future<void> saveClaimedAchievement(String achievementId) async {
+    final prefs = await _prefs;
+
+    final list = prefs.getStringList(_achievementClaimedKey) ?? [];
+
+    if (!list.contains(achievementId)) {
+      list.add(achievementId);
+
+      await prefs.setStringList(_achievementClaimedKey, list);
+    }
   }
 }

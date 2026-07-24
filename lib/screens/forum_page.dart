@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import '../models/forum_post.dart';
 import '../repositories/forum_repository.dart';
-import '../services/storage_service.dart';
 import '../services/user_service.dart';
 import 'forum_detail_page.dart';
+import '../repositories/coin/coin_repository.dart';
 import '../services/coin_service.dart';
+import '../usecases/coin/get_coin_balance_usecase.dart';
+import '../usecases/coin/spend_coin_usecase.dart';
 
 class ForumPage extends StatefulWidget {
   const ForumPage({super.key});
@@ -23,7 +25,15 @@ class _ForumColors {
 
 class _ForumPageState extends State<ForumPage> {
   final ForumRepository _forumRepository = ForumRepository();
-  final CoinService coinService = CoinService();
+
+  final CoinRepository _coinRepository = CoinRepository(CoinService());
+
+  late final GetCoinBalanceUseCase _getCoinBalanceUseCase =
+      GetCoinBalanceUseCase(_coinRepository);
+
+  late final SpendCoinUseCase _spendCoinUseCase = SpendCoinUseCase(
+    _coinRepository,
+  );
   final List<ForumPost> _posts = [];
   bool _isLoading = true;
   int _myCoins = 0;
@@ -48,7 +58,7 @@ class _ForumPageState extends State<ForumPage> {
       _isLoading = true;
     });
 
-    final coins = await StorageService.getCoins();
+    final coins = await _getCoinBalanceUseCase.execute();
     final posts = await _forumRepository.fetchPosts();
 
     setState(() {
@@ -70,7 +80,11 @@ class _ForumPageState extends State<ForumPage> {
   Future<void> _handleSendGift(int index) async {
     if (_myCoins >= 5) {
       final latestCoins = _myCoins - 5;
-      await StorageService.saveCoins(latestCoins);
+      final success = await _spendCoinUseCase.execute(5, '論壇送禮');
+
+      if (!success) {
+        return;
+      }
       final uid = UserService.currentUid;
       if (uid != null) {
         try {
@@ -127,7 +141,7 @@ class _ForumPageState extends State<ForumPage> {
                 if (content.isEmpty) {
                   return;
                 }
-                if (!await coinService.canSpend(30)) {
+                if (_myCoins < 30) {
                   if (!context.mounted) return;
 
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -136,11 +150,16 @@ class _ForumPageState extends State<ForumPage> {
                   return;
                 }
 
-                if (!await coinService.spendCoin(30, '發表貼文')) {
+                final success = await _spendCoinUseCase.execute(
+                  30,
+                  'forum_create_post',
+                );
+
+                if (!success) {
                   return;
                 }
-                final latestCoins = await StorageService.getCoins();
 
+                final latestCoins = await _getCoinBalanceUseCase.execute();
                 if (!mounted) return;
 
                 setState(() {

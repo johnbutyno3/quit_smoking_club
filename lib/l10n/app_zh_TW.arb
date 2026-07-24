@@ -1,10 +1,11 @@
 {
   "appTitle": "戒菸俱樂部",
-  
+
   "settings": "設定",
   "quitPlan": "戒菸計畫",
   "welcomeMessage": "歡迎來到戒菸俱樂部！挑戰正在進行中。",
   "hello": "你好",
+
   "dailyCount": "每日抽菸量",
   "cigarettePrice": "香菸單價",
   "save": "儲存",
@@ -13,11 +14,66 @@
   "forum": "交流論壇",
   "shop": "金幣商城",
   "gameHub": "遊戲大廳",
+
   "recordSmoke": "記錄抽菸",
   "locked": "尚未解鎖",
   "sos": "SOS 求協助",
+
   "smokedCount": "已抽支數",
   "remaining": "剩餘額度",
   "countdown": "距離下一次解鎖抽菸倒數",
-  "todaySchedule": "控菸今日排程表"
+  "todaySchedule": "控菸今日排程表",
+
+  "createPost": "建立貼文",
+  "postName": "暱稱",
+  "postContent": "貼文內容",
+  "publish": "發布",
+  "myCoins": "我的 COIN",
+
+  "giftSent": "禮物送出成功",
+  "insufficientCoins": "COIN 不足",
+
+  "postCreated": "貼文建立成功",
+
+  "anonymousUser": "匿名朋友",
+
+  "like": "讚",
+  "gift": "禮物",
+
+  "now": "剛剛",
+  "minutesAgo": "{count} 分鐘前",
+  "hoursAgo": "{count} 小時前",
+  "daysAgo": "{count} 天前",
+
+  "emptyForum": "目前尚無論壇貼文，快建立第一篇吧！",
+
+  "sosPost": "求助文章",
+
+  "coinHistory": "COIN 紀錄",
+  "currentBalance": "目前餘額",
+  "noTransactionHistory": "目前沒有交易紀錄",
+
+  "purchaseSuccess": "購買成功",
+  "premiumActivated": "高級會員已啟用",
+  "achievementDay1Title": "第一天",
+"achievementDay1Description": "開始戒菸旅程",
+
+"achievementDay7Title": "一週達成",
+"achievementDay7Description": "連續戒菸 7 天",
+
+"achievementDay30Title": "一個月達成",
+"achievementDay30Description": "連續戒菸 30 天",
+
+"achievementMoney1000Title": "省下 1000 元",
+"achievementMoney1000Description": "累積省下 1000 元",
+
+"achievementRecoveryTitle": "健康恢復",
+"achievementRecoveryDescription": "完成第一個身體恢復里程碑",
+"achievementDay7Progress": "還需要完成 7 天戒菸目標",
+  "achievementDay7Progress": "尚未完成 7 天戒菸目標",
+  "achievementDay30Progress": "尚未完成 30 天戒菸目標",
+  "achievementMoney1000Progress": "尚未累積省下 1000 元",
+  "achievementRecoveryProgress": "尚未完成健康恢復階段",
+  "todayAchievement": "今日成就",
+"achievementCompleted": "完成 {completed} / {total}"
 }
