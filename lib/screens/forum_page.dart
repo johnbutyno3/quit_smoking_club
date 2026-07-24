@@ -127,18 +127,12 @@ class _ForumPageState extends State<ForumPage> {
                 if (content.isEmpty) {
                   return;
                 }
-                if (!coinService.canSpend(30)) {
-                  if (!coinService.canSpend(30)) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('COIN不足，請前往商城購買 COIN')),
-                    );
+                if (!await coinService.canSpend(30)) {
+                  if (!context.mounted) return;
 
-                    return;
-                  }
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('COIN不足，請前往商城購買 COIN')),
                   );
-
                   return;
                 }
 

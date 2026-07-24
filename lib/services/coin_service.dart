@@ -41,6 +41,21 @@ class CoinService {
     );
   }
 
+  Future<bool> canSpend(int amount) async {
+    await loadBalance();
+    return _balance >= amount;
+  }
+
+  Future<bool> claimDailyLogin() async {
+    await addCoin(10, '每日登入');
+    return true;
+  }
+
+  Future<bool> claimDailyPlanReward() async {
+    await addCoin(20, '完成每日戒菸計畫');
+    return true;
+  }
+
   Future<bool> spendCoin(int amount, String reason) async {
     await loadBalance();
 
