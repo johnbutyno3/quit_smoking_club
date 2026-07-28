@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '../models/coin_transaction.dart';
 import 'storage_service.dart';
+import 'supabase_coin_log_service.dart';
 
 class CoinService {
   CoinService._internal();
@@ -43,7 +46,19 @@ class CoinService {
         createdAt: DateTime.now(),
       ),
     );
+
     await StorageService.saveCoinHistory(_history);
+
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+
+    if (userId != null) {
+      await SupabaseCoinLogService.addLog(
+        userId: userId,
+        amount: amount,
+        type: 'earn',
+        reason: reason,
+      );
+    }
   }
 
   Future<bool> canSpend(int amount) async {
@@ -82,7 +97,19 @@ class CoinService {
         createdAt: DateTime.now(),
       ),
     );
+
     await StorageService.saveCoinHistory(_history);
+
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+
+    if (userId != null) {
+      await SupabaseCoinLogService.addLog(
+        userId: userId,
+        amount: -amount,
+        type: 'spend',
+        reason: reason,
+      );
+    }
     return true;
   }
 

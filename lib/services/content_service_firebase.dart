@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'content_service.dart';
 import 'package:quit_smoking_club/firebase_config.dart';
+import 'supabase_content_service.dart';
 
 class ContentServiceFirebase {
   static const _contentOverridesKey = 'content_overrides_v1';
@@ -79,16 +80,32 @@ class ContentServiceFirebase {
   }
 
   Future<List<ContentItem>> _loadRemoteItems(String category) async {
-    if (!firebaseEnabled) return [];
     try {
-      final qs = await FirebaseFirestore.instance
-          .collection(_collection)
-          .where('category', isEqualTo: category)
-          .limit(20) // 🌟 只加這行，確保不撈過量資料
-          .get();
+      final data = await SupabaseContentService.getContents(category: category);
 
-      return qs.docs
-          .map((d) => ContentItem.fromJson(d.data()))
+      return data
+          .map((json) => ContentItem.fromJson(json))
+          .where(
+            (item) =>
+                item.title.isNotEmpty &&
+                item.content.isNotEmpty &&
+                item.link.isNotEmpty,
+          )
+          .toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<List<ContentItem>> _loadSupabaseItems(String category) async {
+    try {
+      final response = await SupabaseContentService.getContents(
+        language: 'all',
+        category: category,
+      );
+
+      return response
+          .map(ContentItem.fromJson)
           .where(
             (item) =>
                 item.title.isNotEmpty &&
@@ -146,6 +163,7 @@ class ContentServiceFirebase {
   Future<List<ContentItem>> getContentItems(String category) async {
     final assetItems = await _loadAssetItems(category);
     final backendItems = await _loadBackendMockItems();
+    final supabaseItems = await _loadSupabaseItems(category);
     final remoteItems = await _loadRemoteItems(category);
     final overrideItems = await _loadOverrideItems();
     final merged = <String, ContentItem>{};
@@ -158,6 +176,9 @@ class ContentServiceFirebase {
       merged[item.uniqueId] = item;
     }
     for (final item in remoteItems) {
+      merged[item.uniqueId] = item;
+    }
+    for (final item in supabaseItems) {
       merged[item.uniqueId] = item;
     }
     for (final item in overrideItems.where(

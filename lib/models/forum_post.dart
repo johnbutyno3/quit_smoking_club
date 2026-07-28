@@ -62,4 +62,18 @@ class ForumPost {
       'isSOS': isSOS,
     };
   }
+
+  factory ForumPost.fromJson(Map<String, dynamic> json) {
+    return ForumPost(
+      id: json['id']?.toString() ?? '',
+      name: json['nickname']?.toString() ?? json['name']?.toString() ?? '匿名朋友',
+      createdAt:
+          DateTime.tryParse(json['created_at']?.toString() ?? '') ??
+          DateTime.now(),
+      content: json['content']?.toString() ?? '',
+      likes: json['like_count'] ?? json['likes'] ?? 0,
+      gifts: json['gifts'] ?? 0,
+      isSOS: json['category'] == '菸癮犯了' || json['isSOS'] == true,
+    );
+  }
 }

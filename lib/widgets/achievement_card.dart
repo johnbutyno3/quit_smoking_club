@@ -20,9 +20,9 @@ class AchievementCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "🏅 今日成就",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(
+              "🏅 ${l10n.todayAchievement}",
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 15),
@@ -36,7 +36,10 @@ class AchievementCard extends StatelessWidget {
             const SizedBox(height: 15),
 
             Text(
-              "完成 ${achievement.completedCount} / ${achievement.totalCount}",
+              l10n.achievementCompleted(
+                achievement.completedCount,
+                achievement.totalCount,
+              ),
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
 
