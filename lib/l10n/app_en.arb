@@ -1,29 +1,27 @@
 {
-  "@@locale": "en",
-
   "appTitle": "Quit Smoking Club",
 
   "settings": "Settings",
   "quitPlan": "Quit Plan",
-  "welcomeMessage": "Welcome to Quit Smoking Club! Your challenge is underway.",
+  "welcomeMessage": "Welcome to Quit Smoking Club! Your challenge is in progress.",
   "hello": "Hello",
 
-  "dailyCount": "Daily Cigarettes",
+  "dailyCount": "Daily Cigarette Count",
   "cigarettePrice": "Cigarette Price",
   "save": "Save",
   "cancel": "Cancel",
 
   "forum": "Community Forum",
   "shop": "Coin Shop",
-  "gameHub": "Game Center",
+  "gameHub": "Game Hub",
 
   "recordSmoke": "Record Smoking",
   "locked": "Locked",
   "sos": "SOS Help",
 
-  "smokedCount": "Smoked",
+  "smokedCount": "Cigarettes Smoked",
   "remaining": "Remaining",
-  "countdown": "Countdown to next unlock",
+  "countdown": "Countdown to Next Unlock",
   "todaySchedule": "Today's Smoking Schedule",
 
   "createPost": "Create Post",
@@ -47,36 +45,121 @@
   "hoursAgo": "{count} hours ago",
   "daysAgo": "{count} days ago",
 
-  "emptyForum": "No posts yet. Create the first one!",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
 
-  "sosPost": "Help Request",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+
+  "@daysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+
+  "emptyForum": "No forum posts yet. Create the first one!",
+
+  "sosPost": "Help Request Post",
 
   "coinHistory": "COIN History",
   "currentBalance": "Current Balance",
   "noTransactionHistory": "No transaction history",
 
-  "purchaseSuccess": "Purchase successful",
+  "purchaseSuccess": "Purchase Successful",
   "premiumActivated": "Premium membership activated",
 
   "achievementDay1Title": "First Day",
-  "achievementDay1Description": "Start your quitting journey",
+  "achievementDay1Description": "Started the quit smoking journey",
 
   "achievementDay7Title": "One Week Completed",
-  "achievementDay7Description": "Quit smoking for 7 days",
+  "achievementDay7Description": "Quit smoking for 7 consecutive days",
 
   "achievementDay30Title": "One Month Completed",
-  "achievementDay30Description": "Quit smoking for 30 days",
+  "achievementDay30Description": "Quit smoking for 30 consecutive days",
 
   "achievementMoney1000Title": "Saved 1000",
-  "achievementMoney1000Description": "Saved 1000 in smoking costs",
+  "achievementMoney1000Description": "Saved 1000 in total",
 
   "achievementRecoveryTitle": "Health Recovery",
-  "achievementRecoveryDescription": "Completed the first recovery milestone",
+  "achievementRecoveryDescription": "Completed the first health recovery milestone",
+
   "achievementDay7Progress": "7-day quit goal not completed yet",
-   "achievementDay7Progress": "7-day quit goal is not completed yet",
-  "achievementDay30Progress": "30-day quit goal is not completed yet",
-  "achievementMoney1000Progress": "1000 savings goal is not completed yet",
-  "achievementRecoveryProgress": "Recovery milestone is not completed yet",
+  "achievementDay30Progress": "30-day quit goal not completed yet",
+  "achievementMoney1000Progress": "Have not saved 1000 yet",
+  "achievementRecoveryProgress": "Health recovery stage not completed yet",
+
   "todayAchievement": "Today's Achievements",
-"achievementCompleted": "Completed {completed} / {total}"
+
+  "achievementCompleted": "Completed {completed} / {total}",
+  "@achievementCompleted": {
+    "placeholders": {
+      "completed": {},
+      "total": {}
+    }
+  },
+
+  "quitProgress": "Quit Progress",
+
+  "dayProgress": "Day {current} / {total}",
+  "@dayProgress": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+
+  "todayGoal": "Today's goal: {count} cigarettes",
+  "@todayGoal": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+
+  "smokedToday": "Smoked today: {count} cigarettes",
+  "@smokedToday": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+
+  "remainingToday": "Remaining today: {count} cigarettes",
+  "@remainingToday": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+
+"startQuitTitle": "Start Your Quit Plan",
+
+"startQuitDescription": "Create your personalized quit plan, track your health progress, and get community support.",
+
+"startPlan": "Start Plan",
+
+"lifestyleTitle": "Healthy Lifestyle",
+"exercise": "Exercise Challenge",
+"healthKnowledge": "Health Knowledge",
+"relaxMusic": "Relaxing Music",
+"ranking": "Ranking",
+  "coinBalanceTitle": "Current Coin Balance",
+  "nextSmokeCountdown": "Countdown to Next Smoking Unlock",
+  "sosHelp": "SOS Help",
+  "recordSmoking": "Record Smoking",
+  "notUnlocked": "Not Unlocked",
+  "forum": "Community Forum",
+  "coinShop": "Coin Shop",
+  "gameHub": "Game Hub",
+  "todaySmokingSchedule": "Today's Smoking Schedule",
+  "smoked": "Smoked ✓",
+  "notRecorded": "Not Recorded",
+  "locked": "Locked",
+  "smokedCount": "Smoked",
+  "remainingAmount": "Remaining",
+  "todaySaved": "Saved Today",
+  "coinUnit": "Coins"
 }

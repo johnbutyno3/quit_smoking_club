@@ -19,6 +19,10 @@ import '../services/achievement_engine.dart';
 import '../widgets/achievement_card.dart';
 import '../pages/quit_plan_page.dart';
 import '../pages/coin_page.dart';
+import 'ranking_page.dart';
+import '../models/user_smoking_status.dart';
+import '../widgets/home/home_progress_card.dart';
+import '../models/user_role.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -42,6 +46,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   late RewardEngine rewardEngine;
   late AchievementEngine achievement;
   late RecoveryEngine recovery;
+  late SmokingState state;
   bool _isLoaded = false;
   Timer? _timer;
   int _myCoins = 0;
@@ -69,7 +74,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     final now = DateTime.now();
 
-    final state = SmokingState(
+    state = SmokingState(
       planStartDate: DateTime.now(),
       startTime: DateTime(now.year, now.month, now.day, 8, 0),
       endTime: DateTime(now.year, now.month, now.day, 22, 0),
@@ -166,8 +171,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           plannedCount: sCount,
           smokeRecords: storedRecords,
           lastSmokeTime: storedRecords.isNotEmpty ? storedRecords.last : null,
-        );
 
+          role: UserRole.quitter,
+          smokingStatus: SmokingStatus.smoker,
+        );
         final plan = SmokingPlan(
           startTime: state.startTime,
           endTime: state.endTime,
@@ -403,6 +410,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                               builder: (_) => const ForumPage(),
                             ),
                           );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const RankingPage(),
+                            ),
+                          );
                         },
                       ),
                     ),
@@ -442,6 +455,61 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           );
           _loadStoredData();
         },
+      ),
+    );
+  }
+
+  Widget _buildLifestyleCard() {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Card(
+      color: Colors.white.withAlpha(230),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.lifestyleTitle,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+
+            const SizedBox(height: 16),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildLifestyleItem(Icons.directions_run, l10n.exercise),
+
+                _buildLifestyleItem(Icons.menu_book, l10n.healthKnowledge),
+
+                _buildLifestyleItem(Icons.music_note, l10n.relaxMusic),
+
+                _buildLifestyleItem(Icons.leaderboard, l10n.ranking),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLifestyleItem(IconData icon, String title) {
+    return Expanded(
+      child: Column(
+        children: [
+          Icon(icon, color: _ThemeColors.primary, size: 30),
+
+          const SizedBox(height: 8),
+
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+          ),
+        ],
       ),
     );
   }
@@ -513,19 +581,40 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           // 💡 3.2.1 堆疊最上層：預留自訂頂部推播彈窗空間
           body: Stack(
             children: [
-              _buildQuitProgressCard(),
-
-              const SizedBox(height: 16),
               ListView(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
                   vertical: 16,
                 ),
                 children: [
-                  _buildQuitProgressCard(),
+                  _buildPersonalStatusCard(),
 
                   const SizedBox(height: 16),
 
+                  _buildLifestyleCard(),
+
+                  const SizedBox(height: 16),
+
+                  AchievementCard(achievement: achievement),
+
+                  const SizedBox(height: 20),
+
+                  HomeProgressCard(
+                    currentDay:
+                        DateTime.now()
+                            .difference(engine.state.planStartDate)
+                            .inDays +
+                        1,
+
+                    totalDays: engine.plan.durationDays,
+
+                    smokedToday: engine.totalSmoked,
+
+                    targetToday: engine.todayPlannedCount,
+
+                    remaining: engine.todayPlannedCount - engine.totalSmoked,
+                  ),
+                  // 下面接原本其他卡片
                   Card(
                     color: Colors.white.withAlpha(230),
                     elevation: 4,
@@ -618,8 +707,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   _buildStatCard("今日省下", "$todaySavedMoney 元", Colors.green),
                   const SizedBox(height: 20),
 
-                  AchievementCard(achievement: achievement),
-                  const SizedBox(height: 20),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       vertical: 24,
@@ -976,12 +1063,31 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildQuitProgressCard() {
-    final currentDay =
-        DateTime.now().difference(engine.state.planStartDate).inDays + 1;
+  Widget _buildPersonalStatusCard() {
+    switch (state.smokingStatus) {
+      case SmokingStatus.smoker:
+        return _buildStartQuitCard();
 
-    final totalDays = engine.plan.durationDays;
+      case SmokingStatus.quitting:
+      case SmokingStatus.exSmoker:
+      case SmokingStatus.relapsed:
+      case SmokingStatus.none:
+        return HomeProgressCard(
+          currentDay:
+              DateTime.now().difference(engine.state.planStartDate).inDays + 1,
+          totalDays: engine.plan.durationDays,
+          smokedToday: engine.totalSmoked,
+          targetToday: engine.todayPlannedCount,
+          remaining: engine.todayPlannedCount - engine.totalSmoked,
+        );
 
+      case SmokingStatus.supporter:
+        return _buildStartQuitCard();
+    }
+  }
+
+  Widget _buildStartQuitCard() {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       color: Colors.white.withAlpha(230),
       elevation: 4,
@@ -991,21 +1097,26 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "戒菸進度",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              l10n.startQuitTitle,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
 
             Text(
-              "Day $currentDay / $totalDays",
-              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+              l10n.startQuitDescription,
+              style: const TextStyle(fontSize: 15),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
 
-            Text("今日目標：${engine.todayPlannedCount} 支"),
+            ElevatedButton(
+              onPressed: () {
+                // 之後導向戒菸計畫頁
+              },
+              child: Text(l10n.startPlan),
+            ),
           ],
         ),
       ),

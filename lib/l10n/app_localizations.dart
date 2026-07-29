@@ -180,7 +180,7 @@ abstract class AppLocalizations {
   /// No description provided for @locked.
   ///
   /// In zh_TW, this message translates to:
-  /// **'尚未解鎖'**
+  /// **'待解鎖'**
   String get locked;
 
   /// No description provided for @sos.
@@ -440,6 +440,156 @@ abstract class AppLocalizations {
   /// In zh_TW, this message translates to:
   /// **'完成 {completed} / {total}'**
   String achievementCompleted(Object completed, Object total);
+
+  /// No description provided for @quitProgress.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'戒菸進度'**
+  String get quitProgress;
+
+  /// No description provided for @dayProgress.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'Day {current} / {total}'**
+  String dayProgress(Object current, Object total);
+
+  /// No description provided for @todayGoal.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'今日目標：{count} 支'**
+  String todayGoal(Object count);
+
+  /// No description provided for @smokedToday.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'今日已抽：{count} 支'**
+  String smokedToday(Object count);
+
+  /// No description provided for @remainingToday.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'今日剩餘：{count} 支'**
+  String remainingToday(Object count);
+
+  /// No description provided for @startQuitTitle.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'開始你的戒菸計畫'**
+  String get startQuitTitle;
+
+  /// No description provided for @startQuitDescription.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'建立專屬戒菸方案，追蹤你的健康變化，加入社群支持。'**
+  String get startQuitDescription;
+
+  /// No description provided for @startPlan.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'開始計畫'**
+  String get startPlan;
+
+  /// No description provided for @lifestyleTitle.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'健康生活'**
+  String get lifestyleTitle;
+
+  /// No description provided for @exercise.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'運動挑戰'**
+  String get exercise;
+
+  /// No description provided for @healthKnowledge.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'健康知識'**
+  String get healthKnowledge;
+
+  /// No description provided for @relaxMusic.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'放鬆音樂'**
+  String get relaxMusic;
+
+  /// No description provided for @ranking.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'排行榜'**
+  String get ranking;
+
+  /// No description provided for @coinBalanceTitle.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'目前擁有金幣庫存'**
+  String get coinBalanceTitle;
+
+  /// No description provided for @nextSmokeCountdown.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'距離下一次解鎖抽菸倒數'**
+  String get nextSmokeCountdown;
+
+  /// No description provided for @sosHelp.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'SOS 求協助'**
+  String get sosHelp;
+
+  /// No description provided for @recordSmoking.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'記錄抽菸'**
+  String get recordSmoking;
+
+  /// No description provided for @notUnlocked.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'尚未解鎖'**
+  String get notUnlocked;
+
+  /// No description provided for @coinShop.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'金幣商城'**
+  String get coinShop;
+
+  /// No description provided for @todaySmokingSchedule.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'控菸今日排程表'**
+  String get todaySmokingSchedule;
+
+  /// No description provided for @smoked.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'已抽 ✓'**
+  String get smoked;
+
+  /// No description provided for @notRecorded.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'未記錄'**
+  String get notRecorded;
+
+  /// No description provided for @remainingAmount.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'剩餘額度'**
+  String get remainingAmount;
+
+  /// No description provided for @todaySaved.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'今日省下'**
+  String get todaySaved;
+
+  /// No description provided for @coinUnit.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'金幣'**
+  String get coinUnit;
 }
 
 class _AppLocalizationsDelegate

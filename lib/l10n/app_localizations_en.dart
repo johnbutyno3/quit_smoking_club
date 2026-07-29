@@ -19,13 +19,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get welcomeMessage =>
-      'Welcome to Quit Smoking Club! Your challenge is underway.';
+      'Welcome to Quit Smoking Club! Your challenge is in progress.';
 
   @override
   String get hello => 'Hello';
 
   @override
-  String get dailyCount => 'Daily Cigarettes';
+  String get dailyCount => 'Daily Cigarette Count';
 
   @override
   String get cigarettePrice => 'Cigarette Price';
@@ -43,7 +43,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shop => 'Coin Shop';
 
   @override
-  String get gameHub => 'Game Center';
+  String get gameHub => 'Game Hub';
 
   @override
   String get recordSmoke => 'Record Smoking';
@@ -61,7 +61,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get remaining => 'Remaining';
 
   @override
-  String get countdown => 'Countdown to next unlock';
+  String get countdown => 'Countdown to Next Unlock';
 
   @override
   String get todaySchedule => 'Today\'s Smoking Schedule';
@@ -118,10 +118,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get emptyForum => 'No posts yet. Create the first one!';
+  String get emptyForum => 'No forum posts yet. Create the first one!';
 
   @override
-  String get sosPost => 'Help Request';
+  String get sosPost => 'Help Request Post';
 
   @override
   String get coinHistory => 'COIN History';
@@ -133,7 +133,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noTransactionHistory => 'No transaction history';
 
   @override
-  String get purchaseSuccess => 'Purchase successful';
+  String get purchaseSuccess => 'Purchase Successful';
 
   @override
   String get premiumActivated => 'Premium membership activated';
@@ -142,47 +142,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get achievementDay1Title => 'First Day';
 
   @override
-  String get achievementDay1Description => 'Start your quitting journey';
+  String get achievementDay1Description => 'Started the quit smoking journey';
 
   @override
   String get achievementDay7Title => 'One Week Completed';
 
   @override
-  String get achievementDay7Description => 'Quit smoking for 7 days';
+  String get achievementDay7Description =>
+      'Quit smoking for 7 consecutive days';
 
   @override
   String get achievementDay30Title => 'One Month Completed';
 
   @override
-  String get achievementDay30Description => 'Quit smoking for 30 days';
+  String get achievementDay30Description =>
+      'Quit smoking for 30 consecutive days';
 
   @override
   String get achievementMoney1000Title => 'Saved 1000';
 
   @override
-  String get achievementMoney1000Description => 'Saved 1000 in smoking costs';
+  String get achievementMoney1000Description => 'Saved 1000 in total';
 
   @override
   String get achievementRecoveryTitle => 'Health Recovery';
 
   @override
   String get achievementRecoveryDescription =>
-      'Completed the first recovery milestone';
+      'Completed the first health recovery milestone';
 
   @override
-  String get achievementDay7Progress => '7-day quit goal is not completed yet';
+  String get achievementDay7Progress => '7-day quit goal not completed yet';
 
   @override
-  String get achievementDay30Progress =>
-      '30-day quit goal is not completed yet';
+  String get achievementDay30Progress => '30-day quit goal not completed yet';
 
   @override
-  String get achievementMoney1000Progress =>
-      '1000 savings goal is not completed yet';
+  String get achievementMoney1000Progress => 'Have not saved 1000 yet';
 
   @override
   String get achievementRecoveryProgress =>
-      'Recovery milestone is not completed yet';
+      'Health recovery stage not completed yet';
 
   @override
   String get todayAchievement => 'Today\'s Achievements';
@@ -191,4 +191,88 @@ class AppLocalizationsEn extends AppLocalizations {
   String achievementCompleted(Object completed, Object total) {
     return 'Completed $completed / $total';
   }
+
+  @override
+  String get quitProgress => 'Quit Progress';
+
+  @override
+  String dayProgress(Object current, Object total) {
+    return 'Day $current / $total';
+  }
+
+  @override
+  String todayGoal(Object count) {
+    return 'Today\'s goal: $count cigarettes';
+  }
+
+  @override
+  String smokedToday(Object count) {
+    return 'Smoked today: $count cigarettes';
+  }
+
+  @override
+  String remainingToday(Object count) {
+    return 'Remaining today: $count cigarettes';
+  }
+
+  @override
+  String get startQuitTitle => 'Start Your Quit Plan';
+
+  @override
+  String get startQuitDescription =>
+      'Create your personalized quit plan, track your health progress, and get community support.';
+
+  @override
+  String get startPlan => 'Start Plan';
+
+  @override
+  String get lifestyleTitle => 'Healthy Lifestyle';
+
+  @override
+  String get exercise => 'Exercise Challenge';
+
+  @override
+  String get healthKnowledge => 'Health Knowledge';
+
+  @override
+  String get relaxMusic => 'Relaxing Music';
+
+  @override
+  String get ranking => 'Ranking';
+
+  @override
+  String get coinBalanceTitle => 'Current Coin Balance';
+
+  @override
+  String get nextSmokeCountdown => 'Countdown to Next Smoking Unlock';
+
+  @override
+  String get sosHelp => 'SOS Help';
+
+  @override
+  String get recordSmoking => 'Record Smoking';
+
+  @override
+  String get notUnlocked => 'Not Unlocked';
+
+  @override
+  String get coinShop => 'Coin Shop';
+
+  @override
+  String get todaySmokingSchedule => 'Today\'s Smoking Schedule';
+
+  @override
+  String get smoked => 'Smoked ✓';
+
+  @override
+  String get notRecorded => 'Not Recorded';
+
+  @override
+  String get remainingAmount => 'Remaining';
+
+  @override
+  String get todaySaved => 'Saved Today';
+
+  @override
+  String get coinUnit => 'Coins';
 }

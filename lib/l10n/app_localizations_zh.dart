@@ -48,7 +48,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get recordSmoke => '記錄抽菸';
 
   @override
-  String get locked => '尚未解鎖';
+  String get locked => '待解鎖';
 
   @override
   String get sos => 'SOS 求協助';
@@ -186,6 +186,89 @@ class AppLocalizationsZh extends AppLocalizations {
   String achievementCompleted(Object completed, Object total) {
     return '完成 $completed / $total';
   }
+
+  @override
+  String get quitProgress => '戒菸進度';
+
+  @override
+  String dayProgress(Object current, Object total) {
+    return 'Day $current / $total';
+  }
+
+  @override
+  String todayGoal(Object count) {
+    return '今日目標：$count 支';
+  }
+
+  @override
+  String smokedToday(Object count) {
+    return '今日已抽：$count 支';
+  }
+
+  @override
+  String remainingToday(Object count) {
+    return '今日剩餘：$count 支';
+  }
+
+  @override
+  String get startQuitTitle => '開始你的戒菸計畫';
+
+  @override
+  String get startQuitDescription => '建立專屬戒菸方案，追蹤你的健康變化，加入社群支持。';
+
+  @override
+  String get startPlan => '開始計畫';
+
+  @override
+  String get lifestyleTitle => '健康生活';
+
+  @override
+  String get exercise => '運動挑戰';
+
+  @override
+  String get healthKnowledge => '健康知識';
+
+  @override
+  String get relaxMusic => '放鬆音樂';
+
+  @override
+  String get ranking => '排行榜';
+
+  @override
+  String get coinBalanceTitle => '目前擁有金幣庫存';
+
+  @override
+  String get nextSmokeCountdown => '距離下一次解鎖抽菸倒數';
+
+  @override
+  String get sosHelp => 'SOS 求協助';
+
+  @override
+  String get recordSmoking => '記錄抽菸';
+
+  @override
+  String get notUnlocked => '尚未解鎖';
+
+  @override
+  String get coinShop => '金幣商城';
+
+  @override
+  String get todaySmokingSchedule => '控菸今日排程表';
+
+  @override
+  String get smoked => '已抽 ✓';
+
+  @override
+  String get notRecorded => '未記錄';
+
+  @override
+  String get remainingAmount => '剩餘額度';
+
+  @override
+  String get todaySaved => '今日省下';
+
+  @override
+  String get coinUnit => '金幣';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -232,7 +315,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get recordSmoke => '記錄抽菸';
 
   @override
-  String get locked => '尚未解鎖';
+  String get locked => '待解鎖';
 
   @override
   String get sos => 'SOS 求協助';
@@ -370,4 +453,87 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String achievementCompleted(Object completed, Object total) {
     return '完成 $completed / $total';
   }
+
+  @override
+  String get quitProgress => '戒菸進度';
+
+  @override
+  String dayProgress(Object current, Object total) {
+    return 'Day $current / $total';
+  }
+
+  @override
+  String todayGoal(Object count) {
+    return '今日目標：$count 支';
+  }
+
+  @override
+  String smokedToday(Object count) {
+    return '今日已抽：$count 支';
+  }
+
+  @override
+  String remainingToday(Object count) {
+    return '今日剩餘：$count 支';
+  }
+
+  @override
+  String get startQuitTitle => '開始你的戒菸計畫';
+
+  @override
+  String get startQuitDescription => '建立專屬戒菸方案，追蹤你的健康變化，加入社群支持。';
+
+  @override
+  String get startPlan => '開始計畫';
+
+  @override
+  String get lifestyleTitle => '健康生活';
+
+  @override
+  String get exercise => '運動挑戰';
+
+  @override
+  String get healthKnowledge => '健康知識';
+
+  @override
+  String get relaxMusic => '放鬆音樂';
+
+  @override
+  String get ranking => '排行榜';
+
+  @override
+  String get coinBalanceTitle => '目前擁有金幣庫存';
+
+  @override
+  String get nextSmokeCountdown => '距離下一次解鎖抽菸倒數';
+
+  @override
+  String get sosHelp => 'SOS 求協助';
+
+  @override
+  String get recordSmoking => '記錄抽菸';
+
+  @override
+  String get notUnlocked => '尚未解鎖';
+
+  @override
+  String get coinShop => '金幣商城';
+
+  @override
+  String get todaySmokingSchedule => '控菸今日排程表';
+
+  @override
+  String get smoked => '已抽 ✓';
+
+  @override
+  String get notRecorded => '未記錄';
+
+  @override
+  String get remainingAmount => '剩餘額度';
+
+  @override
+  String get todaySaved => '今日省下';
+
+  @override
+  String get coinUnit => '金幣';
 }

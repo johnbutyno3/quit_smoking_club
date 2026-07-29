@@ -1,7 +1,7 @@
 import 'supabase_service.dart';
 
 class SupabaseRankingService {
-  static Future<List<Map<String, dynamic>>> getRanking() async {
+  static Future<List<Map<String, dynamic>>> getRankings() async {
     final response = await SupabaseService.client
         .from('rankings')
         .select()
@@ -28,5 +28,12 @@ class SupabaseRankingService {
       'community_score': communityScore,
       'total_score': totalScore,
     });
+  }
+
+  static Future<void> deleteRanking(String userId) async {
+    await SupabaseService.client
+        .from('rankings')
+        .delete()
+        .eq('user_id', userId);
   }
 }

@@ -1,3 +1,6 @@
+import 'user_smoking_status.dart';
+import 'user_role.dart';
+
 class SmokingState {
   final DateTime planStartDate;
   final DateTime startTime;
@@ -17,7 +20,12 @@ class SmokingState {
 
   // 最後一次抽菸時間
   final DateTime? lastSmokeTime;
+  // 使用者目前狀態
+  // 使用者角色
+  final UserRole role;
 
+  // 戒菸歷程狀態
+  final SmokingStatus smokingStatus;
   const SmokingState({
     required this.planStartDate,
     required this.startTime,
@@ -31,6 +39,8 @@ class SmokingState {
     this.currentIndex = 0,
 
     this.lastSmokeTime,
+
+    this.userStatus = UserSmokingStatus.smoker,
   });
 
   SmokingState addSmoke(DateTime time) {
@@ -53,6 +63,8 @@ class SmokingState {
       currentIndex: currentIndex + 1,
 
       lastSmokeTime: time,
+
+      userStatus: userStatus,
     );
   }
 
