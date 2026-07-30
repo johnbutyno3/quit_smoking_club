@@ -23,6 +23,7 @@ import 'ranking_page.dart';
 import '../models/user_smoking_status.dart';
 import '../widgets/home/home_progress_card.dart';
 import '../models/user_role.dart';
+import '../repositories/coin/coin_repository.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -41,6 +42,9 @@ class _ThemeColors {
 }
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
+  final CoinRepository _coinRepository = CoinRepository(
+    coinService: CoinService(),
+  );
   final CoinService coinService = CoinService();
   late SmokingEngine engine;
   late RewardEngine rewardEngine;
@@ -135,13 +139,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final todayStr = "${now.year}-${now.month}-${now.day}";
     if (lastDate != todayStr) {
       final reward = isPremium ? 100 : 20;
-      sCoins += reward;
-      await StorageService.saveCoins(sCoins);
+      sCoins = await _coinRepository.getBalance();
       await StorageService.saveLastResetDate(todayStr);
       final uid = UserService.currentUid;
+
       if (uid != null) {
         try {
-          await UserService().updateCoins(uid, sCoins);
+          await _coinRepository.addCoin(reward, 'daily_login_reward');
         } catch (_) {}
       }
 

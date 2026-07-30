@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 
 import '../services/storage_service.dart';
-import '../services/user_service.dart';
 import '../services/coin_service.dart';
 
 import '../repositories/coin/coin_repository.dart';
@@ -67,18 +66,10 @@ class _ShopPageState extends State<ShopPage> {
     });
   }
 
-  Future<void> _buyCoins(int amount) async {
+  Future<void> buyCoins(int amount) async {
     await _coinRepository.addCoin(amount, 'purchase_coin');
 
     final latest = await _getCoinBalanceUseCase.execute();
-
-    final uid = UserService.currentUid;
-
-    if (uid != null) {
-      try {
-        await UserService().updateCoins(uid, latest);
-      } catch (_) {}
-    }
 
     if (!mounted) return;
 
@@ -113,15 +104,6 @@ class _ShopPageState extends State<ShopPage> {
     }
 
     final latest = await _getCoinBalanceUseCase.execute();
-
-    final uid = UserService.currentUid;
-
-    if (uid != null) {
-      try {
-        await UserService().updateCoins(uid, latest);
-      } catch (_) {}
-    }
-
     if (!mounted) return;
 
     setState(() {
@@ -137,7 +119,6 @@ class _ShopPageState extends State<ShopPage> {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  @override
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
@@ -170,7 +151,7 @@ class _ShopPageState extends State<ShopPage> {
 
           ElevatedButton(
             onPressed: () {
-              _buyCoins(10);
+              buyCoins(10);
             },
             child: const Text('Buy 10 COIN'),
           ),

@@ -269,6 +269,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get coinUnit => '金幣';
+
+  @override
+  String get forumCategoryAll => '全部';
+
+  @override
+  String get forumCategoryCraving => '菸癮犯了';
+
+  @override
+  String get forumCategoryStory => '戒菸心得';
+
+  @override
+  String get forumCategoryHealth => '健康交流';
+
+  @override
+  String get forumCategorySupport => '互相鼓勵';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -536,4 +551,19 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get coinUnit => '金幣';
+
+  @override
+  String get forumCategoryAll => '全部';
+
+  @override
+  String get forumCategoryCraving => '菸癮犯了';
+
+  @override
+  String get forumCategoryStory => '戒菸心得';
+
+  @override
+  String get forumCategoryHealth => '健康交流';
+
+  @override
+  String get forumCategorySupport => '互相鼓勵';
 }

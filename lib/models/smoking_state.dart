@@ -40,7 +40,9 @@ class SmokingState {
 
     this.lastSmokeTime,
 
-    this.userStatus = UserSmokingStatus.smoker,
+    this.role = UserRole.quitter,
+
+    this.smokingStatus = SmokingStatus.smoker,
   });
 
   SmokingState addSmoke(DateTime time) {
@@ -64,7 +66,9 @@ class SmokingState {
 
       lastSmokeTime: time,
 
-      userStatus: userStatus,
+      role: role,
+
+      smokingStatus: smokingStatus,
     );
   }
 
@@ -76,20 +80,16 @@ class SmokingState {
   }) {
     return SmokingState(
       planStartDate: newPlanStartDate,
-
       startTime: newStartTime,
-
       endTime: newEndTime,
-
       plannedCount: newPlannedCount,
-
       smokeRecords: const [],
-
       unlockTimes: const [],
-
       currentIndex: 0,
-
       lastSmokeTime: null,
+
+      role: role,
+      smokingStatus: smokingStatus,
     );
   }
 

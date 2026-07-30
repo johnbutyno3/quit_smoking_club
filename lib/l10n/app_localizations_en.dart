@@ -275,4 +275,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get coinUnit => 'Coins';
+
+  @override
+  String get forumCategoryAll => 'All';
+
+  @override
+  String get forumCategoryCraving => 'Craving';
+
+  @override
+  String get forumCategoryStory => 'Quit Stories';
+
+  @override
+  String get forumCategoryHealth => 'Health';
+
+  @override
+  String get forumCategorySupport => 'Support';
 }

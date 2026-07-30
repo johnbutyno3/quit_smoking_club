@@ -94,7 +94,9 @@ class _ForumPageState extends State<ForumPage> {
       final uid = UserService.currentUid;
       if (uid != null) {
         try {
-          await UserService().updateCoins(uid, latestCoins);
+          await CoinRepository(
+            coinService: CoinService(),
+          ).addCoin(latestCoins - _myCoins, 'forum_reward');
         } catch (_) {}
       }
       final post = _posts[index];

@@ -590,6 +590,36 @@ abstract class AppLocalizations {
   /// In zh_TW, this message translates to:
   /// **'金幣'**
   String get coinUnit;
+
+  /// No description provided for @forumCategoryAll.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'全部'**
+  String get forumCategoryAll;
+
+  /// No description provided for @forumCategoryCraving.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'菸癮犯了'**
+  String get forumCategoryCraving;
+
+  /// No description provided for @forumCategoryStory.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'戒菸心得'**
+  String get forumCategoryStory;
+
+  /// No description provided for @forumCategoryHealth.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'健康交流'**
+  String get forumCategoryHealth;
+
+  /// No description provided for @forumCategorySupport.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'互相鼓勵'**
+  String get forumCategorySupport;
 }
 
 class _AppLocalizationsDelegate
