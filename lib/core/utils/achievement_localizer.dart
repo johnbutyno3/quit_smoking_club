@@ -13,8 +13,8 @@ class AchievementLocalizer {
       case 'achievementDay30Title':
         return l10n.achievementDay30Title;
 
-      case 'achievementMoney1000Title':
-        return l10n.achievementMoney1000Title;
+      case 'achievementSpending1000Title':
+        return l10n.achievementSpending1000Title;
 
       case 'achievementRecoveryTitle':
         return l10n.achievementRecoveryTitle;
@@ -32,8 +32,8 @@ class AchievementLocalizer {
       case 'achievementDay30Progress':
         return l10n.achievementDay30Progress;
 
-      case 'achievementMoney1000Progress':
-        return l10n.achievementMoney1000Progress;
+      case 'achievementSpending1000Progress':
+        return l10n.achievementSpending1000Progress;
 
       case 'achievementRecoveryProgress':
         return l10n.achievementRecoveryProgress;
@@ -54,8 +54,8 @@ class AchievementLocalizer {
       case 'achievementDay30Description':
         return l10n.achievementDay30Description;
 
-      case 'achievementMoney1000Description':
-        return l10n.achievementMoney1000Description;
+      case 'achievementSpending1000Description':
+        return l10n.achievementSpending1000Description;
 
       case 'achievementRecoveryDescription':
         return l10n.achievementRecoveryDescription;

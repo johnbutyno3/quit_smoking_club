@@ -22,7 +22,7 @@ class CoinService {
 
   List<CoinTransaction> get history => List.unmodifiable(_history);
 
-  /// 累積消費 COIN
+  /// Total spent COIN amount
   int get totalSpentCoins {
     return _history
         .where((item) => item.amount < 0)

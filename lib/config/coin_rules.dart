@@ -29,9 +29,6 @@ class CoinRules {
   /// 戒菸第 30 天
   static const int achievementDay30 = 100;
 
-  /// 省下金額達標
-  static const int achievementMoney1000 = 100;
-
   /// 身體恢復階段完成
   static const int achievementRecovery = 50;
 

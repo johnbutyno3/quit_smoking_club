@@ -284,6 +284,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get forumCategorySupport => '互相鼓勵';
+
+  @override
+  String get achievementSpending1000Title => '消費 1000 金幣';
+
+  @override
+  String get achievementSpending1000Description => '累積消費 1000 金幣';
+
+  @override
+  String get achievementSpending1000Progress => '尚未消費 1000 金幣';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -566,4 +575,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get forumCategorySupport => '互相鼓勵';
+
+  @override
+  String get achievementSpending1000Title => '消費 1000 金幣';
+
+  @override
+  String get achievementSpending1000Description => '累積消費 1000 金幣';
+
+  @override
+  String get achievementSpending1000Progress => '尚未消費 1000 金幣';
 }

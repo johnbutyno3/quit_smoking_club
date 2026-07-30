@@ -620,6 +620,24 @@ abstract class AppLocalizations {
   /// In zh_TW, this message translates to:
   /// **'互相鼓勵'**
   String get forumCategorySupport;
+
+  /// No description provided for @achievementSpending1000Title.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'消費 1000 金幣'**
+  String get achievementSpending1000Title;
+
+  /// No description provided for @achievementSpending1000Description.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'累積消費 1000 金幣'**
+  String get achievementSpending1000Description;
+
+  /// No description provided for @achievementSpending1000Progress.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'尚未消費 1000 金幣'**
+  String get achievementSpending1000Progress;
 }
 
 class _AppLocalizationsDelegate

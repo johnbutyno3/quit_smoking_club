@@ -98,7 +98,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       recovery: recovery,
       coinRepository: CoinRepository(coinService: CoinService()),
     ); // 計時器每秒自動檢查是否該彈出提醒通知
-
+    achievement.loadLoginStreak();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted || !_isLoaded) return;
 
@@ -196,6 +196,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           recovery: recovery,
           coinRepository: CoinRepository(coinService: CoinService()),
         );
+        achievement.loadLoginStreak();
         _myCoins = sCoins;
         _cigarettePrice = sPrice;
         _isLoaded = true;
@@ -392,6 +393,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                   coinService: CoinService(),
                                 ),
                               );
+                              achievement.loadLoginStreak();
                             });
                           }
                         },

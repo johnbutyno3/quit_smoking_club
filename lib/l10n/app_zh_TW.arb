@@ -166,5 +166,8 @@
   "forumCategoryCraving": "菸癮犯了",
   "forumCategoryStory": "戒菸心得",
   "forumCategoryHealth": "健康交流",
-  "forumCategorySupport": "互相鼓勵"
+  "forumCategorySupport": "互相鼓勵",
+"achievementSpending1000Title": "消費 1000 金幣",
+"achievementSpending1000Description": "累積消費 1000 金幣",
+"achievementSpending1000Progress": "尚未消費 1000 金幣"
 }

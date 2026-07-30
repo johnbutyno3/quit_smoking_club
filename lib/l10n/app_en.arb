@@ -166,5 +166,8 @@
   "forumCategoryCraving": "Craving",
   "forumCategoryStory": "Quit Stories",
   "forumCategoryHealth": "Health",
-  "forumCategorySupport": "Support"
+  "forumCategorySupport": "Support",
+  "achievementSpending1000Title": "Spent 1000 COIN",
+"achievementSpending1000Description": "Spent a total of 1000 COIN",
+"achievementSpending1000Progress": "Have not spent 1000 COIN yet"
   }

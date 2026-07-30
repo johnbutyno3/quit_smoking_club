@@ -117,6 +117,12 @@ class AchievementEngine {
   double get progress => totalCount == 0 ? 0 : completedCount / totalCount;
 
   Future<void> claimAchievementRewards() async {
+    final loginStreak = await StorageService.getLoginStreak();
+
+    if (loginStreak <= 0) {
+      return;
+    }
+
     final claimed = await StorageService.getClaimedAchievements();
 
     for (final achievement in achievements) {

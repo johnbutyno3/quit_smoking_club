@@ -290,4 +290,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get forumCategorySupport => 'Support';
+
+  @override
+  String get achievementSpending1000Title => 'Spent 1000 COIN';
+
+  @override
+  String get achievementSpending1000Description => 'Spent a total of 1000 COIN';
+
+  @override
+  String get achievementSpending1000Progress => 'Have not spent 1000 COIN yet';
 }
