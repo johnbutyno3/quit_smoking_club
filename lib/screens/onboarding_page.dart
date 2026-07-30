@@ -64,7 +64,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
     // 將資料安全寫入 StorageService 磁碟快取，解鎖首次下載流程
     await StorageService.saveUserName(name);
     await StorageService.saveDailyCount(count);
-    await StorageService.saveCoins(20); // 首次下載贈送 20 基礎金幣
     await StorageService.savePremium(false); // 預設為一般會員
 
     if (mounted) {
