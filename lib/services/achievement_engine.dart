@@ -2,19 +2,17 @@ import 'recovery_engine.dart';
 import 'smoking_engine.dart';
 import '../repositories/coin/coin_repository.dart';
 import 'storage_service.dart';
+import '../config/coin_rules.dart';
+import '../services/coin_service.dart';
 
 class Achievement {
   final String id;
-
   final String titleKey;
-
   final String descriptionKey;
-
   final String icon;
-
   final bool unlocked;
-
   final String? progressKey;
+
   const Achievement({
     required this.id,
     required this.titleKey,
@@ -30,16 +28,25 @@ class AchievementEngine {
   final RecoveryEngine recovery;
   final CoinRepository coinRepository;
 
+  int _loginStreak = 0;
+
   AchievementEngine({
     required this.smoking,
     required this.recovery,
     required this.coinRepository,
   });
+
+  Future<void> loadLoginStreak() async {
+    _loginStreak = await StorageService.getLoginStreak();
+  }
+
   int get quitDays =>
       DateTime.now().difference(smoking.state.planStartDate).inDays + 1;
+
+  int get loginStreak => _loginStreak;
+
   int get savedMoney {
     final days = quitDays;
-
     final daily = smoking.state.plannedCount;
 
     return days * daily * 10;
@@ -51,32 +58,40 @@ class AchievementEngine {
       titleKey: "achievementDay1Title",
       descriptionKey: "achievementDay1Description",
       icon: "🎉",
-      unlocked: quitDays >= 1,
+      unlocked: quitDays >= 1 && loginStreak >= 1,
     ),
+
     Achievement(
       id: "day7",
       titleKey: "achievementDay7Title",
       descriptionKey: "achievementDay7Description",
       icon: "🔥",
-      unlocked: quitDays >= 7,
-      progressKey: quitDays >= 7 ? null : "achievementDay7Progress",
+      unlocked: quitDays >= 7 && loginStreak >= 7,
+      progressKey: quitDays >= 7 && loginStreak >= 7
+          ? null
+          : "achievementDay7Progress",
     ),
+
     Achievement(
       id: "day30",
       titleKey: "achievementDay30Title",
       descriptionKey: "achievementDay30Description",
       icon: "🏆",
-      unlocked: quitDays >= 30,
-      progressKey: quitDays >= 30 ? null : "achievementDay30Progress",
+      unlocked: quitDays >= 30 && loginStreak >= 30,
+      progressKey: quitDays >= 30 && loginStreak >= 30
+          ? null
+          : "achievementDay30Progress",
     ),
+
     Achievement(
-      id: "money1000",
-      titleKey: "achievementMoney1000Title",
-      descriptionKey: "achievementMoney1000Description",
-      icon: "💰",
-      unlocked: savedMoney >= 1000,
-      progressKey: savedMoney >= 1000 ? null : "achievementMoney1000Progress",
+      id: "spending1000",
+      titleKey: "achievementSpending1000Title",
+      descriptionKey: "achievementSpending1000Description",
+      icon: "🛒",
+      unlocked:
+          CoinService().totalSpentCoins >= CoinRules.spendingAchievementTarget,
     ),
+
     Achievement(
       id: "recovery",
       titleKey: "achievementRecoveryTitle",
@@ -100,6 +115,7 @@ class AchievementEngine {
   int get totalCount => achievements.length;
 
   double get progress => totalCount == 0 ? 0 : completedCount / totalCount;
+
   Future<void> claimAchievementRewards() async {
     final claimed = await StorageService.getClaimedAchievements();
 
@@ -109,28 +125,29 @@ class AchievementEngine {
 
         switch (achievement.id) {
           case "day1":
-            reward = 10;
+            reward = CoinRules.achievementDay1;
             break;
 
           case "day7":
-            reward = 50;
+            reward = CoinRules.achievementDay7;
             break;
 
           case "day30":
-            reward = 100;
+            reward = CoinRules.achievementDay30;
             break;
 
-          case "money1000":
-            reward = 100;
+          case "spending1000":
+            reward = CoinRules.spendingAchievementReward;
             break;
 
           case "recovery":
-            reward = 50;
+            reward = CoinRules.achievementRecovery;
             break;
         }
 
         if (reward > 0) {
           await coinRepository.addCoin(reward, 'achievement_${achievement.id}');
+
           await StorageService.saveClaimedAchievement(achievement.id);
         }
       }

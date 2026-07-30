@@ -160,7 +160,7 @@ class _ShopPageState extends State<ShopPage> {
 
           ElevatedButton(
             onPressed: _createForum,
-            child: const Text('Create Forum Post (-30 COIN)'),
+            child: const Text('Create Forum Post (-50 COIN)'),
           ),
 
           const SizedBox(height: 20),

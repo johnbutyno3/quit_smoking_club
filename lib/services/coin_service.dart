@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../models/coin_transaction.dart';
 import 'storage_service.dart';
 import 'supabase_coin_log_service.dart';
+import '../config/coin_rules.dart';
 
 class CoinService {
   CoinService._internal();
@@ -20,6 +21,13 @@ class CoinService {
   int get balance => _balance;
 
   List<CoinTransaction> get history => List.unmodifiable(_history);
+
+  /// 累積消費 COIN
+  int get totalSpentCoins {
+    return _history
+        .where((item) => item.amount < 0)
+        .fold(0, (sum, item) => sum + item.amount.abs());
+  }
 
   Future<void> loadBalance() async {
     _balance = await StorageService.getCoins();
@@ -67,12 +75,53 @@ class CoinService {
   }
 
   Future<bool> claimDailyLogin() async {
-    await addCoin(10, 'daily_login');
+    final today = DateTime.now().toIso8601String().substring(0, 10);
+
+    final lastLogin = await StorageService.getLastLoginDate();
+
+    // 今天已登入
+    if (lastLogin == today) {
+      return false;
+    }
+
+    int streak = await StorageService.getLoginStreak();
+
+    if (lastLogin.isEmpty) {
+      streak = 1;
+    } else {
+      final lastDate = DateTime.parse(lastLogin);
+      final nowDate = DateTime.parse(today);
+
+      final diff = nowDate.difference(lastDate).inDays;
+
+      if (diff == 1) {
+        streak++;
+      } else {
+        streak = 1;
+      }
+    }
+
+    await StorageService.saveLastLoginDate(today);
+    await StorageService.saveLoginStreak(streak);
+
+    await addCoin(CoinRules.dailyLoginReward, 'daily_login');
+
     return true;
   }
 
   Future<bool> claimDailyPlanReward() async {
-    await addCoin(20, 'daily_plan_reward');
+    final today = DateTime.now().toIso8601String().substring(0, 10);
+
+    final lastRewardDate = await StorageService.getLastPlanRewardDate();
+
+    if (lastRewardDate == today) {
+      return false;
+    }
+
+    await addCoin(CoinRules.dailyPlanReward, 'daily_plan_reward');
+
+    await StorageService.saveLastPlanRewardDate(today);
+
     return true;
   }
 
@@ -114,7 +163,7 @@ class CoinService {
   }
 
   Future<bool> spendForPost() async {
-    return spendCoin(30, 'forum_create_post');
+    return spendCoin(CoinRules.createPostCost, 'forum_create_post');
   }
 
   void clear() {

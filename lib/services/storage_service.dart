@@ -104,10 +104,10 @@ class StorageService {
     await prefs.setInt('user_coins', coins);
   }
 
-  // 📡 讀取目前金幣總數 (預設送50個)
+  // 📡 讀取目前金幣總數 (預設送20個)
   static Future<int> getCoins() async {
     final prefs = await _prefs;
-    return prefs.getInt('user_coins') ?? 50;
+    return prefs.getInt('user_coins') ?? 20;
   }
 
   // ⭐ COIN交易紀錄讀取
@@ -158,6 +158,38 @@ class StorageService {
   static Future<String> getLastResetDate() async {
     final prefs = await _prefs;
     return prefs.getString('last_reset_date') ?? "";
+  }
+  // 📅 登入連續天數紀錄
+
+  static Future<void> saveLoginStreak(int days) async {
+    final prefs = await _prefs;
+    await prefs.setInt('login_streak', days);
+  }
+
+  static Future<int> getLoginStreak() async {
+    final prefs = await _prefs;
+    return prefs.getInt('login_streak') ?? 0;
+  }
+
+  static Future<void> saveLastLoginDate(String dateStr) async {
+    final prefs = await _prefs;
+    await prefs.setString('last_login_date', dateStr);
+  }
+
+  static Future<String> getLastLoginDate() async {
+    final prefs = await _prefs;
+    return prefs.getString('last_login_date') ?? "";
+  }
+
+  // 📅 每日戒菸計畫獎勵日期
+  static Future<void> saveLastPlanRewardDate(String dateStr) async {
+    final prefs = await _prefs;
+    await prefs.setString('last_plan_reward_date', dateStr);
+  }
+
+  static Future<String> getLastPlanRewardDate() async {
+    final prefs = await _prefs;
+    return prefs.getString('last_plan_reward_date') ?? "";
   }
 
   // 💾 儲存第一支菸時間，格式 "HH:MM"，預設 "08:00"
