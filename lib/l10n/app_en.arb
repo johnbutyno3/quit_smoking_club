@@ -161,5 +161,10 @@
   "smokedCount": "Smoked",
   "remainingAmount": "Remaining",
   "todaySaved": "Saved Today",
-  "coinUnit": "Coins"
-}
+  "coinUnit": "Coins",
+ "forumCategoryAll": "All",
+  "forumCategoryCraving": "Craving",
+  "forumCategoryStory": "Quit Stories",
+  "forumCategoryHealth": "Health",
+  "forumCategorySupport": "Support"
+  }

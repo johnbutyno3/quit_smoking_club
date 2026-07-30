@@ -14,7 +14,9 @@ class CoinPage extends StatefulWidget {
 }
 
 class _CoinPageState extends State<CoinPage> {
-  final CoinRepository _coinRepository = CoinRepository(CoinService());
+  final CoinRepository _coinRepository = CoinRepository(
+    coinService: CoinService(),
+  );
   final CoinService _coinService = CoinService();
   late final GetCoinBalanceUseCase _getCoinBalanceUseCase =
       GetCoinBalanceUseCase(_coinRepository);

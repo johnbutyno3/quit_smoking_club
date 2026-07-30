@@ -161,5 +161,10 @@
   "smokedCount": "已抽支數",
   "remainingAmount": "剩餘額度",
   "todaySaved": "今日省下",
-  "coinUnit": "金幣"
+  "coinUnit": "金幣",
+  "forumCategoryAll": "全部",
+  "forumCategoryCraving": "菸癮犯了",
+  "forumCategoryStory": "戒菸心得",
+  "forumCategoryHealth": "健康交流",
+  "forumCategorySupport": "互相鼓勵"
 }

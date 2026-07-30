@@ -1,20 +1,31 @@
-import 'package:quit_smoking_club/services/coin_service.dart';
+import '../../models/coin_transaction.dart';
+import '../../services/coin_service.dart';
+import '../../services/storage_service.dart';
 
 class CoinRepository {
-  final CoinService coinService;
+  final CoinService _coinService;
 
-  CoinRepository(this.coinService);
+  CoinRepository({CoinService? coinService})
+    : _coinService = coinService ?? CoinService();
 
-  Future<bool> spendCoin(int amount, String reason) async {
-    return await coinService.spendCoin(amount, reason);
-  }
-
-  Future<void> addCoin(int amount, String reason) async {
-    await coinService.addCoin(amount, reason);
+  Future<int> getBalance() async {
+    await _coinService.loadBalance();
+    return _coinService.balance;
   }
 
   Future<int> getCoins() async {
-    await coinService.loadBalance();
-    return coinService.balance;
+    return await getBalance();
+  }
+
+  Future<bool> spendCoin(int amount, String reason) async {
+    return await _coinService.spendCoin(amount, reason);
+  }
+
+  Future<void> addCoin(int amount, String reason) async {
+    await _coinService.addCoin(amount, reason);
+  }
+
+  Future<List<CoinTransaction>> getHistory() async {
+    return await StorageService.getCoinHistory();
   }
 }

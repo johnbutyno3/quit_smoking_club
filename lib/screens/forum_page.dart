@@ -26,8 +26,9 @@ class _ForumColors {
 class _ForumPageState extends State<ForumPage> {
   final ForumRepository _forumRepository = ForumRepository();
 
-  final CoinRepository _coinRepository = CoinRepository(CoinService());
-
+  final CoinRepository _coinRepository = CoinRepository(
+    coinService: CoinService(),
+  );
   late final GetCoinBalanceUseCase _getCoinBalanceUseCase =
       GetCoinBalanceUseCase(_coinRepository);
 
@@ -39,8 +40,13 @@ class _ForumPageState extends State<ForumPage> {
   int _myCoins = 0;
   int _selectedCategory = 0; // 0=全部, 1=菸癮犯了, 2=心得分享, 3=健康交流, 4=互相鼓勵
 
-  static const _categories = ['全部', '菸癮犯了', '戒菸心得', '健康交流', '互相鼓勵'];
-
+  static const _categories = [
+    'forum.category.all',
+    'forum.category.craving',
+    'forum.category.story',
+    'forum.category.health',
+    'forum.category.support',
+  ];
   List<ForumPost> get _filteredPosts {
     if (_selectedCategory == 0) return _posts;
     if (_selectedCategory == 1) return _posts.where((p) => p.isSOS).toList();

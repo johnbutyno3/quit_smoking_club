@@ -45,8 +45,7 @@ class _ShopPageState extends State<ShopPage> {
   void initState() {
     super.initState();
 
-    _coinRepository = CoinRepository(CoinService());
-
+    _coinRepository = CoinRepository(coinService: CoinService());
     _getCoinBalanceUseCase = GetCoinBalanceUseCase(_coinRepository);
 
     _spendCoinUseCase = SpendCoinUseCase(_coinRepository);
