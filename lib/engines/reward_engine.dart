@@ -1,14 +1,13 @@
 import 'score_engine.dart';
 import '../services/smoking_engine.dart';
-import '../services/coin_service.dart';
+import '../repositories/coin/coin_repository.dart';
 
 class RewardEngine {
   final ScoreEngine _scoreEngine = ScoreEngine();
 
-  final CoinService coinService;
+  final CoinRepository coinRepository;
 
-  RewardEngine(this.coinService);
-
+  RewardEngine(this.coinRepository);
   int calculateRewardCoins(SmokingEngine engine) {
     final currentScore = _scoreEngine.getDisplayScore(engine);
 
@@ -18,11 +17,11 @@ class RewardEngine {
     return 0;
   }
 
-  void rewardDailyScore(SmokingEngine engine) {
+  Future<void> rewardDailyScore(SmokingEngine engine) async {
     final coins = calculateRewardCoins(engine);
 
     if (coins > 0) {
-      coinService.addCoin(coins, '每日戒菸評分獎勵');
+      await coinRepository.addCoin(coins, 'daily_score_reward');
     }
   }
 }

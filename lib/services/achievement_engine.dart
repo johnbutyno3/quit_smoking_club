@@ -1,6 +1,6 @@
 import 'recovery_engine.dart';
 import 'smoking_engine.dart';
-import 'coin_service.dart';
+import '../repositories/coin/coin_repository.dart';
 import 'storage_service.dart';
 
 class Achievement {
@@ -28,9 +28,13 @@ class Achievement {
 class AchievementEngine {
   final SmokingEngine smoking;
   final RecoveryEngine recovery;
+  final CoinRepository coinRepository;
 
-  AchievementEngine({required this.smoking, required this.recovery});
-
+  AchievementEngine({
+    required this.smoking,
+    required this.recovery,
+    required this.coinRepository,
+  });
   int get quitDays =>
       DateTime.now().difference(smoking.state.planStartDate).inDays + 1;
   int get savedMoney {
@@ -99,8 +103,6 @@ class AchievementEngine {
   Future<void> claimAchievementRewards() async {
     final claimed = await StorageService.getClaimedAchievements();
 
-    final coinService = CoinService();
-
     for (final achievement in achievements) {
       if (achievement.unlocked && !claimed.contains(achievement.id)) {
         int reward = 0;
@@ -128,8 +130,7 @@ class AchievementEngine {
         }
 
         if (reward > 0) {
-          await coinService.addCoin(reward, 'achievement_${achievement.id}');
-
+          await coinRepository.addCoin(reward, 'achievement_${achievement.id}');
           await StorageService.saveClaimedAchievement(achievement.id);
         }
       }

@@ -93,8 +93,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     engine = SmokingEngine(state, plan);
     recovery = RecoveryEngine(state);
-    achievement = AchievementEngine(smoking: engine, recovery: recovery);
-    // 計時器每秒自動檢查是否該彈出提醒通知
+    achievement = AchievementEngine(
+      smoking: engine,
+      recovery: recovery,
+      coinRepository: CoinRepository(coinService: CoinService()),
+    ); // 計時器每秒自動檢查是否該彈出提醒通知
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted || !_isLoaded) return;
 
@@ -187,7 +190,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
         engine = SmokingEngine(state, plan);
         recovery = RecoveryEngine(state);
-        achievement = AchievementEngine(smoking: engine, recovery: recovery);
+        achievement = AchievementEngine(
+          smoking: engine,
+          recovery: recovery,
+          coinRepository: CoinRepository(coinService: CoinService()),
+        );
         _myCoins = sCoins;
         _cigarettePrice = sPrice;
         _isLoaded = true;
@@ -380,6 +387,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                               achievement = AchievementEngine(
                                 smoking: engine,
                                 recovery: recovery,
+                                coinRepository: CoinRepository(
+                                  coinService: CoinService(),
+                                ),
                               );
                             });
                           }

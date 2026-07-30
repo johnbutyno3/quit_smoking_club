@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/forum_post.dart';
 import '../services/coin_service.dart';
+import '../repositories/coin/coin_repository.dart';
 
 class ForumDetailPage extends StatefulWidget {
   final ForumPost post;
@@ -25,8 +26,9 @@ class ForumDetailPage extends StatefulWidget {
 class _ForumDetailPageState extends State<ForumDetailPage> {
   final TextEditingController _commentController = TextEditingController();
 
-  final CoinService coinService = CoinService();
-
+  final CoinRepository _coinRepository = CoinRepository(
+    coinService: CoinService(),
+  );
   List<Map<String, dynamic>> _comments = [];
 
   bool _loading = true;
@@ -71,7 +73,7 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
   }
 
   Future<bool> _payComment() async {
-    return await coinService.spendCoin(1, '論壇留言');
+    return await _coinRepository.spendCoin(1, 'forum_comment');
   }
 
   Future<void> _sendComment() async {
