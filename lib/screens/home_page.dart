@@ -20,6 +20,7 @@ import '../widgets/achievement_card.dart';
 import '../pages/quit_plan_page.dart';
 import '../pages/coin_page.dart';
 import 'ranking_page.dart';
+import 'reading_library_page.dart';
 import '../models/user_smoking_status.dart';
 import '../widgets/home/home_progress_card.dart';
 import '../models/user_role.dart';
@@ -325,6 +326,38 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       Icons.sentiment_satisfied,
                       "2. 極短篇笑話 (短文小故事)",
                       "Stories",
+                    ),
+                    Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      child: ListTile(
+                        dense: true,
+                        leading: const Icon(
+                          Icons.menu_book_outlined,
+                          color: _ThemeColors.accent,
+                        ),
+                        title: const Text(
+                          '閱讀文章（下載後可離線閱讀）',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios,
+                          size: 12,
+                          color: Colors.grey,
+                        ),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ReadingLibraryPage(),
+                          ),
+                        ),
+                      ),
                     ),
                     _buildTile(
                       Icons.video_library,
