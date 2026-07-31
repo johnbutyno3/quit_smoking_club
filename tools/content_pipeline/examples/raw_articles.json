@@ -1,0 +1,12 @@
+[
+  {
+    "category": "Medical",
+    "language": "zh-TW",
+    "title": "戒菸後的身體變化",
+    "content": "戒菸後，身體會開始逐步恢復。\n\n每個人的情況不同；如有健康疑慮，請詢問醫療專業人員。",
+    "link": "https://example.org/quitting-smoking",
+    "source_name": "Example Health",
+    "coin_cost": 2,
+    "status": "draft"
+  }
+]

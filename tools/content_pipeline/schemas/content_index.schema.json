@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QSC Content Index",
+  "type": "object",
+  "required": ["schema_version", "generated_at", "articles"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "articles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "category", "language", "title", "summary", "preview", "coin_cost", "version", "status"],
+        "properties": {
+          "id": {"type": "string"}, "category": {"type": "string"}, "language": {"type": "string"},
+          "title": {"type": "string"}, "summary": {"type": "string"}, "preview": {"type": "string"},
+          "coin_cost": {"type": "integer", "minimum": 0}, "version": {"type": "integer", "minimum": 1}, "status": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

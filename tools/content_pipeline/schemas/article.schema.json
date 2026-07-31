@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QSC Article",
+  "type": "object",
+  "required": ["schema_version", "id", "category", "language", "title", "summary", "body", "source", "preview", "download", "version", "status"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "category": {"type": "string", "enum": ["medical", "story", "guide", "game", "music", "video"]},
+    "language": {"type": "string", "pattern": "^[a-z]{2,3}(?:-[A-Z]{2})?$"},
+    "title": {"type": "string", "minLength": 1},
+    "summary": {"type": "string", "minLength": 1},
+    "body": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["type", "text"],
+        "properties": {
+          "type": {"type": "string", "enum": ["paragraph", "heading", "quote", "list_item"]},
+          "text": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["url"],
+      "properties": {"name": {"type": "string"}, "url": {"type": "string", "format": "uri"}},
+      "additionalProperties": false
+    },
+    "preview": {
+      "type": "object",
+      "required": ["text", "read_percent"],
+      "properties": {"text": {"type": "string"}, "read_percent": {"type": "integer", "minimum": 0, "maximum": 100}},
+      "additionalProperties": false
+    },
+    "download": {
+      "type": "object",
+      "required": ["coin_cost"],
+      "properties": {"coin_cost": {"type": "integer", "minimum": 0}},
+      "additionalProperties": false
+    },
+    "version": {"type": "integer", "minimum": 1},
+    "status": {"type": "string", "enum": ["draft", "published", "archived"]},
+    "published_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"}
+  },
+  "additionalProperties": false
+}
