@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/reading_book.dart';
 import '../repositories/reading_repository.dart';
 import 'reading_reader_page.dart';
@@ -13,7 +14,9 @@ class ReadingLibraryPage extends StatefulWidget {
 
 class _ReadingLibraryPageState extends State<ReadingLibraryPage> {
   final ReadingRepository _repository = ReadingRepository();
+
   late Future<List<ReadingBook>> _books;
+
   String? _downloadingBookId;
 
   @override
@@ -22,56 +25,83 @@ class _ReadingLibraryPageState extends State<ReadingLibraryPage> {
     _books = _repository.listBooks();
   }
 
-  void _reload() => setState(() => _books = _repository.listBooks());
+  void _reload() {
+    setState(() {
+      _books = _repository.listBooks();
+    });
+  }
 
   Future<void> _openBook(ReadingBook book) async {
     final cached = await _repository.loadCachedBook(book.id);
+
+    if (!mounted) return;
+
     if (cached != null) {
       if (!mounted) return;
       await _openReader(cached);
       return;
     }
 
-    setState(() => _downloadingBookId = book.id);
+    setState(() {
+      _downloadingBookId = book.id;
+    });
+
     try {
       final result = await _repository.downloadBook(book);
+
       if (!mounted) return;
+
       switch (result.status) {
         case ReadingDownloadStatus.downloaded:
         case ReadingDownloadStatus.alreadyCached:
           await _openReader(result.book!);
+
         case ReadingDownloadStatus.insufficientCoins:
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('COIN 不足，無法下載這篇文章。')),
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context)!.readingCoinInsufficient,
+              ),
+            ),
           );
       }
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('下載失敗，請稍後再試。')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.downloadFailed)),
         );
       }
     } finally {
-      if (mounted) setState(() => _downloadingBookId = null);
+      if (mounted) {
+        setState(() {
+          _downloadingBookId = null;
+        });
+      }
     }
   }
 
-  Future<void> _openReader(ReadingBook book) => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => ReadingReaderPage(book: book)),
-      );
+  Future<void> _openReader(ReadingBook book) {
+    return Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => ReadingReaderPage(book: book)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('閱讀文章')),
+      appBar: AppBar(title: Text(l10n.readingTitle)),
       body: FutureBuilder<List<ReadingBook>>(
         future: _books,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return const Center(child: CircularProgressIndicator());
           }
+
           final books = snapshot.data ?? const <ReadingBook>[];
+
           if (books.isEmpty) {
             return Center(
               child: Padding(
@@ -81,14 +111,18 @@ class _ReadingLibraryPageState extends State<ReadingLibraryPage> {
                   children: [
                     const Icon(Icons.menu_book_outlined, size: 48),
                     const SizedBox(height: 12),
-                    const Text('目前沒有可閱讀的文章。'),
+                    Text(l10n.readingEmpty),
                     const SizedBox(height: 12),
-                    OutlinedButton(onPressed: _reload, child: const Text('重新整理')),
+                    OutlinedButton(
+                      onPressed: _reload,
+                      child: Text(l10n.refresh),
+                    ),
                   ],
                 ),
               ),
             );
           }
+
           return RefreshIndicator(
             onRefresh: () async => _reload(),
             child: ListView.separated(
@@ -97,34 +131,53 @@ class _ReadingLibraryPageState extends State<ReadingLibraryPage> {
               separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final book = books[index];
+
                 final downloading = _downloadingBookId == book.id;
+
                 return Card(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(book.title, style: Theme.of(context).textTheme.titleMedium),
+                        Text(
+                          book.title,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+
                         if (book.author.isNotEmpty) Text(book.author),
+
                         if (book.description.isNotEmpty) ...[
                           const SizedBox(height: 8),
                           Text(book.description),
                         ],
+
                         const SizedBox(height: 12),
+
                         Align(
                           alignment: Alignment.centerRight,
                           child: FilledButton.icon(
-                            onPressed: downloading ? null : () => _openBook(book),
+                            onPressed: downloading
+                                ? null
+                                : () => _openBook(book),
+
                             icon: downloading
                                 ? const SizedBox(
                                     width: 16,
                                     height: 16,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
                                   )
-                                : const Icon(Icons.download_for_offline_outlined),
-                            label: Text(book.downloadCoinCost == 0
-                                ? '下載並閱讀'
-                                : '${book.downloadCoinCost} COIN 下載並閱讀'),
+                                : const Icon(
+                                    Icons.download_for_offline_outlined,
+                                  ),
+
+                            label: Text(
+                              book.downloadCoinCost == 0
+                                  ? l10n.downloadAndRead
+                                  : '${book.downloadCoinCost} COIN ${l10n.downloadAndRead}',
+                            ),
                           ),
                         ),
                       ],

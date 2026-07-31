@@ -299,4 +299,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get achievementSpending1000Progress => 'Have not spent 1000 COIN yet';
+
+  @override
+  String get readingTitle => 'Reading';
+
+  @override
+  String get readingEmpty => 'No articles available.';
+
+  @override
+  String get refresh => 'Refresh';
+
+  @override
+  String get readingCoinInsufficient =>
+      'Not enough COIN to download this article.';
+
+  @override
+  String get downloadFailed => 'Download failed. Please try again later.';
+
+  @override
+  String get downloadAndRead => 'Download and Read';
 }

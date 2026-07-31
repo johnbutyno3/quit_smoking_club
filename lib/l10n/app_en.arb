@@ -169,5 +169,11 @@
   "forumCategorySupport": "Support",
   "achievementSpending1000Title": "Spent 1000 COIN",
 "achievementSpending1000Description": "Spent a total of 1000 COIN",
-"achievementSpending1000Progress": "Have not spent 1000 COIN yet"
+"achievementSpending1000Progress": "Have not spent 1000 COIN yet",
+  "readingTitle": "Reading",
+"readingEmpty": "No articles available.",
+"refresh": "Refresh",
+"readingCoinInsufficient": "Not enough COIN to download this article.",
+"downloadFailed": "Download failed. Please try again later.",
+"downloadAndRead": "Download and Read"
   }

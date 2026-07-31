@@ -293,6 +293,24 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get achievementSpending1000Progress => '尚未消費 1000 金幣';
+
+  @override
+  String get readingTitle => '閱讀文章';
+
+  @override
+  String get readingEmpty => '目前沒有可閱讀的文章。';
+
+  @override
+  String get refresh => '重新整理';
+
+  @override
+  String get readingCoinInsufficient => 'COIN 不足，無法下載這篇文章。';
+
+  @override
+  String get downloadFailed => '下載失敗，請稍後再試。';
+
+  @override
+  String get downloadAndRead => '下載並閱讀';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -584,4 +602,22 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get achievementSpending1000Progress => '尚未消費 1000 金幣';
+
+  @override
+  String get readingTitle => '閱讀文章';
+
+  @override
+  String get readingEmpty => '目前沒有可閱讀的文章。';
+
+  @override
+  String get refresh => '重新整理';
+
+  @override
+  String get readingCoinInsufficient => 'COIN 不足，無法下載這篇文章。';
+
+  @override
+  String get downloadFailed => '下載失敗，請稍後再試。';
+
+  @override
+  String get downloadAndRead => '下載並閱讀';
 }

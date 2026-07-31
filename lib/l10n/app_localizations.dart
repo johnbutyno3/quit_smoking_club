@@ -638,6 +638,42 @@ abstract class AppLocalizations {
   /// In zh_TW, this message translates to:
   /// **'尚未消費 1000 金幣'**
   String get achievementSpending1000Progress;
+
+  /// No description provided for @readingTitle.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'閱讀文章'**
+  String get readingTitle;
+
+  /// No description provided for @readingEmpty.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'目前沒有可閱讀的文章。'**
+  String get readingEmpty;
+
+  /// No description provided for @refresh.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'重新整理'**
+  String get refresh;
+
+  /// No description provided for @readingCoinInsufficient.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'COIN 不足，無法下載這篇文章。'**
+  String get readingCoinInsufficient;
+
+  /// No description provided for @downloadFailed.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'下載失敗，請稍後再試。'**
+  String get downloadFailed;
+
+  /// No description provided for @downloadAndRead.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'下載並閱讀'**
+  String get downloadAndRead;
 }
 
 class _AppLocalizationsDelegate
