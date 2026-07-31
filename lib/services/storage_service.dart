@@ -1,5 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+
 import '../models/smoking_plan.dart';
+import '../models/coin_transaction.dart';
 
 class StorageService {
   static final Future<SharedPreferences> _prefsInstance =
@@ -9,7 +12,8 @@ class StorageService {
 
   static const _smokeRecordsKey = 'smoke_records';
   static const _smokeRecordsDateKey = 'smoke_records_date';
-
+  static const _coinHistoryKey = 'coin_history';
+  static const _achievementClaimedKey = 'achievement_claimed';
   static String _formatDateKey(DateTime date) {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
@@ -100,10 +104,36 @@ class StorageService {
     await prefs.setInt('user_coins', coins);
   }
 
-  // 📡 讀取目前金幣總數 (預設送50個)
+  // 📡 讀取目前金幣總數 (預設送20個)
   static Future<int> getCoins() async {
     final prefs = await _prefs;
-    return prefs.getInt('user_coins') ?? 50;
+    return prefs.getInt('user_coins') ?? 20;
+  }
+
+  // ⭐ COIN交易紀錄讀取
+  static Future<List<CoinTransaction>> getCoinHistory() async {
+    final prefs = await _prefs;
+
+    final data = prefs.getStringList(_coinHistoryKey);
+
+    if (data == null) {
+      return [];
+    }
+
+    return data.map((e) {
+      return CoinTransaction.fromJson(jsonDecode(e));
+    }).toList();
+  }
+
+  // ⭐ COIN交易紀錄保存
+  static Future<void> saveCoinHistory(List<CoinTransaction> history) async {
+    final prefs = await _prefs;
+
+    final data = history.map((e) {
+      return jsonEncode(e.toJson());
+    }).toList();
+
+    await prefs.setStringList(_coinHistoryKey, data);
   }
 
   // 💾 儲存會員身份 (true 代表高級會員, false 代表一般)
@@ -128,6 +158,38 @@ class StorageService {
   static Future<String> getLastResetDate() async {
     final prefs = await _prefs;
     return prefs.getString('last_reset_date') ?? "";
+  }
+  // 📅 登入連續天數紀錄
+
+  static Future<void> saveLoginStreak(int days) async {
+    final prefs = await _prefs;
+    await prefs.setInt('login_streak', days);
+  }
+
+  static Future<int> getLoginStreak() async {
+    final prefs = await _prefs;
+    return prefs.getInt('login_streak') ?? 0;
+  }
+
+  static Future<void> saveLastLoginDate(String dateStr) async {
+    final prefs = await _prefs;
+    await prefs.setString('last_login_date', dateStr);
+  }
+
+  static Future<String> getLastLoginDate() async {
+    final prefs = await _prefs;
+    return prefs.getString('last_login_date') ?? "";
+  }
+
+  // 📅 每日戒菸計畫獎勵日期
+  static Future<void> saveLastPlanRewardDate(String dateStr) async {
+    final prefs = await _prefs;
+    await prefs.setString('last_plan_reward_date', dateStr);
+  }
+
+  static Future<String> getLastPlanRewardDate() async {
+    final prefs = await _prefs;
+    return prefs.getString('last_plan_reward_date') ?? "";
   }
 
   // 💾 儲存第一支菸時間，格式 "HH:MM"，預設 "08:00"
@@ -240,5 +302,23 @@ class StorageService {
       plannedCount: daily,
       durationDays: days,
     );
+  }
+
+  static Future<List<String>> getClaimedAchievements() async {
+    final prefs = await _prefs;
+
+    return prefs.getStringList(_achievementClaimedKey) ?? [];
+  }
+
+  static Future<void> saveClaimedAchievement(String achievementId) async {
+    final prefs = await _prefs;
+
+    final list = prefs.getStringList(_achievementClaimedKey) ?? [];
+
+    if (!list.contains(achievementId)) {
+      list.add(achievementId);
+
+      await prefs.setStringList(_achievementClaimedKey, list);
+    }
   }
 }

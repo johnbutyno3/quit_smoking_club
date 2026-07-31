@@ -1,14 +1,27 @@
 import 'score_engine.dart';
 import '../services/smoking_engine.dart';
+import '../repositories/coin/coin_repository.dart';
 
 class RewardEngine {
   final ScoreEngine _scoreEngine = ScoreEngine();
 
-  // 對齊最新 ScoreEngine 方法名稱，修復第一個紅色錯誤
+  final CoinRepository coinRepository;
+
+  RewardEngine(this.coinRepository);
   int calculateRewardCoins(SmokingEngine engine) {
     final currentScore = _scoreEngine.getDisplayScore(engine);
+
     if (currentScore > 80) return 10;
     if (currentScore > 50) return 5;
+
     return 0;
+  }
+
+  Future<void> rewardDailyScore(SmokingEngine engine) async {
+    final coins = calculateRewardCoins(engine);
+
+    if (coins > 0) {
+      await coinRepository.addCoin(coins, 'daily_score_reward');
+    }
   }
 }

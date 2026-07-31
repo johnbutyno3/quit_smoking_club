@@ -180,7 +180,7 @@ abstract class AppLocalizations {
   /// No description provided for @locked.
   ///
   /// In zh_TW, this message translates to:
-  /// **'尚未解鎖'**
+  /// **'待解鎖'**
   String get locked;
 
   /// No description provided for @sos.
@@ -212,6 +212,468 @@ abstract class AppLocalizations {
   /// In zh_TW, this message translates to:
   /// **'控菸今日排程表'**
   String get todaySchedule;
+
+  /// No description provided for @createPost.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'建立貼文'**
+  String get createPost;
+
+  /// No description provided for @postName.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'暱稱'**
+  String get postName;
+
+  /// No description provided for @postContent.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'貼文內容'**
+  String get postContent;
+
+  /// No description provided for @publish.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'發布'**
+  String get publish;
+
+  /// No description provided for @myCoins.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'我的 COIN'**
+  String get myCoins;
+
+  /// No description provided for @giftSent.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'禮物送出成功'**
+  String get giftSent;
+
+  /// No description provided for @insufficientCoins.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'COIN 不足'**
+  String get insufficientCoins;
+
+  /// No description provided for @postCreated.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'貼文建立成功'**
+  String get postCreated;
+
+  /// No description provided for @anonymousUser.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'匿名朋友'**
+  String get anonymousUser;
+
+  /// No description provided for @like.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'讚'**
+  String get like;
+
+  /// No description provided for @gift.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'禮物'**
+  String get gift;
+
+  /// No description provided for @now.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'剛剛'**
+  String get now;
+
+  /// No description provided for @minutesAgo.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'{count} 分鐘前'**
+  String minutesAgo(Object count);
+
+  /// No description provided for @hoursAgo.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'{count} 小時前'**
+  String hoursAgo(Object count);
+
+  /// No description provided for @daysAgo.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'{count} 天前'**
+  String daysAgo(Object count);
+
+  /// No description provided for @emptyForum.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'目前尚無論壇貼文，快建立第一篇吧！'**
+  String get emptyForum;
+
+  /// No description provided for @sosPost.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'求助文章'**
+  String get sosPost;
+
+  /// No description provided for @coinHistory.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'COIN 紀錄'**
+  String get coinHistory;
+
+  /// No description provided for @currentBalance.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'目前餘額'**
+  String get currentBalance;
+
+  /// No description provided for @noTransactionHistory.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'目前沒有交易紀錄'**
+  String get noTransactionHistory;
+
+  /// No description provided for @purchaseSuccess.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'購買成功'**
+  String get purchaseSuccess;
+
+  /// No description provided for @premiumActivated.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'高級會員已啟用'**
+  String get premiumActivated;
+
+  /// No description provided for @achievementDay1Title.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'第一天'**
+  String get achievementDay1Title;
+
+  /// No description provided for @achievementDay1Description.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'開始戒菸旅程'**
+  String get achievementDay1Description;
+
+  /// No description provided for @achievementDay7Title.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'一週達成'**
+  String get achievementDay7Title;
+
+  /// No description provided for @achievementDay7Description.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'連續戒菸 7 天'**
+  String get achievementDay7Description;
+
+  /// No description provided for @achievementDay30Title.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'一個月達成'**
+  String get achievementDay30Title;
+
+  /// No description provided for @achievementDay30Description.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'連續戒菸 30 天'**
+  String get achievementDay30Description;
+
+  /// No description provided for @achievementMoney1000Title.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'省下 1000 元'**
+  String get achievementMoney1000Title;
+
+  /// No description provided for @achievementMoney1000Description.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'累積省下 1000 元'**
+  String get achievementMoney1000Description;
+
+  /// No description provided for @achievementRecoveryTitle.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'健康恢復'**
+  String get achievementRecoveryTitle;
+
+  /// No description provided for @achievementRecoveryDescription.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'完成第一個身體恢復里程碑'**
+  String get achievementRecoveryDescription;
+
+  /// No description provided for @achievementDay7Progress.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'尚未完成 7 天戒菸目標'**
+  String get achievementDay7Progress;
+
+  /// No description provided for @achievementDay30Progress.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'尚未完成 30 天戒菸目標'**
+  String get achievementDay30Progress;
+
+  /// No description provided for @achievementMoney1000Progress.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'尚未累積省下 1000 元'**
+  String get achievementMoney1000Progress;
+
+  /// No description provided for @achievementRecoveryProgress.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'尚未完成健康恢復階段'**
+  String get achievementRecoveryProgress;
+
+  /// No description provided for @todayAchievement.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'今日成就'**
+  String get todayAchievement;
+
+  /// No description provided for @achievementCompleted.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'完成 {completed} / {total}'**
+  String achievementCompleted(Object completed, Object total);
+
+  /// No description provided for @quitProgress.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'戒菸進度'**
+  String get quitProgress;
+
+  /// No description provided for @dayProgress.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'Day {current} / {total}'**
+  String dayProgress(Object current, Object total);
+
+  /// No description provided for @todayGoal.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'今日目標：{count} 支'**
+  String todayGoal(Object count);
+
+  /// No description provided for @smokedToday.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'今日已抽：{count} 支'**
+  String smokedToday(Object count);
+
+  /// No description provided for @remainingToday.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'今日剩餘：{count} 支'**
+  String remainingToday(Object count);
+
+  /// No description provided for @startQuitTitle.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'開始你的戒菸計畫'**
+  String get startQuitTitle;
+
+  /// No description provided for @startQuitDescription.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'建立專屬戒菸方案，追蹤你的健康變化，加入社群支持。'**
+  String get startQuitDescription;
+
+  /// No description provided for @startPlan.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'開始計畫'**
+  String get startPlan;
+
+  /// No description provided for @lifestyleTitle.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'健康生活'**
+  String get lifestyleTitle;
+
+  /// No description provided for @exercise.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'運動挑戰'**
+  String get exercise;
+
+  /// No description provided for @healthKnowledge.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'健康知識'**
+  String get healthKnowledge;
+
+  /// No description provided for @relaxMusic.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'放鬆音樂'**
+  String get relaxMusic;
+
+  /// No description provided for @ranking.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'排行榜'**
+  String get ranking;
+
+  /// No description provided for @coinBalanceTitle.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'目前擁有金幣庫存'**
+  String get coinBalanceTitle;
+
+  /// No description provided for @nextSmokeCountdown.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'距離下一次解鎖抽菸倒數'**
+  String get nextSmokeCountdown;
+
+  /// No description provided for @sosHelp.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'SOS 求協助'**
+  String get sosHelp;
+
+  /// No description provided for @recordSmoking.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'記錄抽菸'**
+  String get recordSmoking;
+
+  /// No description provided for @notUnlocked.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'尚未解鎖'**
+  String get notUnlocked;
+
+  /// No description provided for @coinShop.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'金幣商城'**
+  String get coinShop;
+
+  /// No description provided for @todaySmokingSchedule.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'控菸今日排程表'**
+  String get todaySmokingSchedule;
+
+  /// No description provided for @smoked.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'已抽 ✓'**
+  String get smoked;
+
+  /// No description provided for @notRecorded.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'未記錄'**
+  String get notRecorded;
+
+  /// No description provided for @remainingAmount.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'剩餘額度'**
+  String get remainingAmount;
+
+  /// No description provided for @todaySaved.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'今日省下'**
+  String get todaySaved;
+
+  /// No description provided for @coinUnit.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'金幣'**
+  String get coinUnit;
+
+  /// No description provided for @forumCategoryAll.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'全部'**
+  String get forumCategoryAll;
+
+  /// No description provided for @forumCategoryCraving.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'菸癮犯了'**
+  String get forumCategoryCraving;
+
+  /// No description provided for @forumCategoryStory.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'戒菸心得'**
+  String get forumCategoryStory;
+
+  /// No description provided for @forumCategoryHealth.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'健康交流'**
+  String get forumCategoryHealth;
+
+  /// No description provided for @forumCategorySupport.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'互相鼓勵'**
+  String get forumCategorySupport;
+
+  /// No description provided for @achievementSpending1000Title.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'消費 1000 金幣'**
+  String get achievementSpending1000Title;
+
+  /// No description provided for @achievementSpending1000Description.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'累積消費 1000 金幣'**
+  String get achievementSpending1000Description;
+
+  /// No description provided for @achievementSpending1000Progress.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'尚未消費 1000 金幣'**
+  String get achievementSpending1000Progress;
+
+  /// No description provided for @readingTitle.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'閱讀文章'**
+  String get readingTitle;
+
+  /// No description provided for @readingEmpty.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'目前沒有可閱讀的文章。'**
+  String get readingEmpty;
+
+  /// No description provided for @refresh.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'重新整理'**
+  String get refresh;
+
+  /// No description provided for @readingCoinInsufficient.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'COIN 不足，無法下載這篇文章。'**
+  String get readingCoinInsufficient;
+
+  /// No description provided for @downloadFailed.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'下載失敗，請稍後再試。'**
+  String get downloadFailed;
+
+  /// No description provided for @downloadAndRead.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'下載並閱讀'**
+  String get downloadAndRead;
 }
 
 class _AppLocalizationsDelegate

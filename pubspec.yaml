@@ -40,7 +40,7 @@ dependencies:
   cloud_firestore: ^5.0.0
   firebase_auth: ^5.0.0
   google_fonts: ^6.0.0
-
+  supabase_flutter: ^2.9.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

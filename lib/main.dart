@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 import 'firebase_options.dart';
 import 'screens/home_page.dart';
 import 'screens/login_page.dart';
@@ -13,6 +14,11 @@ import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'https://fnzywzxrwmpfcdcuwznw.supabase.co',
+    publishableKey: 'sb_publishable_9oinTfAqSlIUIpaVnGA4xg_O_BDm7Py',
+  );
 
   bool firebaseOk = false;
   bool alreadySignedIn = false;
@@ -27,7 +33,13 @@ void main() async {
       await ContentServiceFirebase().seedSampleContent();
       firebaseOk = true;
 
-      final currentUser = FirebaseAuth.instance.currentUser;
+      User? currentUser = FirebaseAuth.instance.currentUser;
+
+      if (currentUser == null) {
+        final credential = await FirebaseAuth.instance.signInAnonymously();
+
+        currentUser = credential.user;
+      }
       if (currentUser != null) {
         UserService.currentUid = currentUser.uid;
         final service = UserService();

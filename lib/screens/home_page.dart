@@ -1,3 +1,5 @@
+import '../engines/reward_engine.dart';
+import '../services/coin_service.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -16,6 +18,13 @@ import '../services/recovery_engine.dart';
 import '../services/achievement_engine.dart';
 import '../widgets/achievement_card.dart';
 import '../pages/quit_plan_page.dart';
+import '../pages/coin_page.dart';
+import 'ranking_page.dart';
+import 'reading_library_page.dart';
+import '../models/user_smoking_status.dart';
+import '../widgets/home/home_progress_card.dart';
+import '../models/user_role.dart';
+import '../repositories/coin/coin_repository.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -34,9 +43,15 @@ class _ThemeColors {
 }
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
+  final CoinRepository _coinRepository = CoinRepository(
+    coinService: CoinService(),
+  );
+  final CoinService coinService = CoinService();
   late SmokingEngine engine;
+  late RewardEngine rewardEngine;
   late AchievementEngine achievement;
   late RecoveryEngine recovery;
+  late SmokingState state;
   bool _isLoaded = false;
   Timer? _timer;
   int _myCoins = 0;
@@ -59,12 +74,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-
+    coinService.claimDailyLogin();
     WidgetsBinding.instance.addObserver(this);
 
     final now = DateTime.now();
 
-    final state = SmokingState(
+    state = SmokingState(
       planStartDate: DateTime.now(),
       startTime: DateTime(now.year, now.month, now.day, 8, 0),
       endTime: DateTime(now.year, now.month, now.day, 22, 0),
@@ -79,8 +94,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     engine = SmokingEngine(state, plan);
     recovery = RecoveryEngine(state);
-    achievement = AchievementEngine(smoking: engine, recovery: recovery);
-    // 計時器每秒自動檢查是否該彈出提醒通知
+    achievement = AchievementEngine(
+      smoking: engine,
+      recovery: recovery,
+      coinRepository: CoinRepository(coinService: CoinService()),
+    ); // 計時器每秒自動檢查是否該彈出提醒通知
+    achievement.loadLoginStreak();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted || !_isLoaded) return;
 
@@ -125,13 +144,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final todayStr = "${now.year}-${now.month}-${now.day}";
     if (lastDate != todayStr) {
       final reward = isPremium ? 100 : 20;
-      sCoins += reward;
-      await StorageService.saveCoins(sCoins);
+      sCoins = await _coinRepository.getBalance();
       await StorageService.saveLastResetDate(todayStr);
       final uid = UserService.currentUid;
+
       if (uid != null) {
         try {
-          await UserService().updateCoins(uid, sCoins);
+          await _coinRepository.addCoin(reward, 'daily_login_reward');
         } catch (_) {}
       }
 
@@ -161,8 +180,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           plannedCount: sCount,
           smokeRecords: storedRecords,
           lastSmokeTime: storedRecords.isNotEmpty ? storedRecords.last : null,
-        );
 
+          role: UserRole.quitter,
+          smokingStatus: SmokingStatus.smoker,
+        );
         final plan = SmokingPlan(
           startTime: state.startTime,
           endTime: state.endTime,
@@ -171,7 +192,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
         engine = SmokingEngine(state, plan);
         recovery = RecoveryEngine(state);
-        achievement = AchievementEngine(smoking: engine, recovery: recovery);
+        achievement = AchievementEngine(
+          smoking: engine,
+          recovery: recovery,
+          coinRepository: CoinRepository(coinService: CoinService()),
+        );
+        achievement.loadLoginStreak();
         _myCoins = sCoins;
         _cigarettePrice = sPrice;
         _isLoaded = true;
@@ -236,13 +262,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     setState(() {
       engine.state = engine.state.addSmoke(now);
-      _messages.add(
-        "Recorded smoke at "
-        "${now.hour.toString().padLeft(2, '0')}:"
-        "${now.minute.toString().padLeft(2, '0')}.",
-      );
     });
-
+    if (engine.remaining == 0) {
+      coinService.claimDailyPlanReward();
+    }
     await StorageService.saveSmokeRecords(engine.state.smokeRecords);
   }
 
@@ -303,6 +326,38 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       Icons.sentiment_satisfied,
                       "2. 極短篇笑話 (短文小故事)",
                       "Stories",
+                    ),
+                    Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      child: ListTile(
+                        dense: true,
+                        leading: const Icon(
+                          Icons.menu_book_outlined,
+                          color: _ThemeColors.accent,
+                        ),
+                        title: const Text(
+                          '閱讀文章（下載後可離線閱讀）',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios,
+                          size: 12,
+                          color: Colors.grey,
+                        ),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ReadingLibraryPage(),
+                          ),
+                        ),
+                      ),
                     ),
                     _buildTile(
                       Icons.video_library,
@@ -367,7 +422,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                               achievement = AchievementEngine(
                                 smoking: engine,
                                 recovery: recovery,
+                                coinRepository: CoinRepository(
+                                  coinService: CoinService(),
+                                ),
                               );
+                              achievement.loadLoginStreak();
                             });
                           }
                         },
@@ -399,6 +458,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             context,
                             MaterialPageRoute(
                               builder: (_) => const ForumPage(),
+                            ),
+                          );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const RankingPage(),
                             ),
                           );
                         },
@@ -444,6 +509,61 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
+  Widget _buildLifestyleCard() {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Card(
+      color: Colors.white.withAlpha(230),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.lifestyleTitle,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+
+            const SizedBox(height: 16),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildLifestyleItem(Icons.directions_run, l10n.exercise),
+
+                _buildLifestyleItem(Icons.menu_book, l10n.healthKnowledge),
+
+                _buildLifestyleItem(Icons.music_note, l10n.relaxMusic),
+
+                _buildLifestyleItem(Icons.leaderboard, l10n.ranking),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLifestyleItem(IconData icon, String title) {
+    return Expanded(
+      child: Column(
+        children: [
+          Icon(icon, color: _ThemeColors.primary, size: 30),
+
+          const SizedBox(height: 8),
+
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // 💡 3.2.1 網頁全螢幕高頻震動特效外殼
@@ -471,6 +591,28 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             backgroundColor: Colors.white.withAlpha(204),
             elevation: 0,
             actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Center(
+                  child: Text(
+                    '🪙 ${coinService.balance}',
+                    style: const TextStyle(
+                      color: _ThemeColors.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.monetization_on, color: Colors.amber),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CoinPage()),
+                  );
+                },
+              ),
               IconButton(
                 icon: const Icon(
                   Icons.settings_outlined,
@@ -489,19 +631,40 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           // 💡 3.2.1 堆疊最上層：預留自訂頂部推播彈窗空間
           body: Stack(
             children: [
-              _buildQuitProgressCard(),
-
-              const SizedBox(height: 16),
               ListView(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
                   vertical: 16,
                 ),
                 children: [
-                  _buildQuitProgressCard(),
+                  _buildPersonalStatusCard(),
 
                   const SizedBox(height: 16),
 
+                  _buildLifestyleCard(),
+
+                  const SizedBox(height: 16),
+
+                  AchievementCard(achievement: achievement),
+
+                  const SizedBox(height: 20),
+
+                  HomeProgressCard(
+                    currentDay:
+                        DateTime.now()
+                            .difference(engine.state.planStartDate)
+                            .inDays +
+                        1,
+
+                    totalDays: engine.plan.durationDays,
+
+                    smokedToday: engine.totalSmoked,
+
+                    targetToday: engine.todayPlannedCount,
+
+                    remaining: engine.todayPlannedCount - engine.totalSmoked,
+                  ),
+                  // 下面接原本其他卡片
                   Card(
                     color: Colors.white.withAlpha(230),
                     elevation: 4,
@@ -594,8 +757,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   _buildStatCard("今日省下", "$todaySavedMoney 元", Colors.green),
                   const SizedBox(height: 20),
 
-                  AchievementCard(achievement: achievement),
-                  const SizedBox(height: 20),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       vertical: 24,
@@ -952,12 +1113,31 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildQuitProgressCard() {
-    final currentDay =
-        DateTime.now().difference(engine.state.planStartDate).inDays + 1;
+  Widget _buildPersonalStatusCard() {
+    switch (state.smokingStatus) {
+      case SmokingStatus.smoker:
+        return _buildStartQuitCard();
 
-    final totalDays = engine.plan.durationDays;
+      case SmokingStatus.quitting:
+      case SmokingStatus.exSmoker:
+      case SmokingStatus.relapsed:
+      case SmokingStatus.none:
+        return HomeProgressCard(
+          currentDay:
+              DateTime.now().difference(engine.state.planStartDate).inDays + 1,
+          totalDays: engine.plan.durationDays,
+          smokedToday: engine.totalSmoked,
+          targetToday: engine.todayPlannedCount,
+          remaining: engine.todayPlannedCount - engine.totalSmoked,
+        );
 
+      case SmokingStatus.supporter:
+        return _buildStartQuitCard();
+    }
+  }
+
+  Widget _buildStartQuitCard() {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       color: Colors.white.withAlpha(230),
       elevation: 4,
@@ -967,21 +1147,26 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "戒菸進度",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              l10n.startQuitTitle,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
 
             Text(
-              "Day $currentDay / $totalDays",
-              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+              l10n.startQuitDescription,
+              style: const TextStyle(fontSize: 15),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
 
-            Text("今日目標：${engine.todayPlannedCount} 支"),
+            ElevatedButton(
+              onPressed: () {
+                // 之後導向戒菸計畫頁
+              },
+              child: Text(l10n.startPlan),
+            ),
           ],
         ),
       ),
