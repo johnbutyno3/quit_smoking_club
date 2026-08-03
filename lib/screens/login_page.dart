@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../services/storage_service.dart';
 import '../services/user_service.dart';
 import 'home_page.dart';
@@ -258,18 +259,19 @@ class _LoginPageState extends State<LoginPage>
   }
 
   Widget _buildLoginFields() {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         const SizedBox(height: 16),
         _buildField(
           ctrl: _loginEmailCtrl,
-          label: '電子郵件',
+          label: l10n.loginEmail,
           icon: Icons.email_outlined,
         ),
         const SizedBox(height: 16),
         _buildField(
           ctrl: _loginPassCtrl,
-          label: '密碼',
+          label: l10n.loginPassword,
           icon: Icons.lock_outlined,
           obscure: true,
           showPass: _loginPassVisible,
@@ -296,8 +298,8 @@ class _LoginPageState extends State<LoginPage>
                   ),
                 ),
                 onPressed: _handleLogin,
-                child: const Text(
-                  '信箱登入',
+                child: Text(
+                  l10n.loginWithEmail,
                   style: TextStyle(color: Colors.white, fontSize: 15),
                 ),
               ),
@@ -310,7 +312,10 @@ class _LoginPageState extends State<LoginPage>
             ),
           ),
           icon: const Icon(Icons.login, size: 20),
-          label: const Text('使用 Google 帳號登入', style: TextStyle(fontSize: 15)),
+          label: Text(
+            l10n.loginWithGoogle,
+            style: const TextStyle(fontSize: 15),
+          ),
           onPressed: _handleGoogleSignIn,
         ),
       ],
@@ -318,24 +323,25 @@ class _LoginPageState extends State<LoginPage>
   }
 
   Widget _buildRegisterFields() {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         const SizedBox(height: 16),
         _buildField(
           ctrl: _regNameCtrl,
-          label: '暱稱',
+          label: l10n.postName,
           icon: Icons.person_outline,
         ),
         const SizedBox(height: 16),
         _buildField(
           ctrl: _regEmailCtrl,
-          label: '電子郵件',
+          label: l10n.loginEmail,
           icon: Icons.email_outlined,
         ),
         const SizedBox(height: 16),
         _buildField(
           ctrl: _regPassCtrl,
-          label: '密碼 (至少6碼)',
+          label: l10n.loginPasswordMinLength,
           icon: Icons.lock_outlined,
           obscure: true,
           showPass: _regPassVisible,
@@ -361,8 +367,8 @@ class _LoginPageState extends State<LoginPage>
                   ),
                 ),
                 onPressed: _handleRegister,
-                child: const Text(
-                  '註冊新帳號',
+                child: Text(
+                  l10n.registerNewAccount,
                   style: TextStyle(color: Colors.white, fontSize: 15),
                 ),
               ),
@@ -372,6 +378,7 @@ class _LoginPageState extends State<LoginPage>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: _LC.bg,
       body: Center(
@@ -384,8 +391,8 @@ class _LoginPageState extends State<LoginPage>
               children: [
                 const Icon(Icons.smoke_free, size: 56, color: _LC.primary),
                 const SizedBox(height: 12),
-                const Text(
-                  '戒菸好習慣',
+                Text(
+                  l10n.loginAppSloganTitle,
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -393,8 +400,8 @@ class _LoginPageState extends State<LoginPage>
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
-                  '陪你每天一步一步戒菸',
+                Text(
+                  l10n.loginAppSloganSubtitle,
                   style: TextStyle(fontSize: 13, color: Colors.grey),
                 ),
                 const SizedBox(height: 28),
@@ -413,9 +420,9 @@ class _LoginPageState extends State<LoginPage>
                     ),
                     labelColor: Colors.white,
                     unselectedLabelColor: Colors.black54,
-                    tabs: const [
-                      Tab(text: '登入'),
-                      Tab(text: '註冊'),
+                    tabs: [
+                      Tab(text: l10n.loginTabSignIn),
+                      Tab(text: l10n.loginTabRegister),
                     ],
                   ),
                 ),

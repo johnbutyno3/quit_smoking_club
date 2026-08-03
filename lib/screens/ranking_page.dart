@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 
 import '../models/ranking_model.dart';
 import '../repositories/ranking_repository.dart';
@@ -39,8 +40,9 @@ class _RankingPageState extends State<RankingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('全球排行榜')),
+      appBar: AppBar(title: Text(l10n.rankingGlobalTitle)),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
@@ -51,7 +53,7 @@ class _RankingPageState extends State<RankingPage> {
                 return ListTile(
                   leading: CircleAvatar(child: Text('${index + 1}')),
                   title: Text(item.nickname),
-                  subtitle: Text('戒菸 ${item.quitDays} 天'),
+                  subtitle: Text(l10n.rankingQuitDays(item.quitDays)),
                   trailing: Text(
                     '${item.totalScore}',
                     style: const TextStyle(fontWeight: FontWeight.bold),

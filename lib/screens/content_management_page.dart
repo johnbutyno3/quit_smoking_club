@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../services/content_service.dart';
 import '../services/content_service_firebase.dart';
 import 'package:quit_smoking_club/firebase_config.dart';
@@ -48,8 +49,9 @@ class _ContentManagementPageState extends State<ContentManagementPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('內容管理')),
+      appBar: AppBar(title: Text(l10n.contentManagementTitle)),
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -76,7 +78,7 @@ class _ContentManagementPageState extends State<ContentManagementPage> {
             const SizedBox(height: 12),
             ElevatedButton(
               onPressed: () => _openEditor(null),
-              child: const Text('新增內容'),
+              child: Text(l10n.contentManagementAdd),
             ),
             const SizedBox(height: 12),
             Expanded(
@@ -87,13 +89,13 @@ class _ContentManagementPageState extends State<ContentManagementPage> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (!snapshot.hasData) {
-                    return const Center(child: Text('無內容資料'));
+                    return Center(child: Text(l10n.contentManagementNoData));
                   }
                   final items = snapshot.data!
                       .where((item) => item.category == _selectedCategory)
                       .toList();
                   if (items.isEmpty) {
-                    return const Center(child: Text('目前無資料'));
+                    return Center(child: Text(l10n.contentManagementEmpty));
                   }
                   return ListView.separated(
                     itemCount: items.length,
@@ -178,38 +180,45 @@ class _ContentEditPageState extends State<ContentEditPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('編輯內容')),
+      appBar: AppBar(title: Text(l10n.contentManagementEditTitle)),
       body: Padding(
         padding: const EdgeInsets.all(14),
         child: ListView(
           children: [
-            Text('分類：${widget.category}'),
+            Text(l10n.contentManagementCategory(widget.category)),
             const SizedBox(height: 12),
             TextField(
               controller: _languageCtrl,
-              decoration: const InputDecoration(
-                labelText: '語言代碼 (zh-tw / en / es / all)',
+              decoration: InputDecoration(
+                labelText: l10n.contentManagementLanguageCode,
               ),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _titleCtrl,
-              decoration: const InputDecoration(labelText: '標題'),
+              decoration: InputDecoration(
+                labelText: l10n.contentManagementTitleLabel,
+              ),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _contentCtrl,
               maxLines: 5,
-              decoration: const InputDecoration(labelText: '內容'),
+              decoration: InputDecoration(
+                labelText: l10n.contentManagementContentLabel,
+              ),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _linkCtrl,
-              decoration: const InputDecoration(labelText: '連結網址'),
+              decoration: InputDecoration(
+                labelText: l10n.contentManagementLinkLabel,
+              ),
             ),
             const SizedBox(height: 20),
-            ElevatedButton(onPressed: _save, child: const Text('儲存')),
+            ElevatedButton(onPressed: _save, child: Text(l10n.save)),
           ],
         ),
       ),

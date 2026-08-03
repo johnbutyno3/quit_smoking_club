@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home_page.dart';
+import '../l10n/app_localizations.dart';
 import '../services/storage_service.dart';
 
 class OnboardingPage extends StatefulWidget {
@@ -22,24 +23,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _countController = TextEditingController();
 
-  // 💡 模擬大綱 1.1 節的三大核心特色導覽數據庫
-  final List<Map<String, String>> _features = [
-    {
-      "title": "🌿 醫學級動態控菸排程",
-      "desc":
-          "打破傳統死板定時器！隨時根據您的真實按下時間，動態向後延遲 90 分鐘計算。沒抽菸絕不鎖定，時間過期自動褪色變暗，輔以打勾連動實抽狀態！",
-    },
-    {
-      "title": "👑 高級黑金代幣商城",
-      "desc":
-          "內建階梯式寶箱充值包與奢華黑金漸層 VIP 會員卡。跨天 00:00 系統全自動識別一般/高級會員並智能補發福利金幣，完美串聯商務閉環！",
-    },
-    {
-      "title": "🧡 高顏值卡片流交流論壇",
-      "desc":
-          "首創社群卡片流 Social Feed。使用者遇到菸癮危機按下 SOS 時，系統秒自動同步發布即時求救貼文，大家可以花費 5 金幣送出禮物留言打氣！",
-    },
-  ];
   @override
   void dispose() {
     _pageController.dispose();
@@ -50,6 +33,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   // 💡 大綱 1.3 註冊登入與首次資料寫入硬碟邏輯
   Future<void> _submitAndStart() async {
+    final l10n = AppLocalizations.of(context)!;
     final name = _nameController.text.trim();
     final countStr = _countController.text.trim();
     final count = int.tryParse(countStr) ?? 5;
@@ -57,7 +41,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     if (name.isEmpty) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("⚠️ 請輸入您的暱稱喔！")));
+      ).showSnackBar(SnackBar(content: Text(l10n.onboardingNameRequired)));
       return;
     }
 
@@ -76,6 +60,21 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final features = [
+      {
+        'title': l10n.onboardingFeature1Title,
+        'desc': l10n.onboardingFeature1Desc,
+      },
+      {
+        'title': l10n.onboardingFeature2Title,
+        'desc': l10n.onboardingFeature2Desc,
+      },
+      {
+        'title': l10n.onboardingFeature3Title,
+        'desc': l10n.onboardingFeature3Desc,
+      },
+    ];
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -102,8 +101,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  "歡迎加入戒菸俱樂部，重獲健康生活",
+                Text(
+                  l10n.onboardingWelcome,
                   style: TextStyle(color: Colors.grey, fontSize: 13),
                 ),
                 const SizedBox(height: 30),
@@ -112,12 +111,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   flex: 3,
                   child: PageView.builder(
                     controller: _pageController,
-                    itemCount: _features.length,
+                    itemCount: features.length,
                     onPageChanged: (int p) {
                       setState(() => _currentPage = p);
                     },
                     itemBuilder: (context, idx) {
-                      final f = _features[idx];
+                      final f = features[idx];
                       return Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
@@ -158,7 +157,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 // 導覽頁小圓點進度條
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(_features.length, (idx) {
+                  children: List.generate(features.length, (idx) {
                     return Container(
                       margin: const EdgeInsets.symmetric(horizontal: 4),
                       width: _currentPage == idx ? 16 : 8,
@@ -192,9 +191,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     ),
                     child: ListView(
                       children: [
-                        const Text(
-                          "✍️ 首次建立戒菸個人檔案",
-                          style: TextStyle(
+                        Text(
+                          l10n.onboardingCreateProfile,
+                          style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
                             color: _OnboardColors.primary,
@@ -204,7 +203,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         TextField(
                           controller: _nameController,
                           decoration: InputDecoration(
-                            labelText: "請輸入您的暱稱",
+                            labelText: l10n.onboardingNicknameInput,
                             labelStyle: const TextStyle(fontSize: 12),
                             isDense: true,
                             border: OutlineInputBorder(
@@ -217,7 +216,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           controller: _countController,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
-                            labelText: "今日目標控菸支數 (預設5支)",
+                            labelText: l10n.onboardingDailyTarget,
                             labelStyle: const TextStyle(fontSize: 12),
                             isDense: true,
                             border: OutlineInputBorder(
@@ -239,8 +238,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             elevation: 0,
                           ),
                           onPressed: _submitAndStart,
-                          child: const Text(
-                            "開啟戒菸健康之旅",
+                          child: Text(
+                            l10n.onboardingStartJourney,
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
