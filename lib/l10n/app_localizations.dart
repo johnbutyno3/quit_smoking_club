@@ -1383,6 +1383,30 @@ abstract class AppLocalizations {
   /// **'暫無摘要內容。'**
   String get medicalSummaryUnavailable;
 
+  /// No description provided for @storyLibraryTitle.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'戒菸故事'**
+  String get storyLibraryTitle;
+
+  /// No description provided for @storyLibraryEmpty.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'目前沒有故事內容。'**
+  String get storyLibraryEmpty;
+
+  /// No description provided for @storyLibraryLoadFailed.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'載入故事內容失敗，請稍後再試。'**
+  String get storyLibraryLoadFailed;
+
+  /// No description provided for @storySummaryUnavailable.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'暫無故事摘要。'**
+  String get storySummaryUnavailable;
+
   /// No description provided for @musicLibraryTitle.
   ///
   /// In zh_TW, this message translates to:
