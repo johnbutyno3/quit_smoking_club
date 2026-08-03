@@ -22,6 +22,7 @@ import '../pages/coin_page.dart';
 import 'ranking_page.dart';
 import 'reading_library_page.dart';
 import 'medical_library_page.dart';
+import 'music_library_page.dart';
 import '../models/user_smoking_status.dart';
 import '../widgets/home/home_progress_card.dart';
 import '../models/user_role.dart';
@@ -504,6 +505,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               MaterialPageRoute(
                 builder: (context) => const MedicalLibraryPage(),
               ),
+            );
+          } else if (page == 'Music') {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const MusicLibraryPage()),
             );
           } else {
             await Navigator.push(
