@@ -5,9 +5,7 @@ class SupabaseContentService {
     String? language,
     String? category,
   }) async {
-    var query = SupabaseService.client
-        .from('content_items')
-        .select();
+    var query = SupabaseService.client.from('content_items').select();
 
     if (language != null) {
       query = query.eq('language', language);
@@ -17,9 +15,7 @@ class SupabaseContentService {
       query = query.eq('category', category);
     }
 
-    final response = await query.order(
-      'unique_id',
-    );
+    final response = await query.order('unique_id');
 
     return List<Map<String, dynamic>>.from(response);
   }
