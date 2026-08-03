@@ -21,6 +21,7 @@ import '../pages/quit_plan_page.dart';
 import '../pages/coin_page.dart';
 import 'ranking_page.dart';
 import 'reading_library_page.dart';
+import 'medical_library_page.dart';
 import '../models/user_smoking_status.dart';
 import '../widgets/home/home_progress_card.dart';
 import '../models/user_role.dart';
@@ -497,12 +498,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           color: Colors.grey,
         ),
         onTap: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MitigationPage(title: page),
-            ),
-          );
+          if (page == 'Medical') {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const MedicalLibraryPage(),
+              ),
+            );
+          } else {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MitigationPage(title: page),
+              ),
+            );
+          }
           _loadStoredData();
         },
       ),
