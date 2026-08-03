@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../services/storage_service.dart';
 
 /// 戒菸排程頁面 - 甘特圖風格，顯示每日計畫 vs 實際抽菸數
@@ -91,6 +92,7 @@ class _SchedulePageState extends State<SchedulePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final rows = _rows;
     final today = DateTime.now();
     final elapsed = today.difference(_startDate).inDays + 1;
@@ -108,12 +110,12 @@ class _SchedulePageState extends State<SchedulePage> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              '戒菸排程',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            Text(
+              l10n.scheduleTitle,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             Text(
-              '第 $elapsed 天 · 剩 $remaining 天',
+              l10n.scheduleDayRemaining(elapsed, remaining),
               style: const TextStyle(fontSize: 11, color: Colors.grey),
             ),
           ],
@@ -133,12 +135,12 @@ class _SchedulePageState extends State<SchedulePage> {
               child: Row(
                 children: [
                   _ViewBtn(
-                    label: '本週視圖',
+                    label: l10n.scheduleWeeklyView,
                     selected: _viewMode == 0,
                     onTap: () => setState(() => _viewMode = 0),
                   ),
                   _ViewBtn(
-                    label: '月視圖',
+                    label: l10n.scheduleMonthlyView,
                     selected: _viewMode == 1,
                     onTap: () => setState(() => _viewMode = 1),
                   ),
@@ -151,11 +153,21 @@ class _SchedulePageState extends State<SchedulePage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
-              children: const [
-                SizedBox(width: 48, child: Text('天數', style: _headerStyle)),
-                SizedBox(width: 52, child: Text('日期', style: _headerStyle)),
-                Expanded(child: Text('計畫', style: _headerStyle)),
-                Expanded(child: Text('實際', style: _headerStyle)),
+              children: [
+                SizedBox(
+                  width: 48,
+                  child: Text(l10n.scheduleHeaderDay, style: _headerStyle),
+                ),
+                SizedBox(
+                  width: 52,
+                  child: Text(l10n.scheduleHeaderDate, style: _headerStyle),
+                ),
+                Expanded(
+                  child: Text(l10n.scheduleHeaderPlanned, style: _headerStyle),
+                ),
+                Expanded(
+                  child: Text(l10n.scheduleHeaderActual, style: _headerStyle),
+                ),
               ],
             ),
           ),
@@ -178,11 +190,20 @@ class _SchedulePageState extends State<SchedulePage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _Legend(color: const Color(0xFF4CAF50), label: '達標'),
+                _Legend(
+                  color: const Color(0xFF4CAF50),
+                  label: l10n.scheduleLegendOnTarget,
+                ),
                 const SizedBox(width: 16),
-                _Legend(color: Colors.redAccent, label: '超標'),
+                _Legend(
+                  color: Colors.redAccent,
+                  label: l10n.scheduleLegendOverTarget,
+                ),
                 const SizedBox(width: 16),
-                _Legend(color: Colors.grey.shade300, label: '未來/無記錄'),
+                _Legend(
+                  color: Colors.grey.shade300,
+                  label: l10n.scheduleLegendFutureOrEmpty,
+                ),
               ],
             ),
           ),

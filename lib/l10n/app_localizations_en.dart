@@ -318,4 +318,387 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get downloadAndRead => 'Download and Read';
+
+  @override
+  String get contentManagementTitle => 'Content Management';
+
+  @override
+  String get contentManagementAdd => 'Add Content';
+
+  @override
+  String get contentManagementNoData => 'No content data';
+
+  @override
+  String get contentManagementEmpty => 'No data available';
+
+  @override
+  String get contentManagementEditTitle => 'Edit Content';
+
+  @override
+  String contentManagementCategory(Object category) {
+    return 'Category: $category';
+  }
+
+  @override
+  String get contentManagementLanguageCode =>
+      'Language code (zh-tw / en / es / all)';
+
+  @override
+  String get contentManagementTitleLabel => 'Title';
+
+  @override
+  String get contentManagementContentLabel => 'Content';
+
+  @override
+  String get contentManagementLinkLabel => 'Link URL';
+
+  @override
+  String get loginEmail => 'Email';
+
+  @override
+  String get loginPassword => 'Password';
+
+  @override
+  String get loginWithEmail => 'Sign in with Email';
+
+  @override
+  String get loginWithGoogle => 'Sign in with Google';
+
+  @override
+  String get loginPasswordMinLength => 'Password (at least 6 chars)';
+
+  @override
+  String get registerNewAccount => 'Register New Account';
+
+  @override
+  String get loginAppSloganTitle => 'Quit Smoking Better';
+
+  @override
+  String get loginAppSloganSubtitle => 'Support you to quit step by step';
+
+  @override
+  String get loginTabSignIn => 'Sign In';
+
+  @override
+  String get loginTabRegister => 'Register';
+
+  @override
+  String get introSlide1Title => 'Start Your Quit Journey';
+
+  @override
+  String get introSlide1Desc =>
+      'A science-based quit plan helps you reduce smoking step by step until you quit completely.';
+
+  @override
+  String get introSlide2Title => 'Personalized Schedule';
+
+  @override
+  String get introSlide2Desc =>
+      'Generate a schedule based on your habits and track progress in real time.';
+
+  @override
+  String get introSlide3Title => 'Community Support';
+
+  @override
+  String get introSlide3Desc =>
+      'Join the community, support each other, and ask for help when cravings hit.';
+
+  @override
+  String get introSkip => 'Skip';
+
+  @override
+  String get introGetStarted => 'Get Started';
+
+  @override
+  String get introNext => 'Next ›';
+
+  @override
+  String get rankingGlobalTitle => 'Global Ranking';
+
+  @override
+  String rankingQuitDays(Object days) {
+    return 'Quit for $days days';
+  }
+
+  @override
+  String readingWaitSeconds(Object seconds) {
+    return 'Please read for $seconds more seconds to continue.';
+  }
+
+  @override
+  String get readingCompletedArticle => 'You have finished this article.';
+
+  @override
+  String readingChapterProgress(Object current, Object total) {
+    return 'Chapter $current / $total';
+  }
+
+  @override
+  String get readingCanContinue => 'You can continue to the next chapter';
+
+  @override
+  String readingMinSeconds(Object seconds) {
+    return 'Please read at least $seconds seconds';
+  }
+
+  @override
+  String get readingFinish => 'Finish Reading';
+
+  @override
+  String get readingContinueNextChapter => 'Continue to Next Chapter';
+
+  @override
+  String shopBuyCoins(Object amount) {
+    return 'Buy $amount COIN';
+  }
+
+  @override
+  String get shopCreateForumPost => 'Create Forum Post (-30 COIN)';
+
+  @override
+  String get shopVipActive => 'VIP Active';
+
+  @override
+  String get shopPremium => 'Premium';
+
+  @override
+  String get shopVip => 'VIP';
+
+  @override
+  String get forumInsufficientCoinsToGift =>
+      'Insufficient COIN. Please go to Coin Shop.';
+
+  @override
+  String get forumCreatePostTitle => 'Create New Post';
+
+  @override
+  String get forumNeedCoinsToCreatePost =>
+      'Insufficient COIN, please purchase in Coin Shop';
+
+  @override
+  String get forumCommentSuccessCostOneCoin =>
+      'Comment posted, 1 COIN deducted';
+
+  @override
+  String get forumCommentFailed => 'Failed to post comment';
+
+  @override
+  String get forumCommentNeedsOneCoin => 'Commenting needs 1 COIN';
+
+  @override
+  String get forumWatchAdComment => 'Watch Ad to Comment';
+
+  @override
+  String get forumGoToCoinShop => 'Go to COIN Shop';
+
+  @override
+  String get forumBuyCoin => 'Buy COIN';
+
+  @override
+  String get forumWatchingAd => 'Watching ad...';
+
+  @override
+  String get forumPostDetailTitle => 'Post Details';
+
+  @override
+  String get forumComments => 'Comments';
+
+  @override
+  String get forumNoComments => 'No comments yet';
+
+  @override
+  String get forumCommentHint => 'Enter comment...';
+
+  @override
+  String get scheduleTitle => 'Quit Schedule';
+
+  @override
+  String scheduleDayRemaining(Object elapsed, Object remaining) {
+    return 'Day $elapsed · $remaining days left';
+  }
+
+  @override
+  String get scheduleWeeklyView => 'Weekly View';
+
+  @override
+  String get scheduleMonthlyView => 'Monthly View';
+
+  @override
+  String get scheduleHeaderDay => 'Day';
+
+  @override
+  String get scheduleHeaderDate => 'Date';
+
+  @override
+  String get scheduleHeaderPlanned => 'Planned';
+
+  @override
+  String get scheduleHeaderActual => 'Actual';
+
+  @override
+  String get scheduleLegendOnTarget => 'On target';
+
+  @override
+  String get scheduleLegendOverTarget => 'Over target';
+
+  @override
+  String get scheduleLegendFutureOrEmpty => 'Future/No record';
+
+  @override
+  String get setupBasicInfo => 'Basic Info';
+
+  @override
+  String get setupEdit => 'Edit';
+
+  @override
+  String get setupNone => 'None';
+
+  @override
+  String get setupAgeLabel => 'Age';
+
+  @override
+  String get setupSmokingYearsLabel => 'Smoking Years';
+
+  @override
+  String setupYearsOld(Object value) {
+    return '$value years old';
+  }
+
+  @override
+  String setupYearsValue(Object value) {
+    return '$value years';
+  }
+
+  @override
+  String setupCigarettesPerDay(Object value) {
+    return '$value cigarettes/day';
+  }
+
+  @override
+  String setupPricePerPack(Object value) {
+    return '$value per pack';
+  }
+
+  @override
+  String get setupPlanDays => 'Plan Days';
+
+  @override
+  String setupPlanDaysValue(Object days) {
+    return '$days days';
+  }
+
+  @override
+  String get setupFirstSmokeTime => 'First Smoke Time';
+
+  @override
+  String get setupLastSmokeTime => 'Last Smoke Time';
+
+  @override
+  String get setupViewSchedule => 'View Quit Schedule';
+
+  @override
+  String get setupContentManagement => 'Content Management';
+
+  @override
+  String get setupConfirmSignOut => 'Confirm Sign Out';
+
+  @override
+  String get setupSignOutConfirmMessage =>
+      'Your data will stay in cloud and sync on next login.';
+
+  @override
+  String get setupSignOut => 'Sign Out';
+
+  @override
+  String get setupSignOutAccount => 'Sign Out Account';
+
+  @override
+  String get setupEditBasicInfo => 'Edit Basic Info';
+
+  @override
+  String get setupSmokingYearsWithYear => 'Smoking Years';
+
+  @override
+  String get setupDailyCigarettes => 'Daily Cigarettes';
+
+  @override
+  String get setupPricePerPackLabel => 'Cigarette Price (Per Pack)';
+
+  @override
+  String setupFirstSmokeWithTime(Object time) {
+    return 'First smoke\n$time';
+  }
+
+  @override
+  String setupLastSmokeWithTime(Object time) {
+    return 'Last smoke\n$time';
+  }
+
+  @override
+  String get setupPlanDaysLabel => 'Plan days:';
+
+  @override
+  String setupDaysCompact(Object days) {
+    return '${days}d';
+  }
+
+  @override
+  String setupFormatError(Object error) {
+    return 'Format error: $error';
+  }
+
+  @override
+  String get onboardingNameRequired => 'Please enter your nickname.';
+
+  @override
+  String get onboardingFeature1Title => '🌿 Dynamic Quit Schedule';
+
+  @override
+  String get onboardingFeature1Desc =>
+      'Delay windows dynamically based on your real action time and track smoked records.';
+
+  @override
+  String get onboardingFeature2Title => '👑 Coin Shop';
+
+  @override
+  String get onboardingFeature2Desc =>
+      'Includes coin bundles and VIP support for better motivation.';
+
+  @override
+  String get onboardingFeature3Title => '🧡 Community Feed';
+
+  @override
+  String get onboardingFeature3Desc =>
+      'When cravings hit, ask for help in community and get support.';
+
+  @override
+  String get onboardingWelcome => 'Welcome to Quit Smoking Club';
+
+  @override
+  String get onboardingCreateProfile => 'Create your profile';
+
+  @override
+  String get onboardingNicknameInput => 'Enter your nickname';
+
+  @override
+  String get onboardingDailyTarget => 'Daily cigarette target (default 5)';
+
+  @override
+  String get onboardingStartJourney => 'Start Your Quit Journey';
+
+  @override
+  String get game2048Subtitle => 'Merge numbers by swiping and reach 2048!';
+
+  @override
+  String get gameHubBannerTitle => 'Craving? Play games to shift focus!';
+
+  @override
+  String get gameHubBannerSubtitle =>
+      'Built-in games, offline and ready anytime 🎯';
+
+  @override
+  String get gameHubSelectGame => 'Choose a game';
+
+  @override
+  String get gameHubOfflineBuiltIn => '✅ Built-in · Offline';
 }

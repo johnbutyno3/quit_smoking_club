@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../screens/content_management_page.dart';
 import '../screens/schedule_page.dart';
 import '../screens/login_page.dart';
@@ -69,6 +70,7 @@ class _SetupPageState extends State<SetupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final fh = _firstTime.hour.toString().padLeft(2, '0');
     final fm = _firstTime.minute.toString().padLeft(2, '0');
     final lh = _lastTime.hour.toString().padLeft(2, '0');
@@ -82,8 +84,8 @@ class _SetupPageState extends State<SetupPage> {
           icon: const Icon(Icons.arrow_back_ios, size: 18),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          '設定',
+        title: Text(
+          l10n.settings,
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),
@@ -91,38 +93,53 @@ class _SetupPageState extends State<SetupPage> {
         padding: const EdgeInsets.all(16),
         children: [
           _SectionCard(
-            title: '基本資料',
+            title: l10n.setupBasicInfo,
             trailing: TextButton(
               onPressed: () => _showEditDialog(context),
-              child: const Text(
-                '編輯',
+              child: Text(
+                l10n.setupEdit,
                 style: TextStyle(color: Color(0xFF1B5E20)),
               ),
             ),
             children: [
               _InfoRow(
-                label: '暱稱',
-                value: _nameCtrl.text.isEmpty ? '無' : _nameCtrl.text,
+                label: l10n.postName,
+                value: _nameCtrl.text.isEmpty ? l10n.setupNone : _nameCtrl.text,
               ),
-              _InfoRow(label: '年齡', value: '${_ageCtrl.text} 歲'),
-              _InfoRow(label: '菸齡', value: '${_yearsCtrl.text} 年'),
-              _InfoRow(label: '每日抽菸量', value: '${_countCtrl.text} 支'),
-              _InfoRow(label: '香菸單價', value: '${_priceCtrl.text} 元／包'),
+              _InfoRow(
+                label: l10n.setupAgeLabel,
+                value: l10n.setupYearsOld(_ageCtrl.text),
+              ),
+              _InfoRow(
+                label: l10n.setupSmokingYearsLabel,
+                value: l10n.setupYearsValue(_yearsCtrl.text),
+              ),
+              _InfoRow(
+                label: l10n.dailyCount,
+                value: l10n.setupCigarettesPerDay(_countCtrl.text),
+              ),
+              _InfoRow(
+                label: l10n.cigarettePrice,
+                value: l10n.setupPricePerPack(_priceCtrl.text),
+              ),
             ],
           ),
           const SizedBox(height: 12),
           _SectionCard(
-            title: '戒菸計畫',
+            title: l10n.quitPlan,
             children: [
-              _InfoRow(label: '計畫天數', value: '${_days.round()} 天'),
-              _InfoRow(label: '第一支菸時間', value: '$fh:$fm'),
-              _InfoRow(label: '最後一支菸時間', value: '$lh:$lm'),
+              _InfoRow(
+                label: l10n.setupPlanDays,
+                value: l10n.setupPlanDaysValue(_days.round()),
+              ),
+              _InfoRow(label: l10n.setupFirstSmokeTime, value: '$fh:$fm'),
+              _InfoRow(label: l10n.setupLastSmokeTime, value: '$lh:$lm'),
             ],
           ),
           const SizedBox(height: 12),
           _ActionTile(
             icon: Icons.calendar_today_outlined,
-            label: '查詢戒菸行程',
+            label: l10n.setupViewSchedule,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const SchedulePage()),
@@ -131,7 +148,7 @@ class _SetupPageState extends State<SetupPage> {
           const SizedBox(height: 8),
           _ActionTile(
             icon: Icons.manage_search,
-            label: '內容管理後台',
+            label: l10n.setupContentManagement,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const ContentManagementPage()),
@@ -150,20 +167,20 @@ class _SetupPageState extends State<SetupPage> {
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (_) => AlertDialog(
-                  title: const Text('確認登出'),
-                  content: const Text('登出後資料將保留在雲端，下次登入即可同步回來。'),
+                  title: Text(l10n.setupConfirmSignOut),
+                  content: Text(l10n.setupSignOutConfirmMessage),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context, false),
-                      child: const Text('取消'),
+                      child: Text(l10n.cancel),
                     ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.redAccent,
                       ),
                       onPressed: () => Navigator.pop(context, true),
-                      child: const Text(
-                        '登出',
+                      child: Text(
+                        l10n.setupSignOut,
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
@@ -183,9 +200,9 @@ class _SetupPageState extends State<SetupPage> {
                 );
               }
             },
-            child: const Text(
-              '登出帳號',
-              style: TextStyle(
+            child: Text(
+              l10n.setupSignOutAccount,
+              style: const TextStyle(
                 color: Colors.redAccent,
                 fontWeight: FontWeight.bold,
               ),
@@ -200,21 +217,37 @@ class _SetupPageState extends State<SetupPage> {
     await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('編輯基本資料'),
+        title: Text(AppLocalizations.of(ctx)!.setupEditBasicInfo),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _dialogField(_nameCtrl, '暱稱'),
+              _dialogField(_nameCtrl, AppLocalizations.of(ctx)!.postName),
               const SizedBox(height: 8),
-              _dialogField(_ageCtrl, '年齡', type: TextInputType.number),
+              _dialogField(
+                _ageCtrl,
+                AppLocalizations.of(ctx)!.setupAgeLabel,
+                type: TextInputType.number,
+              ),
               const SizedBox(height: 8),
-              _dialogField(_yearsCtrl, '菸齡 (年)', type: TextInputType.number),
+              _dialogField(
+                _yearsCtrl,
+                AppLocalizations.of(ctx)!.setupSmokingYearsWithYear,
+                type: TextInputType.number,
+              ),
               const SizedBox(height: 8),
-              _dialogField(_countCtrl, '每日吸菸支數', type: TextInputType.number),
+              _dialogField(
+                _countCtrl,
+                AppLocalizations.of(ctx)!.setupDailyCigarettes,
+                type: TextInputType.number,
+              ),
               const SizedBox(height: 8),
 
-              _dialogField(_priceCtrl, '香菸單價（每包）', type: TextInputType.number),
+              _dialogField(
+                _priceCtrl,
+                AppLocalizations.of(ctx)!.setupPricePerPackLabel,
+                type: TextInputType.number,
+              ),
               const SizedBox(height: 16),
               Row(
                 children: [
@@ -222,7 +255,9 @@ class _SetupPageState extends State<SetupPage> {
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.wb_sunny_outlined, size: 16),
                       label: Text(
-                        '第一支菸\n${_firstTime.format(ctx)}',
+                        AppLocalizations.of(
+                          ctx,
+                        )!.setupFirstSmokeWithTime(_firstTime.format(ctx)),
                         textAlign: TextAlign.center,
                         style: const TextStyle(fontSize: 11),
                       ),
@@ -240,7 +275,9 @@ class _SetupPageState extends State<SetupPage> {
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.nightlight_outlined, size: 16),
                       label: Text(
-                        '最後一支菸\n${_lastTime.format(ctx)}',
+                        AppLocalizations.of(
+                          ctx,
+                        )!.setupLastSmokeWithTime(_lastTime.format(ctx)),
                         textAlign: TextAlign.center,
                         style: const TextStyle(fontSize: 11),
                       ),
@@ -259,14 +296,19 @@ class _SetupPageState extends State<SetupPage> {
               StatefulBuilder(
                 builder: (ctx2, setS) => Row(
                   children: [
-                    const Text('計畫天數：', style: TextStyle(fontSize: 13)),
+                    Text(
+                      AppLocalizations.of(ctx2)!.setupPlanDaysLabel,
+                      style: const TextStyle(fontSize: 13),
+                    ),
                     Expanded(
                       child: Slider(
                         value: _days,
                         min: 30,
                         max: 360,
                         divisions: 11,
-                        label: '${_days.round()} 天',
+                        label: AppLocalizations.of(
+                          ctx2,
+                        )!.setupPlanDaysValue(_days.round()),
                         onChanged: (v) {
                           setState(() => _days = v);
                           setS(() {});
@@ -274,7 +316,9 @@ class _SetupPageState extends State<SetupPage> {
                       ),
                     ),
                     Text(
-                      '${_days.round()}天',
+                      AppLocalizations.of(
+                        ctx2,
+                      )!.setupDaysCompact(_days.round()),
                       style: const TextStyle(fontSize: 12),
                     ),
                   ],
@@ -286,7 +330,7 @@ class _SetupPageState extends State<SetupPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('取消'),
+            child: Text(AppLocalizations.of(ctx)!.cancel),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -300,9 +344,13 @@ class _SetupPageState extends State<SetupPage> {
               final years = int.tryParse(_yearsCtrl.text) ?? 8;
               final fmtErr = UserService.validateNameFormat(name);
               if (fmtErr != null) {
-                ScaffoldMessenger.of(
-                  ctx,
-                ).showSnackBar(SnackBar(content: Text('格式錯誤: $fmtErr')));
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(ctx)!.setupFormatError(fmtErr),
+                    ),
+                  ),
+                );
                 return;
               }
               final uid = UserService.currentUid;
@@ -331,7 +379,10 @@ class _SetupPageState extends State<SetupPage> {
               }
               if (ctx.mounted) Navigator.pop(ctx);
             },
-            child: const Text('儲存', style: TextStyle(color: Colors.white)),
+            child: Text(
+              AppLocalizations.of(ctx)!.save,
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),

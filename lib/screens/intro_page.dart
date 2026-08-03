@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import 'login_page.dart';
 
 /// 首次開啟 App 時顯示的三頁滑動特色介紹
@@ -10,32 +11,12 @@ class IntroPage extends StatefulWidget {
 }
 
 class _IntroPageState extends State<IntroPage> {
+  static const int _slideCount = 3;
   final _controller = PageController();
   int _current = 0;
 
-  static const _slides = [
-    _Slide(
-      icon: Icons.eco_outlined,
-      title: '開始你的戒菸之旅',
-      desc: '科學化的戒菸計畫，幫助你一步一步減少菸量，直到完全戒斷。每一天都是勝利。',
-      color: Color(0xFF1B5E20),
-    ),
-    _Slide(
-      icon: Icons.calendar_month_outlined,
-      title: '個人化排程計畫',
-      desc: '根據你的抽菸習慣，系統自動生成最適合你的戒菸時間表，並即時追蹤進度。',
-      color: Color(0xFF2E7D32),
-    ),
-    _Slide(
-      icon: Icons.people_outline,
-      title: '社群互助，不再孤單',
-      desc: '加入戒菸社群，與同道人互相支持鼓勵。菸癮犯了？立即求救，大家都在。',
-      color: Color(0xFF388E3C),
-    ),
-  ];
-
   void _next() {
-    if (_current < _slides.length - 1) {
+    if (_current < _slideCount - 1) {
       _controller.nextPage(
         duration: const Duration(milliseconds: 350),
         curve: Curves.easeInOut,
@@ -60,6 +41,27 @@ class _IntroPageState extends State<IntroPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final slides = [
+      _Slide(
+        icon: Icons.eco_outlined,
+        title: l10n.introSlide1Title,
+        desc: l10n.introSlide1Desc,
+        color: const Color(0xFF1B5E20),
+      ),
+      _Slide(
+        icon: Icons.calendar_month_outlined,
+        title: l10n.introSlide2Title,
+        desc: l10n.introSlide2Desc,
+        color: const Color(0xFF2E7D32),
+      ),
+      _Slide(
+        icon: Icons.people_outline,
+        title: l10n.introSlide3Title,
+        desc: l10n.introSlide3Desc,
+        color: const Color(0xFF388E3C),
+      ),
+    ];
     return Scaffold(
       backgroundColor: const Color(0xFFE8F5E9),
       body: SafeArea(
@@ -70,8 +72,8 @@ class _IntroPageState extends State<IntroPage> {
               alignment: Alignment.topRight,
               child: TextButton(
                 onPressed: _goLogin,
-                child: const Text(
-                  '略過',
+                child: Text(
+                  l10n.introSkip,
                   style: TextStyle(color: Colors.grey, fontSize: 14),
                 ),
               ),
@@ -81,16 +83,16 @@ class _IntroPageState extends State<IntroPage> {
             Expanded(
               child: PageView.builder(
                 controller: _controller,
-                itemCount: _slides.length,
+                itemCount: slides.length,
                 onPageChanged: (i) => setState(() => _current = i),
-                itemBuilder: (_, i) => _SlideView(slide: _slides[i]),
+                itemBuilder: (_, i) => _SlideView(slide: slides[i]),
               ),
             ),
 
             // Dot indicators
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(_slides.length, (i) {
+              children: List.generate(slides.length, (i) {
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 250),
                   margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -122,7 +124,9 @@ class _IntroPageState extends State<IntroPage> {
                   ),
                   onPressed: _next,
                   child: Text(
-                    _current == _slides.length - 1 ? '開始使用' : '下一頁 ›',
+                    _current == slides.length - 1
+                        ? l10n.introGetStarted
+                        : l10n.introNext,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,

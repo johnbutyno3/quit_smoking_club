@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import 'game_2048_page.dart';
 
 // ══════════════════════════════════════════════════════════
@@ -8,26 +9,25 @@ import 'game_2048_page.dart';
 class GameHubPage extends StatelessWidget {
   const GameHubPage({super.key});
 
-  static const _games = [
-    _GameEntry(
-      icon: Icons.grid_4x4,
-      emoji: '🧩',
-      title: '2048',
-      subtitle: '滑動合併數字，挑戰 2048！',
-      color: Color(0xFFEDC22E),
-      bgColor: Color(0xFFFFF8E1),
-    ),
-    // 未來可在此新增更多遊戲
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final games = [
+      _GameEntry(
+        icon: Icons.grid_4x4,
+        emoji: '🧩',
+        title: '2048',
+        subtitle: l10n.game2048Subtitle,
+        color: const Color(0xFFEDC22E),
+        bgColor: const Color(0xFFFFF8E1),
+      ),
+    ];
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7F6),
       appBar: AppBar(
-        title: const Text(
-          '🎮 遊戲大廳',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          '🎮 ${l10n.gameHub}',
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
@@ -49,11 +49,11 @@ class GameHubPage extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '菸癮犯了？來玩遊戲轉移注意力！',
+                  l10n.gameHubBannerTitle,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -62,17 +62,17 @@ class GameHubPage extends StatelessWidget {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  '所有遊戲完全內建，不需網路，隨時可玩 🎯',
+                  l10n.gameHubBannerSubtitle,
                   style: TextStyle(color: Colors.white70, fontSize: 12),
                 ),
               ],
             ),
           ),
 
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: Text(
-              '選擇遊戲',
+              l10n.gameHubSelectGame,
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -85,9 +85,9 @@ class GameHubPage extends StatelessWidget {
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _games.length,
+              itemCount: games.length,
               itemBuilder: (context, index) {
-                final game = _games[index];
+                final game = games[index];
                 return _GameCard(
                   game: game,
                   onTap: () => _launchGame(context, game),
@@ -148,13 +148,13 @@ class _GameCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: game.color.withAlpha(40),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: game.color.withAlpha(80), width: 1.5),
+                  border: Border.all(
+                    color: game.color.withAlpha(80),
+                    width: 1.5,
+                  ),
                 ),
                 child: Center(
-                  child: Text(
-                    game.emoji,
-                    style: const TextStyle(fontSize: 32),
-                  ),
+                  child: Text(game.emoji, style: const TextStyle(fontSize: 32)),
                 ),
               ),
               const SizedBox(width: 16),
@@ -182,13 +182,15 @@ class _GameCard extends StatelessWidget {
                     const SizedBox(height: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFF1B5E20).withAlpha(20),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Text(
-                        '✅ 完全內建 · 離線可玩',
+                      child: Text(
+                        AppLocalizations.of(context)!.gameHubOfflineBuiltIn,
                         style: TextStyle(
                           fontSize: 10,
                           color: Color(0xFF1B5E20),
@@ -199,8 +201,11 @@ class _GameCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.arrow_forward_ios,
-                  size: 16, color: Colors.grey.shade400),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color: Colors.grey.shade400,
+              ),
             ],
           ),
         ),

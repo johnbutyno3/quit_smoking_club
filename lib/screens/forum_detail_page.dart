@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/forum_post.dart';
 import '../services/coin_service.dart';
 import '../repositories/coin/coin_repository.dart';
@@ -77,6 +78,7 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
   }
 
   Future<void> _sendComment() async {
+    final l10n = AppLocalizations.of(context)!;
     final text = _commentController.text.trim();
 
     if (text.isEmpty) return;
@@ -108,8 +110,8 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
       _commentController.clear();
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('留言成功，扣除 1 COIN'),
+        SnackBar(
+          content: Text(l10n.forumCommentSuccessCostOneCoin),
           backgroundColor: Colors.green,
         ),
       );
@@ -118,7 +120,7 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('留言失敗')));
+      ).showSnackBar(SnackBar(content: Text(l10n.forumCommentFailed)));
     }
   }
 
@@ -127,9 +129,9 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('COIN不足'),
+          title: Text(AppLocalizations.of(context)!.insufficientCoins),
 
-          content: const Text('留言需要 1 COIN'),
+          content: Text(AppLocalizations.of(context)!.forumCommentNeedsOneCoin),
 
           actions: [
             TextButton(
@@ -139,19 +141,23 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                 _watchAdComment(text);
               },
 
-              child: const Text('觀看廣告留言'),
+              child: Text(AppLocalizations.of(context)!.forumWatchAdComment),
             ),
 
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
 
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(const SnackBar(content: Text('前往 COIN 商城')));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(context)!.forumGoToCoinShop,
+                    ),
+                  ),
+                );
               },
 
-              child: const Text('購買 COIN'),
+              child: Text(AppLocalizations.of(context)!.forumBuyCoin),
             ),
 
             TextButton(
@@ -159,7 +165,7 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                 Navigator.pop(dialogContext);
               },
 
-              child: const Text('取消'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
           ],
         );
@@ -169,9 +175,13 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
 
   Future<void> _watchAdComment(String text) async {
     if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('觀看廣告中...'), duration: Duration(seconds: 2)),
+      SnackBar(
+        content: Text(l10n.forumWatchingAd),
+        duration: const Duration(seconds: 2),
+      ),
     );
 
     await Future.delayed(const Duration(seconds: 2));
@@ -201,12 +211,13 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final post = widget.post;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '文章詳情',
+        title: Text(
+          l10n.forumPostDetailTitle,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
@@ -254,8 +265,8 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
 
                       const Divider(),
 
-                      const Text(
-                        '留言',
+                      Text(
+                        l10n.forumComments,
 
                         style: TextStyle(
                           fontSize: 18,
@@ -266,12 +277,12 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                       const SizedBox(height: 10),
 
                       if (_comments.isEmpty)
-                        const Center(
+                        Center(
                           child: Padding(
-                            padding: EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(20),
 
                             child: Text(
-                              '目前沒有留言',
+                              l10n.forumNoComments,
                               style: TextStyle(color: Colors.grey),
                             ),
                           ),
@@ -294,7 +305,9 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                                   color: Colors.grey,
                                 ),
 
-                                title: Text(comment['userName'] ?? '匿名'),
+                                title: Text(
+                                  comment['userName'] ?? l10n.anonymousUser,
+                                ),
 
                                 subtitle: Text(comment['content'] ?? ''),
                               ),
@@ -320,8 +333,8 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                   child: TextField(
                     controller: _commentController,
 
-                    decoration: const InputDecoration(
-                      hintText: '輸入留言...',
+                    decoration: InputDecoration(
+                      hintText: l10n.forumCommentHint,
 
                       border: OutlineInputBorder(),
                     ),

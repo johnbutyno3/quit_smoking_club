@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../models/forum_post.dart';
 import '../repositories/forum_repository.dart';
 import '../services/user_service.dart';
@@ -40,13 +41,7 @@ class _ForumPageState extends State<ForumPage> {
   int _myCoins = 0;
   int _selectedCategory = 0; // 0=全部, 1=菸癮犯了, 2=心得分享, 3=健康交流, 4=互相鼓勵
 
-  static const _categories = [
-    'forum.category.all',
-    'forum.category.craving',
-    'forum.category.story',
-    'forum.category.health',
-    'forum.category.support',
-  ];
+  static const _categories = [0, 1, 2, 3, 4];
   List<ForumPost> get _filteredPosts {
     if (_selectedCategory == 0) return _posts;
     if (_selectedCategory == 1) return _posts.where((p) => p.isSOS).toList();
@@ -84,6 +79,7 @@ class _ForumPageState extends State<ForumPage> {
   }
 
   Future<void> _handleSendGift(int index) async {
+    final l10n = AppLocalizations.of(context)!;
     if (_myCoins >= 5) {
       final latestCoins = _myCoins - 5;
       final success = await _spendCoinUseCase.execute(5, '論壇送禮');
@@ -98,13 +94,14 @@ class _ForumPageState extends State<ForumPage> {
         _myCoins = latestCoins;
         _posts[index] = post.copyWith(gifts: post.gifts + 1);
       });
-      _showSnack('🎁 成功花費 5 金幣送出冰鎮薄荷糖！');
+      _showSnack(l10n.giftSent);
     } else {
-      _showSnack('❌ 金幣不足！請前往金幣商城儲值包！');
+      _showSnack(l10n.forumInsufficientCoinsToGift);
     }
   }
 
   Future<void> _showCreatePostDialog() async {
+    final l10n = AppLocalizations.of(context)!;
     final nameController = TextEditingController();
     final contentController = TextEditingController();
 
@@ -112,31 +109,31 @@ class _ForumPageState extends State<ForumPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('創建新貼文'),
+          title: Text(l10n.forumCreatePostTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(labelText: '暱稱'),
+                decoration: InputDecoration(labelText: l10n.postName),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: contentController,
                 maxLines: 4,
-                decoration: const InputDecoration(labelText: '貼文內容'),
+                decoration: InputDecoration(labelText: l10n.postContent),
               ),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('取消'),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () async {
                 final name = nameController.text.trim().isEmpty
-                    ? '匿名朋友'
+                    ? l10n.anonymousUser
                     : nameController.text.trim();
                 final content = contentController.text.trim();
                 if (content.isEmpty) {
@@ -146,7 +143,7 @@ class _ForumPageState extends State<ForumPage> {
                   if (!context.mounted) return;
 
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('COIN不足，請前往商城購買 COIN')),
+                    SnackBar(content: Text(l10n.forumNeedCoinsToCreatePost)),
                   );
                   return;
                 }
@@ -178,9 +175,10 @@ class _ForumPageState extends State<ForumPage> {
                 await _forumRepository.addPost(newPost);
                 if (context.mounted) Navigator.pop(context);
                 await _loadForumData();
-                _showSnack('✅ 成功扣除 1 金幣，貼文已發佈！');
+                if (!mounted) return;
+                _showSnack(l10n.postCreated);
               },
-              child: const Text('發佈'),
+              child: Text(l10n.publish),
             ),
           ],
         );
@@ -193,27 +191,50 @@ class _ForumPageState extends State<ForumPage> {
   }
 
   String _getRelativeTime(DateTime dateTime) {
+    final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final diff = now.difference(dateTime);
-    if (diff.inMinutes < 1) return '剛剛';
-    if (diff.inHours < 1) return '${diff.inMinutes}分鐘前';
-    if (diff.inDays < 1) return '${diff.inHours}小時前';
-    return '${diff.inDays}天前';
+    if (diff.inMinutes < 1) return l10n.now;
+    if (diff.inHours < 1) return l10n.minutesAgo(diff.inMinutes);
+    if (diff.inDays < 1) return l10n.hoursAgo(diff.inHours);
+    return l10n.daysAgo(diff.inDays);
+  }
+
+  String _categoryLabel(int categoryId) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (categoryId) {
+      case 0:
+        return l10n.forumCategoryAll;
+      case 1:
+        return l10n.forumCategoryCraving;
+      case 2:
+        return l10n.forumCategoryStory;
+      case 3:
+        return l10n.forumCategoryHealth;
+      case 4:
+        return l10n.forumCategorySupport;
+      default:
+        return l10n.forumCategoryAll;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: _ForumColors.bg,
       appBar: AppBar(
-        title: const Text('論壇', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          l10n.forum,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.add_comment_outlined),
             onPressed: _showCreatePostDialog,
-            tooltip: '創建貼文 (10 金幣)',
+            tooltip: l10n.createPost,
           ),
         ],
         bottom: PreferredSize(
@@ -241,7 +262,7 @@ class _ForumPageState extends State<ForumPage> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      _categories[i],
+                      _categoryLabel(_categories[i]),
                       style: TextStyle(
                         color: selected ? Colors.white : Colors.grey,
                         fontSize: 12,
@@ -271,8 +292,8 @@ class _ForumPageState extends State<ForumPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    '我的剩餘金幣',
+                  Text(
+                    l10n.myCoins,
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                   ),
                   Text(
@@ -295,11 +316,11 @@ class _ForumPageState extends State<ForumPage> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('目前尚無論壇貼文，快按右上角新增吧！'),
+                        Text(l10n.emptyForum),
                         const SizedBox(height: 12),
                         ElevatedButton(
                           onPressed: _showCreatePostDialog,
-                          child: const Text('建立第一則貼文'),
+                          child: Text(l10n.createPost),
                         ),
                       ],
                     ),
@@ -406,8 +427,8 @@ class _ForumPageState extends State<ForumPage> {
                                             8,
                                           ),
                                         ),
-                                        child: const Text(
-                                          '🚨 求助文',
+                                        child: Text(
+                                          '🚨 ${l10n.sosPost}',
                                           style: TextStyle(
                                             color: Colors.red,
                                             fontWeight: FontWeight.bold,
@@ -445,7 +466,7 @@ class _ForumPageState extends State<ForumPage> {
                                         size: 18,
                                       ),
                                       label: Text(
-                                        '${post.likes} 讚',
+                                        '${post.likes} ${l10n.like}',
                                         style: const TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,
@@ -462,7 +483,7 @@ class _ForumPageState extends State<ForumPage> {
                                         size: 18,
                                       ),
                                       label: Text(
-                                        '${post.gifts} 禮物',
+                                        '${post.gifts} ${l10n.gift}',
                                         style: const TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,

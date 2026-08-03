@@ -153,14 +153,14 @@ class _ShopPageState extends State<ShopPage> {
             onPressed: () {
               buyCoins(10);
             },
-            child: const Text('Buy 10 COIN'),
+            child: Text(t.shopBuyCoins(10)),
           ),
 
           const SizedBox(height: 10),
 
           ElevatedButton(
             onPressed: _createForum,
-            child: const Text('Create Forum Post (-50 COIN)'),
+            child: Text(t.shopCreateForumPost),
           ),
 
           const SizedBox(height: 20),
@@ -174,7 +174,7 @@ class _ShopPageState extends State<ShopPage> {
               ),
 
               title: Text(
-                _isPremiumUser ? 'VIP Active' : 'Premium',
+                _isPremiumUser ? t.shopVipActive : t.shopPremium,
                 style: const TextStyle(color: Colors.white),
               ),
 
@@ -185,7 +185,7 @@ class _ShopPageState extends State<ShopPage> {
                     )
                   : ElevatedButton(
                       onPressed: _unlockPremium,
-                      child: const Text('VIP'),
+                      child: Text(t.shopVip),
                     ),
             ),
           ),
