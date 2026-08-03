@@ -701,4 +701,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gameHubOfflineBuiltIn => '✅ Built-in · Offline';
+
+  @override
+  String get medicalLibraryTitle => 'Medical Library';
+
+  @override
+  String get medicalLibraryEmpty => 'No medical articles available.';
+
+  @override
+  String get medicalLibraryLoadFailed =>
+      'Failed to load medical articles. Please try again.';
+
+  @override
+  String get medicalVip => 'VIP';
+
+  @override
+  String get medicalSummaryUnavailable => 'Summary is unavailable.';
 }

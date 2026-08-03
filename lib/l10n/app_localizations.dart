@@ -1352,6 +1352,36 @@ abstract class AppLocalizations {
   /// In zh_TW, this message translates to:
   /// **'✅ 完全內建 · 離線可玩'**
   String get gameHubOfflineBuiltIn;
+
+  /// No description provided for @medicalLibraryTitle.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'醫學知識庫'**
+  String get medicalLibraryTitle;
+
+  /// No description provided for @medicalLibraryEmpty.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'目前沒有醫學文章。'**
+  String get medicalLibraryEmpty;
+
+  /// No description provided for @medicalLibraryLoadFailed.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'載入醫學文章失敗，請稍後再試。'**
+  String get medicalLibraryLoadFailed;
+
+  /// No description provided for @medicalVip.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'VIP'**
+  String get medicalVip;
+
+  /// No description provided for @medicalSummaryUnavailable.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'暫無摘要內容。'**
+  String get medicalSummaryUnavailable;
 }
 
 class _AppLocalizationsDelegate
