@@ -719,6 +719,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get medicalSummaryUnavailable => 'Summary is unavailable.';
 
   @override
+  String get storyLibraryTitle => 'Quit Stories';
+
+  @override
+  String get storyLibraryEmpty => 'No stories available.';
+
+  @override
+  String get storyLibraryLoadFailed =>
+      'Failed to load stories. Please try again.';
+
+  @override
+  String get storySummaryUnavailable => 'Story summary is unavailable.';
+
+  @override
   String get musicLibraryTitle => 'Relaxing Music';
 
   @override

@@ -702,6 +702,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get medicalSummaryUnavailable => '暫無摘要內容。';
 
   @override
+  String get storyLibraryTitle => '戒菸故事';
+
+  @override
+  String get storyLibraryEmpty => '目前沒有故事內容。';
+
+  @override
+  String get storyLibraryLoadFailed => '載入故事內容失敗，請稍後再試。';
+
+  @override
+  String get storySummaryUnavailable => '暫無故事摘要。';
+
+  @override
   String get musicLibraryTitle => '放鬆音樂';
 
   @override
@@ -1413,6 +1425,18 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get medicalSummaryUnavailable => '暫無摘要內容。';
+
+  @override
+  String get storyLibraryTitle => '戒菸故事';
+
+  @override
+  String get storyLibraryEmpty => '目前沒有故事內容。';
+
+  @override
+  String get storyLibraryLoadFailed => '載入故事內容失敗，請稍後再試。';
+
+  @override
+  String get storySummaryUnavailable => '暫無故事摘要。';
 
   @override
   String get musicLibraryTitle => '放鬆音樂';
