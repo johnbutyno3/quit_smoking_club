@@ -306,4 +306,10 @@
 "gameHubBannerSubtitle": "所有遊戲完全內建，不需網路，隨時可玩 🎯",
 "gameHubSelectGame": "選擇遊戲",
 "gameHubOfflineBuiltIn": "✅ 完全內建 · 離線可玩"
+,
+"medicalLibraryTitle": "醫學知識庫",
+"medicalLibraryEmpty": "目前沒有醫學文章。",
+"medicalLibraryLoadFailed": "載入醫學文章失敗，請稍後再試。",
+"medicalVip": "VIP",
+"medicalSummaryUnavailable": "暫無摘要內容。"
 }

@@ -685,6 +685,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get gameHubOfflineBuiltIn => '✅ 完全內建 · 離線可玩';
+
+  @override
+  String get medicalLibraryTitle => '醫學知識庫';
+
+  @override
+  String get medicalLibraryEmpty => '目前沒有醫學文章。';
+
+  @override
+  String get medicalLibraryLoadFailed => '載入醫學文章失敗，請稍後再試。';
+
+  @override
+  String get medicalVip => 'VIP';
+
+  @override
+  String get medicalSummaryUnavailable => '暫無摘要內容。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -1368,4 +1383,19 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get gameHubOfflineBuiltIn => '✅ 完全內建 · 離線可玩';
+
+  @override
+  String get medicalLibraryTitle => '醫學知識庫';
+
+  @override
+  String get medicalLibraryEmpty => '目前沒有醫學文章。';
+
+  @override
+  String get medicalLibraryLoadFailed => '載入醫學文章失敗，請稍後再試。';
+
+  @override
+  String get medicalVip => 'VIP';
+
+  @override
+  String get medicalSummaryUnavailable => '暫無摘要內容。';
 }

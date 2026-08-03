@@ -306,4 +306,10 @@
 "gameHubBannerSubtitle": "Built-in games, offline and ready anytime 🎯",
 "gameHubSelectGame": "Choose a game",
 "gameHubOfflineBuiltIn": "✅ Built-in · Offline"
+,
+"medicalLibraryTitle": "Medical Library",
+"medicalLibraryEmpty": "No medical articles available.",
+"medicalLibraryLoadFailed": "Failed to load medical articles. Please try again.",
+"medicalVip": "VIP",
+"medicalSummaryUnavailable": "Summary is unavailable."
   }
