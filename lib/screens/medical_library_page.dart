@@ -4,6 +4,7 @@ import '../l10n/app_localizations.dart';
 import '../models/medical/medical_article.dart';
 import '../repositories/medical_repository.dart';
 import '../widgets/medical/medical_article_card.dart';
+import 'medical_article_detail_page.dart';
 
 class MedicalLibraryPage extends StatefulWidget {
   const MedicalLibraryPage({super.key});
@@ -94,7 +95,17 @@ class _MedicalLibraryPageState extends State<MedicalLibraryPage> {
               separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final article = articles[index];
-                return MedicalArticleCard(article: article);
+                return GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          MedicalArticleDetailPage(article: article),
+                    ),
+                  ),
+                  child: MedicalArticleCard(article: article),
+                );
               },
             ),
           );
