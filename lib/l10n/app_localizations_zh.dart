@@ -700,6 +700,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get medicalSummaryUnavailable => '暫無摘要內容。';
+
+  @override
+  String get musicLibraryTitle => '放鬆音樂';
+
+  @override
+  String get musicLibraryEmpty => '目前沒有可用音樂內容。';
+
+  @override
+  String get musicLibraryLoadFailed => '載入音樂內容失敗，請稍後再試。';
+
+  @override
+  String get musicSummaryUnavailable => '暫無內容說明。';
+
+  @override
+  String get musicSourceLink => '來源連結';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -1398,4 +1413,19 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get medicalSummaryUnavailable => '暫無摘要內容。';
+
+  @override
+  String get musicLibraryTitle => '放鬆音樂';
+
+  @override
+  String get musicLibraryEmpty => '目前沒有可用音樂內容。';
+
+  @override
+  String get musicLibraryLoadFailed => '載入音樂內容失敗，請稍後再試。';
+
+  @override
+  String get musicSummaryUnavailable => '暫無內容說明。';
+
+  @override
+  String get musicSourceLink => '來源連結';
 }

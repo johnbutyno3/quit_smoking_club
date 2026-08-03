@@ -717,4 +717,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get medicalSummaryUnavailable => 'Summary is unavailable.';
+
+  @override
+  String get musicLibraryTitle => 'Relaxing Music';
+
+  @override
+  String get musicLibraryEmpty => 'No music items available.';
+
+  @override
+  String get musicLibraryLoadFailed =>
+      'Failed to load music items. Please try again.';
+
+  @override
+  String get musicSummaryUnavailable => 'Description is unavailable.';
+
+  @override
+  String get musicSourceLink => 'Source link';
 }

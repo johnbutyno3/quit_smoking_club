@@ -311,5 +311,10 @@
 "medicalLibraryEmpty": "目前沒有醫學文章。",
 "medicalLibraryLoadFailed": "載入醫學文章失敗，請稍後再試。",
 "medicalVip": "VIP",
-"medicalSummaryUnavailable": "暫無摘要內容。"
+"medicalSummaryUnavailable": "暫無摘要內容。",
+"musicLibraryTitle": "放鬆音樂",
+"musicLibraryEmpty": "目前沒有可用音樂內容。",
+"musicLibraryLoadFailed": "載入音樂內容失敗，請稍後再試。",
+"musicSummaryUnavailable": "暫無內容說明。",
+"musicSourceLink": "來源連結"
 }

@@ -1382,6 +1382,36 @@ abstract class AppLocalizations {
   /// In zh_TW, this message translates to:
   /// **'暫無摘要內容。'**
   String get medicalSummaryUnavailable;
+
+  /// No description provided for @musicLibraryTitle.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'放鬆音樂'**
+  String get musicLibraryTitle;
+
+  /// No description provided for @musicLibraryEmpty.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'目前沒有可用音樂內容。'**
+  String get musicLibraryEmpty;
+
+  /// No description provided for @musicLibraryLoadFailed.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'載入音樂內容失敗，請稍後再試。'**
+  String get musicLibraryLoadFailed;
+
+  /// No description provided for @musicSummaryUnavailable.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'暫無內容說明。'**
+  String get musicSummaryUnavailable;
+
+  /// No description provided for @musicSourceLink.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'來源連結'**
+  String get musicSourceLink;
 }
 
 class _AppLocalizationsDelegate
