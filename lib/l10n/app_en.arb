@@ -311,5 +311,10 @@
 "medicalLibraryEmpty": "No medical articles available.",
 "medicalLibraryLoadFailed": "Failed to load medical articles. Please try again.",
 "medicalVip": "VIP",
-"medicalSummaryUnavailable": "Summary is unavailable."
+"medicalSummaryUnavailable": "Summary is unavailable.",
+"musicLibraryTitle": "Relaxing Music",
+"musicLibraryEmpty": "No music items available.",
+"musicLibraryLoadFailed": "Failed to load music items. Please try again.",
+"musicSummaryUnavailable": "Description is unavailable.",
+"musicSourceLink": "Source link"
   }
