@@ -27,6 +27,10 @@ class ContentRepository {
     return books.map(_fromReadingBook).toList(growable: false);
   }
 
+  Future<List<ContentItem>> getMusicContents() {
+    return getContents(category: ContentCategory.music);
+  }
+
   Future<List<ContentItem>> getMedicalContents() async {
     return getContents(category: ContentCategory.medical);
   }
