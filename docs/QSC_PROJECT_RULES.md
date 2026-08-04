@@ -1170,3 +1170,34 @@ flutter analyze
 0 errors
 
 才進入下一修改階段。
+---
+
+# Content Architecture Principles
+
+## Content Flow
+
+UI
+↓
+Repository
+↓
+ContentRepository
+↓
+Supabase
+
+Rules
+
+- UI 不可直接存取資料來源。
+- 所有內容必須經由 ContentRepository。
+- Medical、Stories、Music、YouTube、Games 使用相同架構。
+
+## MVP Rule
+
+V1.0 只開發上市必要功能。
+
+## Future Expansion
+
+ContentRepository 保留未來支援：
+
+- Official Content
+- Partner Content
+- Community Content
