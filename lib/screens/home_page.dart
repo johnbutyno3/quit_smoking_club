@@ -24,6 +24,7 @@ import 'reading_library_page.dart';
 import 'medical_library_page.dart';
 import 'music_library_page.dart';
 import 'story_library_page.dart';
+import 'youtube_library_page.dart';
 import '../models/user_smoking_status.dart';
 import '../widgets/home/home_progress_card.dart';
 import '../models/user_role.dart';
@@ -516,6 +517,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             await Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const StoryLibraryPage()),
+            );
+          } else if (page == 'YouTube') {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const YouTubeLibraryPage(),
+              ),
             );
           } else {
             await Navigator.push(
