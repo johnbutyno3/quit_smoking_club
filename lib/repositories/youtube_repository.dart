@@ -1,6 +1,7 @@
 import '../models/content/content_item.dart';
+import '../models/content/content_category.dart';
 import '../models/youtube/youtube_item.dart';
-import 'content_repository.dart';
+import 'content/content_repository.dart';
 
 class YouTubeRepository {
   YouTubeRepository({ContentRepository? contentRepository})
@@ -9,7 +10,9 @@ class YouTubeRepository {
   final ContentRepository _contentRepository;
 
   Future<List<YouTubeItem>> getYouTubeItems() async {
-    final items = await _contentRepository.getYouTubeContents();
+    final items = await _contentRepository.getContents(
+      category: ContentCategory.youtube,
+    );
     return items.map(_toYouTubeItem).toList(growable: false);
   }
 
