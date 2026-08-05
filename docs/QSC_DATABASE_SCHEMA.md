@@ -1,69 +1,82 @@
 # Quit Smoking Club
-# QSC Database Schema Document V1.0
 
-最後更新：2026-07-30
+# QSC Database Schema Document V2.0
+
+Last Updated: 2026-08-05
 
 ---
 
 # 1. Database Overview
 
+QSC uses a hybrid database architecture.
 
-QSC 採用混合資料架構。
+The system separates data according to ownership and access requirements.
 
+---
 
-資料分級：
+## Private Data
 
-
-Private Data
-
-使用：
+Technology:
 
 Firebase
 
+Purpose:
 
-用途：
+Store user private information.
 
-儲存使用者私人資料。
+Examples:
 
+* Account information
+* Personal profile
+* Quit smoking plans
+* Smoking records
+* User settings
+* Coin balance
+* VIP status
 
 ---
 
-Public Content
+## Public Content and Community Data
 
-使用：
+Technology:
 
 Supabase
 
+Purpose:
 
-用途：
+Store public content and community features.
 
-儲存公開內容與社群資料。
+Examples:
 
+* Articles
+* Stories
+* Music
+* YouTube resources
+* Games metadata
+* Reading content
+* Forum data
 
 ---
 
-Local Data
+## Local Data
 
-使用：
+Technology:
 
 Local Storage / Cache
 
+Purpose:
 
-用途：
-
-- 離線使用
-- 快取
-- 暫存資料
-
+* Offline access
+* Cache frequently used content
+* Temporary synchronization data
 
 ---
 
 # 2. Database Architecture
 
+Data flow:
 
-資料流：
-
-
+```
 User Interface
 
 ↓
@@ -81,537 +94,443 @@ Data Source
 ↓
 
 Firebase / Supabase / Local Storage
-
+```
 
 ---
 
 # 3. Firebase Database Structure
 
-
-Firebase 主要負責：
-
-- 帳號
-- 個人資料
-- 戒菸資料
-- 私人紀錄
-
+Firebase is responsible for private user data.
 
 ---
 
 # 3.1 Users
 
-
 Collection:
 
+```
 users
-
-
-用途：
-
-使用者基本帳號資料。
-
+```
 
 Fields:
 
-- uid
-- email
-- displayName
-- createdAt
-- lastLoginAt
-- accountStatus
-
+* uid
+* email
+* displayName
+* createdAt
+* lastLoginAt
+* accountStatus
 
 ---
 
 # 3.2 User Profile
 
-
 Collection:
 
+```
 user_profiles
-
-
-用途：
-
-使用者個人設定。
-
+```
 
 Fields:
 
-- uid
-- nickname
-- age
-- smokingYears
-- cigarettesPerDay
-- cigarettePrice
-- firstSmokeTime
-- lastSmokeTime
-- createdAt
-- updatedAt
-
+* uid
+* nickname
+* age
+* smokingYears
+* cigarettesPerDay
+* cigarettePrice
+* firstSmokeTime
+* lastSmokeTime
+* createdAt
+* updatedAt
 
 ---
 
 # 3.3 Quit Plan
 
-
 Collection:
 
+```
 quit_plans
-
-
-用途：
-
-保存戒菸計畫。
-
+```
 
 Fields:
 
-- uid
-- planStartDate
-- targetQuitDate
-- durationDays
-- plannedCount
-- startTime
-- endTime
-- status
-- createdAt
-
+* uid
+* planStartDate
+* targetQuitDate
+* durationDays
+* plannedCount
+* startTime
+* endTime
+* status
+* createdAt
 
 ---
 
 # 3.4 Smoking Records
 
-
 Collection:
 
+```
 smoking_records
-
-
-用途：
-
-保存抽菸紀錄。
-
+```
 
 Fields:
 
-- uid
-- recordId
-- smokeTime
-- location
-- note
-- createdAt
+* uid
+* recordId
+* smokeTime
+* location
+* note
+* createdAt
 
+Used for:
 
-用途：
-
-提供：
-
-- 戒菸分析
-- 行為分析
-- 進度計算
-
+* Quit progress analysis
+* Behavior analysis
+* Personal statistics
 
 ---
 
 # 3.5 User Settings
 
-
 Collection:
 
+```
 user_settings
-
-
-用途：
-
-使用者偏好設定。
-
+```
 
 Fields:
 
-- uid
-- language
-- notificationEnabled
-- theme
-- privacySetting
-
+* uid
+* language
+* notificationEnabled
+* theme
+* privacySetting
 
 ---
 
 # 4. Supabase Database Structure
 
-
-Supabase 負責：
-
-公開內容。
-
+Supabase manages public content and community data.
 
 ---
 
-# 4.1 Medical Articles
-
+# 4.1 Unified Content System
 
 Table:
 
-medical_articles
+```
+content_items
+```
 
+Purpose:
 
-用途：
+A unified content source for all public content.
 
-醫療與戒菸知識。
+Supported categories:
 
+* medical
+* stories
+* music
+* youtube
+* games
 
 Fields:
 
-- id
-- title
-- content
-- category
-- language
-- author
-- createdAt
-- updatedAt
-- status
+```
+id
+unique_id
+title
+category
+language
+content
+link
+author
+download_coin_cost
+status
+created_at
+updated_at
+```
 
+Category examples:
 
----
-
-# 4.2 Success Stories
-
-
-Table:
-
-success_stories
-
-
-用途：
-
-戒菸成功故事。
-
-
-Fields:
-
-- id
-- title
-- content
-- authorName
-- language
-- createdAt
-- status
-
-
----
-
-# 4.3 Music Content
-
-
-Table:
-
-music_contents
-
-
-用途：
-
-戒菸放鬆音樂。
-
-
-Fields:
-
-- id
-- title
-- description
-- url
-- category
-- language
-
-
----
-
-# 4.4 Games Content
-
-
-Table:
-
+```
+medical
+stories
+music
+youtube
 games
+```
 
+The application uses:
 
-用途：
+```
+SupabaseContentService
 
-遊戲中心資料。
+↓
 
+ContentRepository
 
-Fields:
+↓
 
-- id
-- name
-- description
-- type
-- rewardCoin
-- status
-
+ContentItem
+```
 
 ---
 
-# 4.5 Forum Posts
+# 4.2 Reading System
 
+Reading uses a separated structure because books contain multiple chapters.
+
+---
 
 Table:
 
+```
+reading_books
+```
+
+Fields:
+
+* id
+* title
+* author
+* description
+* language
+* download_coin_cost
+* status
+* created_at
+* updated_at
+
+---
+
+Table:
+
+```
+reading_chapters
+```
+
+Fields:
+
+* id
+* book_id
+* chapter_order
+* title
+* content
+* word_count
+* created_at
+
+Relationship:
+
+```
+reading_books
+
+1
+
+↓
+
+N
+
+reading_chapters
+```
+
+---
+
+# 4.3 Forum Posts
+
+Table:
+
+```
 forum_posts
-
-
-用途：
-
-論壇文章。
-
+```
 
 Fields:
 
-- id
-- userId
-- title
-- content
-- createdAt
-- updatedAt
-- status
+* id
+* userId
+* title
+* content
+* createdAt
+* updatedAt
+* status
 
+Current limitation:
 
-限制：
+Text only.
 
-目前只支援文字內容。
+Not supported:
 
-
-禁止：
-
-- 圖片
-- 影片
-
+* Image upload
+* Video upload
 
 ---
 
-# 4.6 Forum Comments
-
+# 4.4 Forum Comments
 
 Table:
 
+```
 forum_comments
-
-
-用途：
-
-文章留言。
-
+```
 
 Fields:
 
-- id
-- postId
-- userId
-- content
-- createdAt
-
+* id
+* postId
+* userId
+* content
+* createdAt
 
 ---
 
 # 5. Coin System Database
 
+COIN is an internal virtual currency.
 
-COIN 為 App 內虛擬貨幣。
+Rules:
 
-
-不可：
-
-- 提領
-- 兌換現金
-
+* Cannot withdraw
+* Cannot exchange for cash
 
 ---
 
-# 5.1 Coin Balance
+## 5.1 Coin Balance
 
-
-Storage:
+Technology:
 
 Firebase
 
-
-用途：
-
-保存使用者目前 COIN。
-
-
 Fields:
 
-- uid
-- balance
-- updatedAt
-
+* uid
+* balance
+* updatedAt
 
 ---
 
-# 5.2 Coin Transactions
+## 5.2 Coin Transactions
 
-
-Storage:
+Technology:
 
 Firebase
 
-
-用途：
-
-保存交易紀錄。
-
-
 Fields:
 
-- transactionId
-- uid
-- amount
-- type
-- reason
-- createdAt
+* transactionId
+* uid
+* amount
+* type
+* reason
+* createdAt
 
+Types:
 
-Type:
-
-- earn
-- spend
-
+* earn
+* spend
 
 ---
 
 # 6. VIP System
 
-
-Storage:
+Technology:
 
 Firebase
 
-
-用途：
-
-管理會員狀態。
-
-
 Fields:
 
-- uid
-- vipLevel
-- startDate
-- expireDate
-- status
+* uid
+* vipLevel
+* startDate
+* expireDate
+* status
 
+VIP benefits:
 
-VIP 功能：
-
-- 移除廣告
-- 增加 COIN 獎勵
-- 特殊優惠
-
+* Remove advertisements
+* Increase rewards
+* Special discounts
 
 ---
 
 # 7. Local Storage Strategy
 
-
-Local Storage 用途：
-
+Local storage is used for:
 
 Cache:
 
-- 使用者基本資料
-- 最近內容
-- 戒菸計畫
-
+* Recent content
+* User preferences
+* Quit plan data
 
 Offline:
 
-- 暫存操作
-- 待同步資料
-
+* Temporary actions
+* Pending synchronization
 
 ---
 
-# 8. Data Security Rules
+# 8. Security Rules
 
+Private data:
 
-私人資料：
+Only accessible by the owner.
 
-只能由本人存取。
+Firebase:
 
+Requires:
 
-Firebase：
+* Authentication
+* Permission validation
 
-需要：
+Public data:
 
-- Authentication
-- Permission Check
+Supabase:
 
+Controlled by:
 
-公開內容：
-
-Supabase：
-
-依照：
-
-- Read Permission
-- Admin Permission
-
-
-管理。
-
+* Read permission
+* Admin permission
 
 ---
 
 # 9. Database Design Rules
 
+Before creating a new table:
 
-新增資料表前：
+Check:
 
-確認：
+1. Is this private user data?
+2. Is this public content?
+3. Does it require offline support?
+4. Does it require transaction history?
 
+Avoid:
 
-1. 是否屬於私人資料？
-
-2. 是否屬於公開內容？
-
-3. 是否需要離線？
-
-4. 是否需要交易紀錄？
-
-
-避免：
-
-- 資料重複
-- 不必要欄位
-- 混合私人與公開資料
-
+* Duplicate data models
+* Unnecessary tables
+* Mixing private and public data
 
 ---
 
 # 10. Future Expansion
 
+Possible future systems:
 
-未來可能增加：
+* Ranking System
+* Achievement System
+* Reward History
+* Notification System
+* Enterprise Program
 
+All new database designs must follow:
 
-- Ranking System
-- Achievement System
-- Reward History
-- Notification System
-- Enterprise Program
-
-
-新增資料：
-
-必須符合 QSC Architecture。
-
+QSC Architecture Rules.
 
 ---
 
 # END
 
-
 Quit Smoking Club
-
-QSC Database Schema Document V1.0
+QSC Database Schema Document V2.0
