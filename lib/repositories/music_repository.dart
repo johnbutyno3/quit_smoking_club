@@ -1,3 +1,4 @@
+import '../models/content/content_category.dart';
 import '../models/content/content_item.dart';
 import '../models/music/music_item.dart';
 import 'content/content_repository.dart';
@@ -9,7 +10,9 @@ class MusicRepository {
   final ContentRepository _contentRepository;
 
   Future<List<MusicItem>> getMusicItems() async {
-    final items = await _contentRepository.getMusicContents();
+    final items = await _contentRepository.getContents(
+      category: ContentCategory.music,
+    );
     return items.map(_toMusicItem).toList(growable: false);
   }
 

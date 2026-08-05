@@ -1,4 +1,5 @@
 import 'content/content_repository.dart';
+import '../models/content/content_category.dart';
 import '../models/content/content_item.dart';
 import '../models/medical/medical_article.dart';
 
@@ -9,7 +10,9 @@ class MedicalRepository {
   final ContentRepository _contentRepository;
 
   Future<List<MedicalArticle>> getMedicalArticles() async {
-    final items = await _contentRepository.getMedicalContents();
+    final items = await _contentRepository.getContents(
+      category: ContentCategory.medical,
+    );
     return items.map(_toMedicalArticle).toList(growable: false);
   }
 

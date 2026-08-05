@@ -1,3 +1,4 @@
+import '../models/content/content_category.dart';
 import '../models/content/content_item.dart';
 import '../models/story/story_item.dart';
 import 'content/content_repository.dart';
@@ -9,7 +10,9 @@ class StoryRepository {
   final ContentRepository _contentRepository;
 
   Future<List<StoryItem>> getStories() async {
-    final items = await _contentRepository.getStoryContents();
+    final items = await _contentRepository.getContents(
+      category: ContentCategory.stories,
+    );
     return items.map(_toStoryItem).toList(growable: false);
   }
 
