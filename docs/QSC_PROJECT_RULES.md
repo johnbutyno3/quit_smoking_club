@@ -1201,3 +1201,9 @@ ContentRepository 保留未來支援：
 - Official Content
 - Partner Content
 - Community Content
+## Product Direction
+
+QSC 不應成為單純戒菸工具。
+
+戒菸是入口，
+健康生活與社群陪伴是長期價值。
