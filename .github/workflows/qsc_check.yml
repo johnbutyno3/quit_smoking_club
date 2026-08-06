@@ -1,0 +1,24 @@
+name: QSC Guard Check
+
+on:
+  pull_request:
+
+jobs:
+  qsc-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Run QSC guard check
+        shell: pwsh
+        run: ./tools/qsc_check.ps1
+
+      - name: Run flutter analyze
+        run: flutter analyze
