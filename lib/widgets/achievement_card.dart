@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../services/achievement_engine.dart';
+import '../engines/achievement_engine.dart';
 import '../core/utils/achievement_localizer.dart';
 import '../l10n/app_localizations.dart';
 

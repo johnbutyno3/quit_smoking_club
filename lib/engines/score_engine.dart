@@ -1,4 +1,4 @@
-import '../services/smoking_engine.dart';
+import 'smoking_engine.dart';
 
 class ScoreEngine {
   // 修正 double 轉 int 類型錯誤與變數對齊

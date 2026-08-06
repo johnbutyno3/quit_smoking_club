@@ -1,9 +1,6 @@
 import 'recovery_engine.dart';
 import 'smoking_engine.dart';
-import '../repositories/coin/coin_repository.dart';
-import 'storage_service.dart';
 import '../config/coin_rules.dart';
-import '../services/coin_service.dart';
 
 class Achievement {
   final String id;
@@ -26,24 +23,26 @@ class Achievement {
 class AchievementEngine {
   final SmokingEngine smoking;
   final RecoveryEngine recovery;
-  final CoinRepository coinRepository;
 
   int _loginStreak = 0;
+  int _totalSpentCoins = 0;
 
-  AchievementEngine({
-    required this.smoking,
-    required this.recovery,
-    required this.coinRepository,
-  });
+  AchievementEngine({required this.smoking, required this.recovery});
 
-  Future<void> loadLoginStreak() async {
-    _loginStreak = await StorageService.getLoginStreak();
+  void updateProgressContext({
+    required int loginStreak,
+    required int totalSpentCoins,
+  }) {
+    _loginStreak = loginStreak;
+    _totalSpentCoins = totalSpentCoins;
   }
 
   int get quitDays =>
       DateTime.now().difference(smoking.state.planStartDate).inDays + 1;
 
   int get loginStreak => _loginStreak;
+
+  int get totalSpentCoins => _totalSpentCoins;
 
   int get savedMoney {
     final days = quitDays;
@@ -88,8 +87,7 @@ class AchievementEngine {
       titleKey: "achievementSpending1000Title",
       descriptionKey: "achievementSpending1000Description",
       icon: "🛒",
-      unlocked:
-          CoinService().totalSpentCoins >= CoinRules.spendingAchievementTarget,
+      unlocked: _totalSpentCoins >= CoinRules.spendingAchievementTarget,
     ),
 
     Achievement(
@@ -116,47 +114,20 @@ class AchievementEngine {
 
   double get progress => totalCount == 0 ? 0 : completedCount / totalCount;
 
-  Future<void> claimAchievementRewards() async {
-    final loginStreak = await StorageService.getLoginStreak();
-
-    if (loginStreak <= 0) {
-      return;
-    }
-
-    final claimed = await StorageService.getClaimedAchievements();
-
-    for (final achievement in achievements) {
-      if (achievement.unlocked && !claimed.contains(achievement.id)) {
-        int reward = 0;
-
-        switch (achievement.id) {
-          case "day1":
-            reward = CoinRules.achievementDay1;
-            break;
-
-          case "day7":
-            reward = CoinRules.achievementDay7;
-            break;
-
-          case "day30":
-            reward = CoinRules.achievementDay30;
-            break;
-
-          case "spending1000":
-            reward = CoinRules.spendingAchievementReward;
-            break;
-
-          case "recovery":
-            reward = CoinRules.achievementRecovery;
-            break;
-        }
-
-        if (reward > 0) {
-          await coinRepository.addCoin(reward, 'achievement_${achievement.id}');
-
-          await StorageService.saveClaimedAchievement(achievement.id);
-        }
-      }
+  int rewardForAchievement(String achievementId) {
+    switch (achievementId) {
+      case 'day1':
+        return CoinRules.achievementDay1;
+      case 'day7':
+        return CoinRules.achievementDay7;
+      case 'day30':
+        return CoinRules.achievementDay30;
+      case 'spending1000':
+        return CoinRules.spendingAchievementReward;
+      case 'recovery':
+        return CoinRules.achievementRecovery;
+      default:
+        return 0;
     }
   }
 }

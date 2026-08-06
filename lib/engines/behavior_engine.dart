@@ -1,4 +1,4 @@
-import '../services/smoking_engine.dart';
+import 'smoking_engine.dart';
 
 class BehaviorEngine {
   // 對齊最新動態引擎數據

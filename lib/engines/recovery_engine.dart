@@ -1,13 +1,13 @@
 import '../models/smoking_state.dart';
 
 class RecoveryStage {
-  final String title;
-  final String description;
+  final String titleKey;
+  final String descriptionKey;
   final Duration unlockAfter;
 
   const RecoveryStage({
-    required this.title,
-    required this.description,
+    required this.titleKey,
+    required this.descriptionKey,
     required this.unlockAfter,
   });
 }
@@ -73,28 +73,28 @@ class RecoveryEngine {
 
   List<RecoveryStage> get stages => const [
     RecoveryStage(
-      title: "20 分鐘",
-      description: "心率開始恢復正常。",
+      titleKey: 'recoveryStage20mTitle',
+      descriptionKey: 'recoveryStage20mDescription',
       unlockAfter: Duration(minutes: 20),
     ),
     RecoveryStage(
-      title: "12 小時",
-      description: "血液中的一氧化碳恢復正常。",
+      titleKey: 'recoveryStage12hTitle',
+      descriptionKey: 'recoveryStage12hDescription',
       unlockAfter: Duration(hours: 12),
     ),
     RecoveryStage(
-      title: "2 週",
-      description: "肺功能開始改善。",
+      titleKey: 'recoveryStage2wTitle',
+      descriptionKey: 'recoveryStage2wDescription',
       unlockAfter: Duration(days: 14),
     ),
     RecoveryStage(
-      title: "3 個月",
-      description: "循環系統持續改善。",
+      titleKey: 'recoveryStage3mTitle',
+      descriptionKey: 'recoveryStage3mDescription',
       unlockAfter: Duration(days: 90),
     ),
     RecoveryStage(
-      title: "1 年",
-      description: "心血管疾病風險明顯下降。",
+      titleKey: 'recoveryStage1yTitle',
+      descriptionKey: 'recoveryStage1yDescription',
       unlockAfter: Duration(days: 365),
     ),
   ];

@@ -4,7 +4,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../models/smoking_state.dart';
-import '../services/smoking_engine.dart';
+import '../engines/smoking_engine.dart';
 import '../services/storage_service.dart';
 import '../services/user_service.dart';
 import 'forum_page.dart';
@@ -14,8 +14,8 @@ import 'mitigation_page.dart';
 import 'game_hub_page.dart';
 import '../l10n/app_localizations.dart';
 import '../models/smoking_plan.dart';
-import '../services/recovery_engine.dart';
-import '../services/achievement_engine.dart';
+import '../engines/recovery_engine.dart';
+import '../engines/achievement_engine.dart';
 import '../widgets/achievement_card.dart';
 import '../pages/quit_plan_page.dart';
 import '../pages/coin_page.dart';
@@ -101,9 +101,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     achievement = AchievementEngine(
       smoking: engine,
       recovery: recovery,
-      coinRepository: CoinRepository(coinService: CoinService()),
     ); // 計時器每秒自動檢查是否該彈出提醒通知
-    achievement.loadLoginStreak();
+    _refreshAchievementProgressContext();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted || !_isLoaded) return;
 
@@ -196,17 +195,26 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
         engine = SmokingEngine(state, plan);
         recovery = RecoveryEngine(state);
-        achievement = AchievementEngine(
-          smoking: engine,
-          recovery: recovery,
-          coinRepository: CoinRepository(coinService: CoinService()),
-        );
-        achievement.loadLoginStreak();
+        achievement = AchievementEngine(smoking: engine, recovery: recovery);
         _myCoins = sCoins;
         _cigarettePrice = sPrice;
         _isLoaded = true;
       });
+      _refreshAchievementProgressContext();
     }
+  }
+
+  Future<void> _refreshAchievementProgressContext() async {
+    await coinService.loadBalance();
+    final streak = await StorageService.getLoginStreak();
+    if (!mounted) return;
+
+    setState(() {
+      achievement.updateProgressContext(
+        loginStreak: streak,
+        totalSpentCoins: coinService.totalSpentCoins,
+      );
+    });
   }
 
   // 💡 3.2.1 按下或時間到連動全螢幕高頻劇烈震動
@@ -426,12 +434,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                               achievement = AchievementEngine(
                                 smoking: engine,
                                 recovery: recovery,
-                                coinRepository: CoinRepository(
-                                  coinService: CoinService(),
-                                ),
                               );
-                              achievement.loadLoginStreak();
                             });
+                            _refreshAchievementProgressContext();
                           }
                         },
                       ),

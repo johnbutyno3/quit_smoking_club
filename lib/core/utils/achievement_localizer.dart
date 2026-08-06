@@ -1,5 +1,5 @@
 import '../../l10n/app_localizations.dart';
-import '../../services/achievement_engine.dart';
+import '../../engines/achievement_engine.dart';
 
 class AchievementLocalizer {
   static String title(Achievement achievement, AppLocalizations l10n) {

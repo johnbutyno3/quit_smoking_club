@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../services/plan_generator.dart';
+import '../engines/plan_generator.dart';
 import '../models/smoking_plan.dart';
 
 class QuitPlanPage extends StatefulWidget {

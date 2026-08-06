@@ -1,5 +1,5 @@
 import 'score_engine.dart';
-import '../services/smoking_engine.dart';
+import 'smoking_engine.dart';
 import '../repositories/coin/coin_repository.dart';
 
 class RewardEngine {
