@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
+import '../repositories/forum_repository.dart';
 import '../l10n/app_localizations.dart';
 import '../models/forum_post.dart';
 import '../services/coin_service.dart';
@@ -25,6 +24,8 @@ class ForumDetailPage extends StatefulWidget {
 }
 
 class _ForumDetailPageState extends State<ForumDetailPage> {
+  final ForumRepository _forumRepository = ForumRepository();
+
   final TextEditingController _commentController = TextEditingController();
 
   final CoinRepository _coinRepository = CoinRepository(
@@ -48,18 +49,12 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
 
   Future<void> _loadComments() async {
     try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('forum_posts')
-          .doc(widget.post.id)
-          .collection('comments')
-          .orderBy('created_at')
-          .get();
+      final comments = await _forumRepository.fetchComments(widget.post.id);
 
       if (!mounted) return;
 
       setState(() {
-        _comments = snapshot.docs.map((doc) => doc.data()).toList();
-
+        _comments = comments;
         _loading = false;
       });
     } catch (e) {
@@ -93,15 +88,12 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
     }
 
     try {
-      await FirebaseFirestore.instance
-          .collection('forum_posts')
-          .doc(widget.post.id)
-          .collection('comments')
-          .add({
-            'content': text,
-            'created_at': DateTime.now().toIso8601String(),
-            'userName': widget.currentUserName,
-          });
+      await _forumRepository.addComment(
+        userId: widget.currentUid ?? '',
+        nickname: widget.currentUserName,
+        postId: widget.post.id,
+        content: text,
+      );
 
       await _loadComments();
 
@@ -189,17 +181,12 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
     if (!mounted) return;
 
     try {
-      await FirebaseFirestore.instance
-          .collection('forum_posts')
-          .doc(widget.post.id)
-          .collection('comments')
-          .add({
-            'content': text,
-
-            'created_at': DateTime.now().toIso8601String(),
-
-            'userName': widget.currentUserName,
-          });
+      await _forumRepository.addComment(
+        userId: widget.currentUid ?? '',
+        nickname: widget.currentUserName,
+        postId: widget.post.id,
+        content: text,
+      );
 
       await _loadComments();
 
