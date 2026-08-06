@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
-import '../services/content_service.dart';
-import '../services/content_service_firebase.dart';
-import 'package:quit_smoking_club/firebase_config.dart';
+import '../models/content/content_category.dart';
+import '../models/content/content_item.dart';
+import '../repositories/content/content_repository.dart';
 
 class ContentManagementPage extends StatefulWidget {
   const ContentManagementPage({super.key});
@@ -12,28 +12,26 @@ class ContentManagementPage extends StatefulWidget {
 }
 
 class _ContentManagementPageState extends State<ContentManagementPage> {
-  final dynamic _service = firebaseEnabled
-      ? ContentServiceFirebase()
-      : ContentService();
-  final List<String> _categories = [
-    'Medical',
-    'Stories',
-    'YouTube',
-    'Music',
-    'Games',
+  final ContentRepository _repository = ContentRepository();
+  final List<ContentCategory> _categories = const [
+    ContentCategory.medical,
+    ContentCategory.stories,
+    ContentCategory.youtube,
+    ContentCategory.music,
+    ContentCategory.games,
   ];
-  String _selectedCategory = 'Medical';
+  ContentCategory _selectedCategory = ContentCategory.medical;
   late Future<List<ContentItem>> _itemsFuture;
 
   @override
   void initState() {
     super.initState();
-    _itemsFuture = _service.getContentItems(_selectedCategory);
+    _itemsFuture = _repository.getContents(category: _selectedCategory);
   }
 
   Future<void> _refreshItems() async {
     setState(() {
-      _itemsFuture = _service.getContentItems(_selectedCategory);
+      _itemsFuture = _repository.getContents(category: _selectedCategory);
     });
   }
 
@@ -41,10 +39,30 @@ class _ContentManagementPageState extends State<ContentManagementPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            ContentEditPage(category: _selectedCategory, initialItem: item),
+        builder: (context) => ContentEditPage(
+          category: _selectedCategory,
+          initialItem: item,
+          repository: _repository,
+        ),
       ),
     ).then((_) => _refreshItems());
+  }
+
+  String _categoryLabel(ContentCategory category) {
+    switch (category) {
+      case ContentCategory.medical:
+        return 'Medical';
+      case ContentCategory.stories:
+        return 'Stories';
+      case ContentCategory.youtube:
+        return 'YouTube';
+      case ContentCategory.music:
+        return 'Music';
+      case ContentCategory.games:
+        return 'Games';
+      case ContentCategory.reading:
+        return 'Reading';
+    }
   }
 
   @override
@@ -56,13 +74,13 @@ class _ContentManagementPageState extends State<ContentManagementPage> {
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-            DropdownButton<String>(
+            DropdownButton<ContentCategory>(
               value: _selectedCategory,
               items: _categories
                   .map(
                     (category) => DropdownMenuItem(
                       value: category,
-                      child: Text(category),
+                      child: Text(_categoryLabel(category)),
                     ),
                   )
                   .toList(),
@@ -70,7 +88,9 @@ class _ContentManagementPageState extends State<ContentManagementPage> {
                 if (value != null) {
                   setState(() {
                     _selectedCategory = value;
-                    _itemsFuture = _service.getContentItems(_selectedCategory);
+                    _itemsFuture = _repository.getContents(
+                      category: _selectedCategory,
+                    );
                   });
                 }
               },
@@ -115,9 +135,7 @@ class _ContentManagementPageState extends State<ContentManagementPage> {
                             IconButton(
                               icon: const Icon(Icons.delete),
                               onPressed: () async {
-                                await _service.deleteOverrideItem(
-                                  item.uniqueId,
-                                );
+                                await _repository.deleteContent(item.uniqueId);
                                 _refreshItems();
                               },
                             ),
@@ -137,10 +155,16 @@ class _ContentManagementPageState extends State<ContentManagementPage> {
 }
 
 class ContentEditPage extends StatefulWidget {
-  final String category;
+  final ContentCategory category;
   final ContentItem? initialItem;
+  final ContentRepository repository;
 
-  const ContentEditPage({super.key, required this.category, this.initialItem});
+  const ContentEditPage({
+    super.key,
+    required this.category,
+    required this.repository,
+    this.initialItem,
+  });
 
   @override
   State<ContentEditPage> createState() => _ContentEditPageState();
@@ -151,9 +175,6 @@ class _ContentEditPageState extends State<ContentEditPage> {
   final _titleCtrl = TextEditingController();
   final _contentCtrl = TextEditingController();
   final _linkCtrl = TextEditingController();
-  final dynamic _service = firebaseEnabled
-      ? ContentServiceFirebase()
-      : ContentService();
 
   @override
   void initState() {
@@ -168,13 +189,14 @@ class _ContentEditPageState extends State<ContentEditPage> {
 
   Future<void> _save() async {
     final item = ContentItem(
+      id: widget.initialItem?.id ?? '',
       category: widget.category,
       language: _languageCtrl.text.trim().toLowerCase(),
       title: _titleCtrl.text.trim(),
       content: _contentCtrl.text.trim(),
       link: _linkCtrl.text.trim(),
     );
-    await _service.saveOverrideItem(item);
+    await widget.repository.saveContent(item);
     if (mounted) Navigator.pop(context);
   }
 
@@ -187,7 +209,7 @@ class _ContentEditPageState extends State<ContentEditPage> {
         padding: const EdgeInsets.all(14),
         child: ListView(
           children: [
-            Text(l10n.contentManagementCategory(widget.category)),
+            Text(l10n.contentManagementCategory(widget.category.name)),
             const SizedBox(height: 12),
             TextField(
               controller: _languageCtrl,

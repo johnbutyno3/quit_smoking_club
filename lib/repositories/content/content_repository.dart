@@ -22,6 +22,31 @@ class ContentRepository {
     return rows.map(ContentItem.fromMap).toList(growable: false);
   }
 
+  Future<ContentItem?> getContentById(String id) async {
+    final row = await SupabaseContentService.getContentById(id);
+    if (row == null) {
+      return null;
+    }
+
+    return ContentItem.fromMap(row);
+  }
+
+  Future<void> saveContent(ContentItem item) async {
+    final existing = await getContentById(item.uniqueId);
+    final payload = item.toMap();
+
+    if (existing == null) {
+      await SupabaseContentService.createContent(payload);
+      return;
+    }
+
+    await SupabaseContentService.updateContent(item.uniqueId, payload);
+  }
+
+  Future<void> deleteContent(String id) {
+    return SupabaseContentService.deleteContent(id);
+  }
+
   Future<List<ContentItem>> getReadingContents({String? language}) async {
     final books = await _readingService.listBooks(language: language);
     return books.map(_fromReadingBook).toList(growable: false);
@@ -33,6 +58,10 @@ class ContentRepository {
 
   Future<List<ContentItem>> getMusicContents() {
     return getContents(category: ContentCategory.music);
+  }
+
+  Future<List<ContentItem>> getYouTubeContents() {
+    return getContents(category: ContentCategory.youtube);
   }
 
   Future<List<ContentItem>> getMedicalContents() async {
