@@ -1323,6 +1323,30 @@ abstract class AppLocalizations {
   /// **'開啟戒菸健康之旅'**
   String get onboardingStartJourney;
 
+  /// No description provided for @homePremiumMember.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'高級會員'**
+  String get homePremiumMember;
+
+  /// No description provided for @homeRegularMember.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'一般會員'**
+  String get homeRegularMember;
+
+  /// No description provided for @gameHubBuiltInMiniGames.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'內建小遊戲'**
+  String get gameHubBuiltInMiniGames;
+
+  /// No description provided for @forumGoToForumLobby.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'前往論壇大廳'**
+  String get forumGoToForumLobby;
+
   /// No description provided for @nickname_empty.
   ///
   /// In zh_TW, this message translates to:

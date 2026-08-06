@@ -672,6 +672,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onboardingStartJourney => '開啟戒菸健康之旅';
 
   @override
+  String get homePremiumMember => '高級會員';
+
+  @override
+  String get homeRegularMember => '一般會員';
+
+  @override
+  String get gameHubBuiltInMiniGames => '內建小遊戲';
+
+  @override
+  String get forumGoToForumLobby => '前往論壇大廳';
+
+  @override
   String get nickname_empty => '昵称不能为空';
 
   @override
@@ -1410,6 +1422,18 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get onboardingStartJourney => '開啟戒菸健康之旅';
+
+  @override
+  String get homePremiumMember => '高級會員';
+
+  @override
+  String get homeRegularMember => '一般會員';
+
+  @override
+  String get gameHubBuiltInMiniGames => '內建小遊戲';
+
+  @override
+  String get forumGoToForumLobby => '前往論壇大廳';
 
   @override
   String get nickname_empty => '暱稱不得為空';

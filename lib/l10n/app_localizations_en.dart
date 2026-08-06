@@ -687,6 +687,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingStartJourney => 'Start Your Quit Journey';
 
   @override
+  String get homePremiumMember => 'Premium Member';
+
+  @override
+  String get homeRegularMember => 'Regular Member';
+
+  @override
+  String get gameHubBuiltInMiniGames => 'Built-in Mini Games';
+
+  @override
+  String get forumGoToForumLobby => 'Go to Forum Lobby';
+
+  @override
   String get nickname_empty => 'Nickname cannot be empty';
 
   @override

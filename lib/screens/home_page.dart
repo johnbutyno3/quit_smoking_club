@@ -157,7 +157,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         } catch (_) {}
       }
 
-      final rankStr = isPremium ? "高級會員" : "一般會員";
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      final rankStr = isPremium
+          ? l10n.homePremiumMember
+          : l10n.homeRegularMember;
       _messages.add("📆 跨天簽到：您目前為 [$rankStr]");
       _messages.add("💰 系統已自動發放今日福利 $reward 金幣！");
     }
@@ -294,6 +298,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
+        final l10n = AppLocalizations.of(context)!;
         return Container(
           height: MediaQuery.of(context).size.height * 0.55,
           decoration: const BoxDecoration(
@@ -379,7 +384,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     _buildTile(Icons.audiotrack, "4. 音樂連結 (聽一下音樂)", "Music"),
                     _buildTile(
                       Icons.sports_esports,
-                      "5. 遊戲大廳 (內建小遊戲)",
+                      "5. ${l10n.gameHub} (${l10n.gameHubBuiltInMiniGames})",
                       "Games",
                     ),
 
@@ -398,9 +403,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           color: Colors.green,
                         ),
 
-                        title: const Text(
-                          "6. 戒菸計畫",
-                          style: TextStyle(
+                        title: Text(
+                          "6. ${l10n.quitPlan}",
+                          style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
                           ),
@@ -452,9 +457,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       child: ListTile(
                         dense: true,
                         leading: const Icon(Icons.forum, color: Colors.blue),
-                        title: const Text(
-                          "7. 前往論壇大廳",
-                          style: TextStyle(
+                        title: Text(
+                          "7. ${l10n.forumGoToForumLobby}",
+                          style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
                           ),
@@ -601,6 +606,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     // 💡 3.2.1 網頁全螢幕高頻震動特效外殼
     return AnimatedPadding(
       duration: const Duration(milliseconds: 50),
@@ -917,7 +923,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                               builder: (context) => const ForumPage(),
                             ),
                           ),
-                          child: const Text("交流論壇"),
+                          child: Text(l10n.forum),
                         ),
                       ),
                       const SizedBox(width: 14),
@@ -938,7 +944,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                               builder: (context) => const ShopPage(),
                             ),
                           ),
-                          child: const Text("金幣商城"),
+                          child: Text(l10n.shop),
                         ),
                       ),
                     ],
@@ -958,7 +964,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         ),
                       ),
                       icon: const Text('🎮', style: TextStyle(fontSize: 16)),
-                      label: const Text('遊戲大廳'),
+                      label: Text(l10n.gameHub),
                       onPressed: () => Navigator.push(
                         context,
                         MaterialPageRoute(

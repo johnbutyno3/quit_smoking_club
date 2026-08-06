@@ -5,5 +5,9 @@
   "nickname_too_short": "昵称至少需要 2 个字符",
   "nickname_too_long": "昵称不能超过 15 个字符",
   "nickname_invalid_characters": "昵称只能包含字母、数字、下划线或连字符",
-  "nickname_only_numbers": "昵称不能只包含数字"
+  "nickname_only_numbers": "昵称不能只包含数字",
+  "homePremiumMember": "高級會員",
+  "homeRegularMember": "一般會員",
+  "gameHubBuiltInMiniGames": "內建小遊戲",
+  "forumGoToForumLobby": "前往論壇大廳"
 }
