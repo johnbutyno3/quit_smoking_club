@@ -165,7 +165,12 @@ class _ForumPageState extends State<ForumPage> {
                 });
                 final newPost = ForumPost(
                   id: '',
+                  userId: UserService.currentUid ?? '',
+                  // 新 UI 仍填入使用者輸入的顯示名稱（向下相容 name -> nickname）
                   name: name,
+                  // 沒有 title/category 欄位輸入時使用合理預設
+                  title: name,
+                  category: '',
                   createdAt: DateTime.now(),
                   content: content,
                   likes: 0,
