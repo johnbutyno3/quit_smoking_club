@@ -6,7 +6,6 @@ import 'firebase_options.dart';
 import 'screens/home_page.dart';
 import 'screens/login_page.dart';
 import 'screens/intro_page.dart';
-import 'services/content_service_firebase.dart';
 import 'services/storage_service.dart';
 import 'services/user_service.dart';
 import 'firebase_config.dart';
@@ -30,7 +29,6 @@ void main() async {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
-      await ContentServiceFirebase().seedSampleContent();
       firebaseOk = true;
 
       User? currentUser = FirebaseAuth.instance.currentUser;

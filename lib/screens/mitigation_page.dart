@@ -1,9 +1,12 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import '../services/content_service.dart';
-import '../services/content_service_firebase.dart';
-import 'package:quit_smoking_club/firebase_config.dart';
+
+import '../models/content/content_category.dart';
+import '../models/content/content_item.dart';
+import '../repositories/content/content_repository.dart';
+
 import 'game_hub_page.dart';
 
 class MitigationPage extends StatefulWidget {
@@ -24,9 +27,7 @@ class _MitigateColors {
 
 class _MitigationPageState extends State<MitigationPage> {
   final List<ContentItem> _tips = [];
-  final dynamic _contentService = firebaseEnabled
-      ? ContentServiceFirebase()
-      : ContentService();
+  final ContentRepository _contentRepository = ContentRepository();
 
   String? _selectedTitle;
   String? _selectedContent;
@@ -51,9 +52,10 @@ class _MitigationPageState extends State<MitigationPage> {
           .toString()
           .toLowerCase()
           .replaceAll('_', '-');
-      final items = await _contentService.getContentForCategoryAndLocale(
-        widget.title,
-        localeString,
+      final category = ContentCategoryParser.fromValue(widget.title);
+      final items = await _contentRepository.getContents(
+        language: localeString,
+        category: category,
       );
 
       if (items.isEmpty) {
@@ -463,7 +465,9 @@ class _BuiltInGameCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFF1B5E20).withAlpha(20),
                         borderRadius: BorderRadius.circular(20),
@@ -480,8 +484,11 @@ class _BuiltInGameCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.arrow_forward_ios,
-                  size: 14, color: Colors.grey.shade400),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 14,
+                color: Colors.grey.shade400,
+              ),
             ],
           ),
         ),
