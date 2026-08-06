@@ -23,6 +23,23 @@ class _SetupPageState extends State<SetupPage> {
   TimeOfDay _firstTime = const TimeOfDay(hour: 8, minute: 0);
   TimeOfDay _lastTime = const TimeOfDay(hour: 22, minute: 0);
 
+  String _localizeNicknameError(String key, AppLocalizations l10n) {
+    switch (key) {
+      case 'nickname_empty':
+        return l10n.nickname_empty;
+      case 'nickname_too_short':
+        return l10n.nickname_too_short;
+      case 'nickname_too_long':
+        return l10n.nickname_too_long;
+      case 'nickname_invalid_characters':
+        return l10n.nickname_invalid_characters;
+      case 'nickname_only_numbers':
+        return l10n.nickname_only_numbers;
+      default:
+        return key;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -344,10 +361,13 @@ class _SetupPageState extends State<SetupPage> {
               final years = int.tryParse(_yearsCtrl.text) ?? 8;
               final fmtErr = UserService.validateNameFormat(name);
               if (fmtErr != null) {
+                final l10n = AppLocalizations.of(ctx)!;
                 ScaffoldMessenger.of(ctx).showSnackBar(
                   SnackBar(
                     content: Text(
-                      AppLocalizations.of(ctx)!.setupFormatError(fmtErr),
+                      l10n.setupFormatError(
+                        _localizeNicknameError(fmtErr, l10n),
+                      ),
                     ),
                   ),
                 );

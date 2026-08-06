@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../services/storage_service.dart';
 import '../services/user_service.dart';
 import 'home_page.dart';
@@ -50,6 +51,23 @@ class _OnboardingSetupPageState extends State<OnboardingSetupPage> {
   TimeOfDay _lastTime = const TimeOfDay(hour: 22, minute: 0);
   double _months = 3;
 
+  String _localizeNicknameError(String key, AppLocalizations l10n) {
+    switch (key) {
+      case 'nickname_empty':
+        return l10n.nickname_empty;
+      case 'nickname_too_short':
+        return l10n.nickname_too_short;
+      case 'nickname_too_long':
+        return l10n.nickname_too_long;
+      case 'nickname_invalid_characters':
+        return l10n.nickname_invalid_characters;
+      case 'nickname_only_numbers':
+        return l10n.nickname_only_numbers;
+      default:
+        return key;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -70,10 +88,11 @@ class _OnboardingSetupPageState extends State<OnboardingSetupPage> {
   // ── 步驟導航 ─────────────────────────────────────────────────────
   Future<void> _nextStep() async {
     if (_currentStep == 0) {
+      final l10n = AppLocalizations.of(context)!;
       // 格式驗證
       final fmtErr = UserService.validateNameFormat(_nameCtrl.text.trim());
       if (fmtErr != null) {
-        setState(() => _nameError = fmtErr);
+        setState(() => _nameError = _localizeNicknameError(fmtErr, l10n));
         return;
       }
       // 即時重複名稱檢查（在前進前就告知，不用走到最後才退回）

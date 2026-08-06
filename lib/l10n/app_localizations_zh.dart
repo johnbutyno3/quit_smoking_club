@@ -672,6 +672,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get onboardingStartJourney => '開啟戒菸健康之旅';
 
   @override
+  String get nickname_empty => '昵称不能为空';
+
+  @override
+  String get nickname_too_short => '昵称至少需要 2 个字符';
+
+  @override
+  String get nickname_too_long => '昵称不能超过 15 个字符';
+
+  @override
+  String get nickname_invalid_characters => '昵称只能包含字母、数字、下划线或连字符';
+
+  @override
+  String get nickname_only_numbers => '昵称不能只包含数字';
+
+  @override
   String get game2048Subtitle => '滑動合併數字，挑戰 2048！';
 
   @override
@@ -1395,6 +1410,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get onboardingStartJourney => '開啟戒菸健康之旅';
+
+  @override
+  String get nickname_empty => '暱稱不得為空';
+
+  @override
+  String get nickname_too_short => '暱稱至少需要 2 個字元';
+
+  @override
+  String get nickname_too_long => '暱稱不可超過 15 個字元';
+
+  @override
+  String get nickname_invalid_characters => '暱稱只能包含字母、數字、底線或連字號';
+
+  @override
+  String get nickname_only_numbers => '暱稱不可只包含數字';
 
   @override
   String get game2048Subtitle => '滑動合併數字，挑戰 2048！';

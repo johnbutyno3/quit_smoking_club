@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class ForumPost {
   final String id;
   final String name;
@@ -39,41 +37,20 @@ class ForumPost {
     );
   }
 
-  factory ForumPost.fromDocument(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    return ForumPost(
-      id: doc.id,
-      name: data['name']?.toString() ?? '匿名朋友',
-      createdAt: (data['created_at'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      content: data['content']?.toString() ?? '',
-      likes: (data['likes'] as int?) ?? 0,
-      gifts: (data['gifts'] as int?) ?? 0,
-      isSOS: (data['isSOS'] as bool?) ?? false,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'created_at': Timestamp.fromDate(createdAt),
-      'content': content,
-      'likes': likes,
-      'gifts': gifts,
-      'isSOS': isSOS,
-    };
-  }
-
   factory ForumPost.fromJson(Map<String, dynamic> json) {
     return ForumPost(
       id: json['id']?.toString() ?? '',
-      name: json['nickname']?.toString() ?? json['name']?.toString() ?? '匿名朋友',
+      name: json['nickname']?.toString() ?? json['name']?.toString() ?? '',
       createdAt:
           DateTime.tryParse(json['created_at']?.toString() ?? '') ??
           DateTime.now(),
       content: json['content']?.toString() ?? '',
       likes: json['like_count'] ?? json['likes'] ?? 0,
       gifts: json['gifts'] ?? 0,
-      isSOS: json['category'] == '菸癮犯了' || json['isSOS'] == true,
+      isSOS:
+          json['is_sos'] == true ||
+          json['isSOS'] == true ||
+          json['category'] == '菸癮犯了',
     );
   }
 }

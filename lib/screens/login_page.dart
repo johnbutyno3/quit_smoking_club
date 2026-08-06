@@ -30,6 +30,23 @@ class _LoginPageState extends State<LoginPage>
   bool _isLoading = false;
   String? _error;
 
+  String _localizeNicknameError(String key, AppLocalizations l10n) {
+    switch (key) {
+      case 'nickname_empty':
+        return l10n.nickname_empty;
+      case 'nickname_too_short':
+        return l10n.nickname_too_short;
+      case 'nickname_too_long':
+        return l10n.nickname_too_long;
+      case 'nickname_invalid_characters':
+        return l10n.nickname_invalid_characters;
+      case 'nickname_only_numbers':
+        return l10n.nickname_only_numbers;
+      default:
+        return key;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -49,12 +66,13 @@ class _LoginPageState extends State<LoginPage>
   }
 
   Future<void> _handleRegister() async {
+    final l10n = AppLocalizations.of(context)!;
     final name = _regNameCtrl.text.trim();
     final email = _regEmailCtrl.text.trim();
     final pass = _regPassCtrl.text;
     final nameErr = UserService.validateNameFormat(name);
     if (nameErr != null) {
-      setState(() => _error = nameErr);
+      setState(() => _error = _localizeNicknameError(nameErr, l10n));
       return;
     }
     if (email.isEmpty || !email.contains('@')) {

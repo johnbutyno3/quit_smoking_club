@@ -687,6 +687,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingStartJourney => 'Start Your Quit Journey';
 
   @override
+  String get nickname_empty => 'Nickname cannot be empty';
+
+  @override
+  String get nickname_too_short => 'Nickname must be at least 2 characters';
+
+  @override
+  String get nickname_too_long => 'Nickname cannot exceed 15 characters';
+
+  @override
+  String get nickname_invalid_characters =>
+      'Nickname can only contain letters, numbers, underscore, or hyphen';
+
+  @override
+  String get nickname_only_numbers => 'Nickname cannot contain only numbers';
+
+  @override
   String get game2048Subtitle => 'Merge numbers by swiping and reach 2048!';
 
   @override

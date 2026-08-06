@@ -1323,6 +1323,36 @@ abstract class AppLocalizations {
   /// **'開啟戒菸健康之旅'**
   String get onboardingStartJourney;
 
+  /// No description provided for @nickname_empty.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'暱稱不得為空'**
+  String get nickname_empty;
+
+  /// No description provided for @nickname_too_short.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'暱稱至少需要 2 個字元'**
+  String get nickname_too_short;
+
+  /// No description provided for @nickname_too_long.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'暱稱不可超過 15 個字元'**
+  String get nickname_too_long;
+
+  /// No description provided for @nickname_invalid_characters.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'暱稱只能包含字母、數字、底線或連字號'**
+  String get nickname_invalid_characters;
+
+  /// No description provided for @nickname_only_numbers.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'暱稱不可只包含數字'**
+  String get nickname_only_numbers;
+
   /// No description provided for @game2048Subtitle.
   ///
   /// In zh_TW, this message translates to:
