@@ -52,22 +52,6 @@ class ContentRepository {
     return books.map(_fromReadingBook).toList(growable: false);
   }
 
-  Future<List<ContentItem>> getStoryContents() {
-    return getContents(category: ContentCategory.stories);
-  }
-
-  Future<List<ContentItem>> getMusicContents() {
-    return getContents(category: ContentCategory.music);
-  }
-
-  Future<List<ContentItem>> getYouTubeContents() {
-    return getContents(category: ContentCategory.youtube);
-  }
-
-  Future<List<ContentItem>> getMedicalContents() async {
-    return getContents(category: ContentCategory.medical);
-  }
-
   Future<ReadingBook> loadReadingBook(String bookId) {
     return _readingService.loadBook(bookId);
   }
