@@ -255,6 +255,24 @@ abstract class AppLocalizations {
   /// **'COIN 不足'**
   String get insufficientCoins;
 
+  /// No description provided for @externalLinkInvalidFormat.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'連結格式錯誤，已讀取內部資料。'**
+  String get externalLinkInvalidFormat;
+
+  /// No description provided for @externalLinkOpenTimeout.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'外部連結無法在 10 秒內開啟，已改為顯示內部內容。'**
+  String get externalLinkOpenTimeout;
+
+  /// No description provided for @externalLinkOpenFailed.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'外部連結開啟失敗，已顯示內部資料。'**
+  String get externalLinkOpenFailed;
+
   /// No description provided for @postCreated.
   ///
   /// In zh_TW, this message translates to:

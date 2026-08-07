@@ -87,6 +87,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get insufficientCoins => 'COIN 不足';
 
   @override
+  String get externalLinkInvalidFormat => '連結格式錯誤，已讀取內部資料。';
+
+  @override
+  String get externalLinkOpenTimeout => '外部連結無法在 10 秒內開啟，已改為顯示內部內容。';
+
+  @override
+  String get externalLinkOpenFailed => '外部連結開啟失敗，已顯示內部資料。';
+
+  @override
   String get postCreated => '貼文建立成功';
 
   @override

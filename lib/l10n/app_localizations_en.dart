@@ -88,6 +88,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get insufficientCoins => 'Insufficient COIN';
 
   @override
+  String get externalLinkInvalidFormat => 'Invalid link format, showing internal content.';
+
+  @override
+  String get externalLinkOpenTimeout => 'External link could not be opened within 10 seconds; showing internal content instead.';
+
+  @override
+  String get externalLinkOpenFailed => 'Failed to open external link; showing internal content.';
+
+  @override
   String get postCreated => 'Post created successfully';
 
   @override

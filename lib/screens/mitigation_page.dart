@@ -134,9 +134,9 @@ class _MitigationPageState extends State<MitigationPage> {
     final uri = Uri.tryParse(_selectedLink!);
     if (uri == null) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('連結格式錯誤，已讀取內部資料。')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.externalLinkInvalidFormat)),
+        );
       }
       return;
     }
@@ -169,15 +169,15 @@ class _MitigationPageState extends State<MitigationPage> {
 
         if (!fallbackLaunched && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('外部連結無法在 10 秒內開啟，已改為顯示內部內容。')),
+            SnackBar(content: Text(AppLocalizations.of(context)!.externalLinkOpenTimeout)),
           );
         }
       }
     } catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('外部連結開啟失敗，已顯示內部資料。\n$error')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${AppLocalizations.of(context)!.externalLinkOpenFailed}')),
+        );
       }
     } finally {
       if (mounted) {
