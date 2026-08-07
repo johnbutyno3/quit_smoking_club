@@ -6,8 +6,9 @@ import 'firebase_options.dart';
 import 'screens/home_page.dart';
 import 'screens/login_page.dart';
 import 'screens/intro_page.dart';
-import 'services/storage_service.dart';
-import 'services/user_service.dart';
+import 'screens/app_gate.dart';
+import 'usecases/storage/storage_facade_usecase.dart';
+import 'usecases/user/user_facade_usecase.dart';
 import 'firebase_config.dart';
 import 'l10n/app_localizations.dart';
 
@@ -19,17 +20,12 @@ void main() async {
     publishableKey: 'sb_publishable_9oinTfAqSlIUIpaVnGA4xg_O_BDm7Py',
   );
 
-  bool firebaseOk = false;
-  bool alreadySignedIn = false;
-  bool introShown = await StorageService.getIntroShown();
-
   // ignore_for_file: unused_local_variable, unused_import
   if (firebaseEnabled) {
     try {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
-      firebaseOk = true;
 
       User? currentUser = FirebaseAuth.instance.currentUser;
 
@@ -39,70 +35,55 @@ void main() async {
         currentUser = credential.user;
       }
       if (currentUser != null) {
-        UserService.currentUid = currentUser.uid;
-        final service = UserService();
-        final profile = await service.loadProfile(currentUser.uid);
+        UserFacadeUseCase.currentUid = currentUser.uid;
+        final userFacade = UserFacadeUseCase();
+        final profile = await userFacade.loadProfile(currentUser.uid);
         if (profile != null) {
-          await service.syncCloudToLocal(currentUser.uid);
+          await userFacade.syncCloudToLocal(currentUser.uid);
         } else {
-          final localName = await StorageService.getUserName();
+          final localName = await StorageFacadeUseCase.getUserName();
           if (localName.isEmpty) {
-            await StorageService.saveUserName('戒菸夥伴');
-            await StorageService.saveDailyCount(5);
-            await StorageService.saveCoins(20);
-            await StorageService.savePremium(false);
+            await StorageFacadeUseCase.saveUserName('戒菸夥伴');
+            await StorageFacadeUseCase.saveDailyCount(5);
+            await StorageFacadeUseCase.saveCoins(20);
+            await StorageFacadeUseCase.savePremium(false);
           }
-          await service.syncLocalToCloud(currentUser.uid);
+          await userFacade.syncLocalToCloud(currentUser.uid);
         }
-        alreadySignedIn = true;
       }
     } catch (error, stackTrace) {
       debugPrint('Firebase initialize failed: $error');
       debugPrint('$stackTrace');
-      final storedName = await StorageService.getUserName();
+      final storedName = await StorageFacadeUseCase.getUserName();
       if (storedName.isEmpty) {
-        await StorageService.saveUserName('戒菸夥伴');
-        await StorageService.saveDailyCount(5);
-        await StorageService.saveCoins(20);
-        await StorageService.savePremium(false);
+        await StorageFacadeUseCase.saveUserName('戒菸夥伴');
+        await StorageFacadeUseCase.saveDailyCount(5);
+        await StorageFacadeUseCase.saveCoins(20);
+        await StorageFacadeUseCase.savePremium(false);
       }
-      alreadySignedIn = true;
     }
   } else {
-    final storedName = await StorageService.getUserName();
+    final storedName = await StorageFacadeUseCase.getUserName();
     if (storedName.isEmpty) {
-      await StorageService.saveUserName('戒菸夥伴');
-      await StorageService.saveDailyCount(5);
-      await StorageService.saveCoins(20);
-      await StorageService.savePremium(false);
+      await StorageFacadeUseCase.saveUserName('戒菸夥伴');
+      await StorageFacadeUseCase.saveDailyCount(5);
+      await StorageFacadeUseCase.saveCoins(20);
+      await StorageFacadeUseCase.savePremium(false);
     }
-    alreadySignedIn = true;
   }
 
-  Widget home;
-  if (alreadySignedIn) {
-    home = const HomePage();
-  } else if (!introShown) {
-    await StorageService.saveIntroShown(true);
-    home = const IntroPage();
-  } else {
-    home = const LoginPage();
-  }
-
-  runApp(MyApp(home: home));
+  runApp(const MyApp());
 }
 
 // ========================================================
 // 完美支援新版 Flutter 語法的高質感主題設定
 // ========================================================
 class MyApp extends StatelessWidget {
-  final Widget home;
-  const MyApp({super.key, required this.home});
-
+  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Quit Smoking Club',
+      title: AppLocalizations.of(context)?.appTitle ?? 'Quit Smoking Club',
       debugShowCheckedModeBanner: false,
 
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -155,7 +136,7 @@ class MyApp extends StatelessWidget {
       ),
 
       // 💡 透過自訂背景底座，讓所有子頁面自動透出精美漸層
-      home: GlobalBackground(child: home),
+      home: const GlobalBackground(child: AppGate()),
     );
   }
 }

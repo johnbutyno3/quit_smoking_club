@@ -1,7 +1,7 @@
 import '../models/reading_book.dart';
 import '../models/reading_chapter.dart';
 import '../models/reading_statistics.dart';
-import '../services/reading_progress_service.dart';
+import '../repositories/reading_progress_repository.dart';
 
 enum ChapterCompletionStatus { completed, alreadyCompleted, tooEarly }
 
@@ -15,11 +15,13 @@ class ChapterCompletionResult {
 /// Applies the anti-farming rules from QSC_READING_SPEC. The screen owns the
 /// timer display, but completion is only recorded after manual continuation.
 class ReadingEngine {
-  ReadingEngine({ReadingProgressService? progressService, DateTime Function()? now})
-      : _progressService = progressService ?? ReadingProgressService(),
-        _now = now ?? DateTime.now;
+  ReadingEngine({
+    ReadingProgressRepository? progressService,
+    DateTime Function()? now,
+  }) : _progressService = progressService ?? ReadingProgressRepository(),
+       _now = now ?? DateTime.now;
 
-  final ReadingProgressService _progressService;
+  final ReadingProgressRepository _progressService;
   final DateTime Function() _now;
   final Map<String, DateTime> _openedAt = {};
 
@@ -41,23 +43,31 @@ class ReadingEngine {
     required ReadingChapter chapter,
   }) async {
     if (await _progressService.isChapterCompleted(chapter.id)) {
-      return const ChapterCompletionResult(ChapterCompletionStatus.alreadyCompleted);
+      return const ChapterCompletionResult(
+        ChapterCompletionStatus.alreadyCompleted,
+      );
     }
     final remaining = remainingSeconds(chapter);
     if (remaining > 0) {
-      return ChapterCompletionResult(ChapterCompletionStatus.tooEarly, remainingSeconds: remaining);
+      return ChapterCompletionResult(
+        ChapterCompletionStatus.tooEarly,
+        remainingSeconds: remaining,
+      );
     }
     final recorded = await _progressService.completeChapter(
       chapterId: chapter.id,
       bookId: book.id,
       seconds: chapter.effectiveSeconds,
       words: chapter.wordCount,
-      isLastChapter: book.chapters.isNotEmpty && chapter.id == book.chapters.last.id,
+      isLastChapter:
+          book.chapters.isNotEmpty && chapter.id == book.chapters.last.id,
       now: _now(),
     );
     _openedAt.remove(chapter.id);
     return ChapterCompletionResult(
-      recorded ? ChapterCompletionStatus.completed : ChapterCompletionStatus.alreadyCompleted,
+      recorded
+          ? ChapterCompletionStatus.completed
+          : ChapterCompletionStatus.alreadyCompleted,
     );
   }
 
