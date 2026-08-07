@@ -2,7 +2,7 @@ import '../models/content/content_item.dart';
 import '../models/reading_book.dart';
 import '../repositories/content/content_repository.dart';
 import '../repositories/coin/coin_repository.dart';
-import '../services/reading_cache_service.dart';
+import '../repositories/reading_cache_repository.dart';
 
 enum ReadingDownloadStatus { downloaded, alreadyCached, insufficientCoins }
 
@@ -18,15 +18,15 @@ class ReadingDownloadResult {
 class ReadingRepository {
   ReadingRepository({
     ContentRepository? contentRepository,
-    ReadingCacheService? cache,
+    ReadingCacheRepository? cache,
     CoinRepository? coinRepository,
   }) : _contentRepository = contentRepository ?? ContentRepository(),
-       _cache = cache ?? ReadingCacheService(),
-       _coinRepository = coinRepository ?? CoinRepository();
+       _cache = cache ?? ReadingCacheRepository(),
+       _coinFacade.xxx() = coinRepository ?? CoinRepository();
 
   final ContentRepository _contentRepository;
-  final ReadingCacheService _cache;
-  final CoinRepository _coinRepository;
+  final ReadingCacheRepository _cache;
+  final CoinRepository _coinFacade.xxx();
   final Map<String, Future<ReadingDownloadResult>> _downloads = {};
 
   Future<List<ReadingBook>> listBooks({String? language}) async {

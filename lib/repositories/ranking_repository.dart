@@ -1,26 +1,16 @@
 import '../models/ranking_model.dart';
-import '../services/supabase_ranking_service.dart';
+import 'supabase_ranking_repository.dart';
 
 class RankingRepository {
-  Future<List<RankingModel>> getRankings() async {
-    final data = await SupabaseRankingService.getRankings();
+  final SupabaseRankingRepository _svc;
 
-    return data.map((e) => RankingModel.fromJson(e)).toList();
-  }
+  RankingRepository({SupabaseRankingRepository? svc})
+    : _svc = svc ?? SupabaseRankingRepository();
 
-  Future<void> updateRanking(RankingModel ranking) async {
-    await SupabaseRankingService.updateRanking(
-      userId: ranking.userId,
-      nickname: ranking.nickname,
-      quitDays: ranking.quitDays,
-      savedMoney: ranking.savedMoney,
-      achievementScore: ranking.achievementScore,
-      communityScore: ranking.communityScore,
-      totalScore: ranking.totalScore,
-    );
-  }
+  Future<List<RankingModel>> getRankings() => _svc.getRankings();
 
-  Future<void> deleteRanking(String userId) async {
-    await SupabaseRankingService.deleteRanking(userId);
-  }
+  Future<void> updateRanking(RankingModel ranking) =>
+      _svc.updateRanking(ranking);
+
+  Future<void> deleteRanking(String userId) => _svc.deleteRanking(userId);
 }

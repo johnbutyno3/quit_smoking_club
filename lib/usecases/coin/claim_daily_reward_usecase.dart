@@ -1,16 +1,16 @@
-import '../../services/coin_reward_service.dart';
+import '../../repositories/coin_reward_repository.dart';
 
 class ClaimDailyRewardUseCase {
-  final CoinRewardService rewardService;
+  final CoinRewardRepository _repository;
 
-  ClaimDailyRewardUseCase({CoinRewardService? rewardService})
-    : rewardService = rewardService ?? CoinRewardService();
+  ClaimDailyRewardUseCase({CoinRewardRepository? repository})
+    : _repository = repository ?? CoinRewardRepository();
 
   Future<void> claimDailyLogin() async {
-    await rewardService.rewardDailyLogin();
+    await _repository.rewardDailyLogin();
   }
 
   Future<void> claimDailyPlan() async {
-    await rewardService.rewardDailyPlan();
+    await _repository.rewardDailyPlan();
   }
 }
