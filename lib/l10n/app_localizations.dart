@@ -255,24 +255,6 @@ abstract class AppLocalizations {
   /// **'COIN 不足'**
   String get insufficientCoins;
 
-  /// No description provided for @externalLinkInvalidFormat.
-  ///
-  /// In zh_TW, this message translates to:
-  /// **'連結格式錯誤，已讀取內部資料。'**
-  String get externalLinkInvalidFormat;
-
-  /// No description provided for @externalLinkOpenTimeout.
-  ///
-  /// In zh_TW, this message translates to:
-  /// **'外部連結無法在 10 秒內開啟，已改為顯示內部內容。'**
-  String get externalLinkOpenTimeout;
-
-  /// No description provided for @externalLinkOpenFailed.
-  ///
-  /// In zh_TW, this message translates to:
-  /// **'外部連結開啟失敗，已顯示內部資料。'**
-  String get externalLinkOpenFailed;
-
   /// No description provided for @postCreated.
   ///
   /// In zh_TW, this message translates to:
@@ -507,6 +489,90 @@ abstract class AppLocalizations {
   /// **'開始計畫'**
   String get startPlan;
 
+  /// No description provided for @quitPlanPageTitle.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'戒菸計畫'**
+  String get quitPlanPageTitle;
+
+  /// No description provided for @quitPlanDailyCigarettes.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'每日抽菸數'**
+  String get quitPlanDailyCigarettes;
+
+  /// No description provided for @quitPlanPricePerPack.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'每包價格'**
+  String get quitPlanPricePerPack;
+
+  /// No description provided for @quitPlanCigarettesPerPack.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'每包支數'**
+  String get quitPlanCigarettesPerPack;
+
+  /// No description provided for @quitPlanDays.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'戒菸天數'**
+  String get quitPlanDays;
+
+  /// No description provided for @quitPlanGenerateButton.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'產生戒菸計畫'**
+  String get quitPlanGenerateButton;
+
+  /// No description provided for @quitPlanEstimatedSavings.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'預估節省：{saving} 元'**
+  String quitPlanEstimatedSavings(Object saving);
+
+  /// No description provided for @quitPlanDayLabel.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'第 {day} 天'**
+  String quitPlanDayLabel(Object day);
+
+  /// No description provided for @plannedCigarettes.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'🚬 {count} 支'**
+  String plannedCigarettes(Object count);
+
+  /// No description provided for @previousStep.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'上一步'**
+  String get previousStep;
+
+  /// No description provided for @nextStep.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'下一步'**
+  String get nextStep;
+
+  /// No description provided for @usernameAlreadyUsed.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'「{name}」已被使用，請換一個'**
+  String usernameAlreadyUsed(Object name);
+
+  /// No description provided for @usernameAlreadyUsedPleaseEdit.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'「{name}」已被使用，請返回修改'**
+  String usernameAlreadyUsedPleaseEdit(Object name);
+
+  /// No description provided for @usernameStartQuitJourney.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'開始戒菸之旅 🚀'**
+  String get usernameStartQuitJourney;
+
   /// No description provided for @lifestyleTitle.
   ///
   /// In zh_TW, this message translates to:
@@ -579,6 +645,96 @@ abstract class AppLocalizations {
   /// **'控菸今日排程表'**
   String get todaySmokingSchedule;
 
+  /// No description provided for @dailySignInNotification.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'📆 跨天簽到：您目前為 [{rank}]'**
+  String dailySignInNotification(Object rank);
+
+  /// No description provided for @dailyRewardNotification.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'💰 系統已自動發放今日福利 {reward} 金幣！'**
+  String dailyRewardNotification(Object reward);
+
+  /// No description provided for @smokingUnlockNotification.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'🔔 控菸時間已到！新一輪配額已解鎖，您今天已成功少抽 2 支菸！'**
+  String get smokingUnlockNotification;
+
+  /// No description provided for @smokeSuccessMessage.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'🎉 你太棒了，少抽一支菸！'**
+  String get smokeSuccessMessage;
+
+  /// No description provided for @cravingWarningMessage.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'🚨 警告：使用者菸癮犯了！已通知好友！'**
+  String get cravingWarningMessage;
+
+  /// No description provided for @friendEncouragementMessage.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'💬 好友小明：堅持住！快進入下方的緩解艙！'**
+  String get friendEncouragementMessage;
+
+  /// No description provided for @cravingReliefChamberTitle.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'🚨 菸癮危機緩解艙'**
+  String get cravingReliefChamberTitle;
+
+  /// No description provided for @mitigationTileMedical.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'1. 醫學常識 (內建戒菸文章)'**
+  String get mitigationTileMedical;
+
+  /// No description provided for @mitigationTileShortJokes.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'2. 極短篇笑話 (短文小故事)'**
+  String get mitigationTileShortJokes;
+
+  /// No description provided for @readingArticleOfflineLabel.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'閱讀文章（下載後可離線閱讀）'**
+  String get readingArticleOfflineLabel;
+
+  /// No description provided for @youtubeVideoLabel.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'3. YouTube影片 (看一下影片)'**
+  String get youtubeVideoLabel;
+
+  /// No description provided for @musicLinkLabel.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'4. 音樂連結 (聽一下音樂)'**
+  String get musicLinkLabel;
+
+  /// No description provided for @cigarettesCount.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'{count} 支'**
+  String cigarettesCount(Object count);
+
+  /// No description provided for @currencyAmount.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'{amount} 元'**
+  String currencyAmount(Object amount);
+
+  /// No description provided for @todaySaved.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'今日省下'**
+  String get todaySaved;
+
   /// No description provided for @smoked.
   ///
   /// In zh_TW, this message translates to:
@@ -596,12 +752,6 @@ abstract class AppLocalizations {
   /// In zh_TW, this message translates to:
   /// **'剩餘額度'**
   String get remainingAmount;
-
-  /// No description provided for @todaySaved.
-  ///
-  /// In zh_TW, this message translates to:
-  /// **'今日省下'**
-  String get todaySaved;
 
   /// No description provided for @coinUnit.
   ///
@@ -788,6 +938,156 @@ abstract class AppLocalizations {
   /// In zh_TW, this message translates to:
   /// **'註冊新帳號'**
   String get registerNewAccount;
+
+  /// No description provided for @enterValidEmail.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'請輸入正確的電子郵件'**
+  String get enterValidEmail;
+
+  /// No description provided for @passwordMinLengthError.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'密碼至少需要 6 個字元'**
+  String get passwordMinLengthError;
+
+  /// No description provided for @emailAlreadyRegistered.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'此電子郵件已被註冊，請直接登入'**
+  String get emailAlreadyRegistered;
+
+  /// No description provided for @weakPassword.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'密碼強度不足'**
+  String get weakPassword;
+
+  /// No description provided for @invalidEmailFormat.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'電子郵件格式不正確'**
+  String get invalidEmailFormat;
+
+  /// No description provided for @registrationFailed.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'註冊失敗，請稍後再試'**
+  String get registrationFailed;
+
+  /// No description provided for @fillEmailAndPassword.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'請填寫電子郵件與密碼'**
+  String get fillEmailAndPassword;
+
+  /// No description provided for @invalidEmailOrPassword.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'電子郵件或密碼不正確'**
+  String get invalidEmailOrPassword;
+
+  /// No description provided for @tooManyAttempts.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'嘗試次數過多，請稍後再試'**
+  String get tooManyAttempts;
+
+  /// No description provided for @loginFailed.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'登入失敗，請稍後再試'**
+  String get loginFailed;
+
+  /// No description provided for @loginFailedWithError.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'登入失敗：{error}'**
+  String loginFailedWithError(Object error);
+
+  /// No description provided for @externalLinkInvalidFormat.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'連結格式無效，顯示內建內容。'**
+  String get externalLinkInvalidFormat;
+
+  /// No description provided for @externalLinkOpenTimeout.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'外部連結無法在 10 秒內開啟；改為顯示內建內容。'**
+  String get externalLinkOpenTimeout;
+
+  /// No description provided for @externalLinkOpenFailed.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'無法開啟外部連結，改為顯示內建內容。'**
+  String get externalLinkOpenFailed;
+
+  /// No description provided for @onlineGameRecommendation.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'🌐 推薦線上遊戲'**
+  String get onlineGameRecommendation;
+
+  /// No description provided for @nextTip.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'下一則提示'**
+  String get nextTip;
+
+  /// No description provided for @randomTip.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'隨機'**
+  String get randomTip;
+
+  /// No description provided for @successfullySurvivedButton.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'🟢 我撐過了！'**
+  String get successfullySurvivedButton;
+
+  /// No description provided for @cravingTip.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'💡 小提醒：當菸癮來襲時，深呼吸 3 次可幫助緩解不適！'**
+  String get cravingTip;
+
+  /// No description provided for @offlineBuiltInLabel.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'✅ 完全內建 · 離線可玩'**
+  String get offlineBuiltInLabel;
+
+  /// No description provided for @motivationalQuote1.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'每一支沒抽的菸，都是你重新掌控生活的勝利！'**
+  String get motivationalQuote1;
+
+  /// No description provided for @motivationalQuote2.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'深呼吸！這口新鮮空氣比尼古丁更強大！'**
+  String get motivationalQuote2;
+
+  /// No description provided for @motivationalQuote3.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'菸癮通常只會持續約 3 分鐘，撐過就算贏！'**
+  String get motivationalQuote3;
+
+  /// No description provided for @motivationalQuote4.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'你省下的不是錢，而是和家人相處的時間！'**
+  String get motivationalQuote4;
+
+  /// No description provided for @motivationalQuote5.
+  ///
+  /// In zh_TW, this message translates to:
+  /// **'你比自己想像的還要強！'**
+  String get motivationalQuote5;
 
   /// No description provided for @loginAppSloganTitle.
   ///

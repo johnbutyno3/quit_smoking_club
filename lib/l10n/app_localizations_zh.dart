@@ -87,15 +87,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get insufficientCoins => 'COIN 不足';
 
   @override
-  String get externalLinkInvalidFormat => '連結格式錯誤，已讀取內部資料。';
-
-  @override
-  String get externalLinkOpenTimeout => '外部連結無法在 10 秒內開啟，已改為顯示內部內容。';
-
-  @override
-  String get externalLinkOpenFailed => '外部連結開啟失敗，已顯示內部資料。';
-
-  @override
   String get postCreated => '貼文建立成功';
 
   @override
@@ -229,6 +220,58 @@ class AppLocalizationsZh extends AppLocalizations {
   String get startPlan => '開始計畫';
 
   @override
+  String get quitPlanPageTitle => '戒菸計畫';
+
+  @override
+  String get quitPlanDailyCigarettes => '每日抽菸數';
+
+  @override
+  String get quitPlanPricePerPack => '每包價格';
+
+  @override
+  String get quitPlanCigarettesPerPack => '每包支數';
+
+  @override
+  String get quitPlanDays => '戒菸天數';
+
+  @override
+  String get quitPlanGenerateButton => '產生戒菸計畫';
+
+  @override
+  String quitPlanEstimatedSavings(Object saving) {
+    return '預估節省：$saving 元';
+  }
+
+  @override
+  String quitPlanDayLabel(Object day) {
+    return '第 $day 天';
+  }
+
+  @override
+  String plannedCigarettes(Object count) {
+    return '🚬 $count 支';
+  }
+
+  @override
+  String get previousStep => '上一步';
+
+  @override
+  String get nextStep => '下一步';
+
+  @override
+  String usernameAlreadyUsed(Object name) {
+    return '「$name」已被使用，請換一個';
+  }
+
+  @override
+  String usernameAlreadyUsedPleaseEdit(Object name) {
+    return '「$name」已被使用，請返回修改';
+  }
+
+  @override
+  String get usernameStartQuitJourney => '開始戒菸之旅 🚀';
+
+  @override
   String get lifestyleTitle => '健康生活';
 
   @override
@@ -265,6 +308,59 @@ class AppLocalizationsZh extends AppLocalizations {
   String get todaySmokingSchedule => '控菸今日排程表';
 
   @override
+  String dailySignInNotification(Object rank) {
+    return '📆 跨天簽到：您目前為 [$rank]';
+  }
+
+  @override
+  String dailyRewardNotification(Object reward) {
+    return '💰 系統已自動發放今日福利 $reward 金幣！';
+  }
+
+  @override
+  String get smokingUnlockNotification => '🔔 控菸時間已到！新一輪配額已解鎖，您今天已成功少抽 2 支菸！';
+
+  @override
+  String get smokeSuccessMessage => '🎉 你太棒了，少抽一支菸！';
+
+  @override
+  String get cravingWarningMessage => '🚨 警告：使用者菸癮犯了！已通知好友！';
+
+  @override
+  String get friendEncouragementMessage => '💬 好友小明：堅持住！快進入下方的緩解艙！';
+
+  @override
+  String get cravingReliefChamberTitle => '🚨 菸癮危機緩解艙';
+
+  @override
+  String get mitigationTileMedical => '1. 醫學常識 (內建戒菸文章)';
+
+  @override
+  String get mitigationTileShortJokes => '2. 極短篇笑話 (短文小故事)';
+
+  @override
+  String get readingArticleOfflineLabel => '閱讀文章（下載後可離線閱讀）';
+
+  @override
+  String get youtubeVideoLabel => '3. YouTube影片 (看一下影片)';
+
+  @override
+  String get musicLinkLabel => '4. 音樂連結 (聽一下音樂)';
+
+  @override
+  String cigarettesCount(Object count) {
+    return '$count 支';
+  }
+
+  @override
+  String currencyAmount(Object amount) {
+    return '$amount 元';
+  }
+
+  @override
+  String get todaySaved => '今日省下';
+
+  @override
   String get smoked => '已抽 ✓';
 
   @override
@@ -272,9 +368,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get remainingAmount => '剩餘額度';
-
-  @override
-  String get todaySaved => '今日省下';
 
   @override
   String get coinUnit => '金幣';
@@ -370,6 +463,83 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get registerNewAccount => '註冊新帳號';
+
+  @override
+  String get enterValidEmail => '請輸入正確的電子郵件';
+
+  @override
+  String get passwordMinLengthError => '密碼至少需要 6 個字元';
+
+  @override
+  String get emailAlreadyRegistered => '此電子郵件已被註冊，請直接登入';
+
+  @override
+  String get weakPassword => '密碼強度不足';
+
+  @override
+  String get invalidEmailFormat => '電子郵件格式不正確';
+
+  @override
+  String get registrationFailed => '註冊失敗，請稍後再試';
+
+  @override
+  String get fillEmailAndPassword => '請填寫電子郵件與密碼';
+
+  @override
+  String get invalidEmailOrPassword => '電子郵件或密碼不正確';
+
+  @override
+  String get tooManyAttempts => '嘗試次數過多，請稍後再試';
+
+  @override
+  String get loginFailed => '登入失敗，請稍後再試';
+
+  @override
+  String loginFailedWithError(Object error) {
+    return '登入失敗：$error';
+  }
+
+  @override
+  String get externalLinkInvalidFormat => '連結格式無效，顯示內建內容。';
+
+  @override
+  String get externalLinkOpenTimeout => '外部連結無法在 10 秒內開啟；改為顯示內建內容。';
+
+  @override
+  String get externalLinkOpenFailed => '無法開啟外部連結，改為顯示內建內容。';
+
+  @override
+  String get onlineGameRecommendation => '🌐 推薦線上遊戲';
+
+  @override
+  String get nextTip => '下一則提示';
+
+  @override
+  String get randomTip => '隨機';
+
+  @override
+  String get successfullySurvivedButton => '🟢 我撐過了！';
+
+  @override
+  String get cravingTip => '💡 小提醒：當菸癮來襲時，深呼吸 3 次可幫助緩解不適！';
+
+  @override
+  String get offlineBuiltInLabel => '✅ 完全內建 · 離線可玩';
+
+  @override
+  String get motivationalQuote1 => '每一支沒抽的菸，都是你重新掌控生活的勝利！';
+
+  @override
+  String get motivationalQuote2 => '深呼吸！這口新鮮空氣比尼古丁更強大！';
+
+  @override
+  String get motivationalQuote3 => '菸癮通常只會持續約 3 分鐘，撐過就算贏！';
+
+  @override
+  String get motivationalQuote4 => '你省下的不是錢，而是和家人相處的時間！';
+
+  @override
+  String get motivationalQuote5 => '你比自己想像的還要強！';
 
   @override
   String get loginAppSloganTitle => '戒菸好習慣';
@@ -981,6 +1151,58 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get startPlan => '開始計畫';
 
   @override
+  String get quitPlanPageTitle => '戒菸計畫';
+
+  @override
+  String get quitPlanDailyCigarettes => '每日抽菸數';
+
+  @override
+  String get quitPlanPricePerPack => '每包價格';
+
+  @override
+  String get quitPlanCigarettesPerPack => '每包支數';
+
+  @override
+  String get quitPlanDays => '戒菸天數';
+
+  @override
+  String get quitPlanGenerateButton => '產生戒菸計畫';
+
+  @override
+  String quitPlanEstimatedSavings(Object saving) {
+    return '預估節省：$saving 元';
+  }
+
+  @override
+  String quitPlanDayLabel(Object day) {
+    return '第 $day 天';
+  }
+
+  @override
+  String plannedCigarettes(Object count) {
+    return '🚬 $count 支';
+  }
+
+  @override
+  String get previousStep => '上一步';
+
+  @override
+  String get nextStep => '下一步';
+
+  @override
+  String usernameAlreadyUsed(Object name) {
+    return '「$name」已被使用，請換一個';
+  }
+
+  @override
+  String usernameAlreadyUsedPleaseEdit(Object name) {
+    return '「$name」已被使用，請返回修改';
+  }
+
+  @override
+  String get usernameStartQuitJourney => '開始戒菸之旅 🚀';
+
+  @override
   String get lifestyleTitle => '健康生活';
 
   @override
@@ -1017,6 +1239,59 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get todaySmokingSchedule => '控菸今日排程表';
 
   @override
+  String dailySignInNotification(Object rank) {
+    return '📆 跨天簽到：您目前為 [$rank]';
+  }
+
+  @override
+  String dailyRewardNotification(Object reward) {
+    return '💰 系統已自動發放今日福利 $reward 金幣！';
+  }
+
+  @override
+  String get smokingUnlockNotification => '🔔 控菸時間已到！新一輪配額已解鎖，您今天已成功少抽 2 支菸！';
+
+  @override
+  String get smokeSuccessMessage => '🎉 你太棒了，少抽一支菸！';
+
+  @override
+  String get cravingWarningMessage => '🚨 警告：使用者菸癮犯了！已通知好友！';
+
+  @override
+  String get friendEncouragementMessage => '💬 好友小明：堅持住！快進入下方的緩解艙！';
+
+  @override
+  String get cravingReliefChamberTitle => '🚨 菸癮危機緩解艙';
+
+  @override
+  String get mitigationTileMedical => '1. 醫學常識 (內建戒菸文章)';
+
+  @override
+  String get mitigationTileShortJokes => '2. 極短篇笑話 (短文小故事)';
+
+  @override
+  String get readingArticleOfflineLabel => '閱讀文章（下載後可離線閱讀）';
+
+  @override
+  String get youtubeVideoLabel => '3. YouTube影片 (看一下影片)';
+
+  @override
+  String get musicLinkLabel => '4. 音樂連結 (聽一下音樂)';
+
+  @override
+  String cigarettesCount(Object count) {
+    return '$count 支';
+  }
+
+  @override
+  String currencyAmount(Object amount) {
+    return '$amount 元';
+  }
+
+  @override
+  String get todaySaved => '今日省下';
+
+  @override
   String get smoked => '已抽 ✓';
 
   @override
@@ -1024,9 +1299,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get remainingAmount => '剩餘額度';
-
-  @override
-  String get todaySaved => '今日省下';
 
   @override
   String get coinUnit => '金幣';
@@ -1122,6 +1394,83 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get registerNewAccount => '註冊新帳號';
+
+  @override
+  String get enterValidEmail => '請輸入正確的電子郵件';
+
+  @override
+  String get passwordMinLengthError => '密碼至少需要 6 個字元';
+
+  @override
+  String get emailAlreadyRegistered => '此電子郵件已被註冊，請直接登入';
+
+  @override
+  String get weakPassword => '密碼強度不足';
+
+  @override
+  String get invalidEmailFormat => '電子郵件格式不正確';
+
+  @override
+  String get registrationFailed => '註冊失敗，請稍後再試';
+
+  @override
+  String get fillEmailAndPassword => '請填寫電子郵件與密碼';
+
+  @override
+  String get invalidEmailOrPassword => '電子郵件或密碼不正確';
+
+  @override
+  String get tooManyAttempts => '嘗試次數過多，請稍後再試';
+
+  @override
+  String get loginFailed => '登入失敗，請稍後再試';
+
+  @override
+  String loginFailedWithError(Object error) {
+    return '登入失敗：$error';
+  }
+
+  @override
+  String get externalLinkInvalidFormat => '連結格式無效，顯示內建內容。';
+
+  @override
+  String get externalLinkOpenTimeout => '外部連結無法在 10 秒內開啟；改為顯示內建內容。';
+
+  @override
+  String get externalLinkOpenFailed => '無法開啟外部連結，改為顯示內建內容。';
+
+  @override
+  String get onlineGameRecommendation => '🌐 推薦線上遊戲';
+
+  @override
+  String get nextTip => '下一則提示';
+
+  @override
+  String get randomTip => '隨機';
+
+  @override
+  String get successfullySurvivedButton => '🟢 我撐過了！';
+
+  @override
+  String get cravingTip => '💡 小提醒：當菸癮來襲時，深呼吸 3 次可幫助緩解不適！';
+
+  @override
+  String get offlineBuiltInLabel => '✅ 完全內建 · 離線可玩';
+
+  @override
+  String get motivationalQuote1 => '每一支沒抽的菸，都是你重新掌控生活的勝利！';
+
+  @override
+  String get motivationalQuote2 => '深呼吸！這口新鮮空氣比尼古丁更強大！';
+
+  @override
+  String get motivationalQuote3 => '菸癮通常只會持續約 3 分鐘，撐過就算贏！';
+
+  @override
+  String get motivationalQuote4 => '你省下的不是錢，而是和家人相處的時間！';
+
+  @override
+  String get motivationalQuote5 => '你比自己想像的還要強！';
 
   @override
   String get loginAppSloganTitle => '戒菸好習慣';

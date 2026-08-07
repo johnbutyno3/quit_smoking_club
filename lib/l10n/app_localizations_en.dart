@@ -88,15 +88,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get insufficientCoins => 'Insufficient COIN';
 
   @override
-  String get externalLinkInvalidFormat => 'Invalid link format, showing internal content.';
-
-  @override
-  String get externalLinkOpenTimeout => 'External link could not be opened within 10 seconds; showing internal content instead.';
-
-  @override
-  String get externalLinkOpenFailed => 'Failed to open external link; showing internal content.';
-
-  @override
   String get postCreated => 'Post created successfully';
 
   @override
@@ -235,6 +226,58 @@ class AppLocalizationsEn extends AppLocalizations {
   String get startPlan => 'Start Plan';
 
   @override
+  String get quitPlanPageTitle => 'Quit Plan';
+
+  @override
+  String get quitPlanDailyCigarettes => 'Daily cigarettes';
+
+  @override
+  String get quitPlanPricePerPack => 'Price per pack';
+
+  @override
+  String get quitPlanCigarettesPerPack => 'Cigarettes per pack';
+
+  @override
+  String get quitPlanDays => 'Quit days';
+
+  @override
+  String get quitPlanGenerateButton => 'Generate quit plan';
+
+  @override
+  String quitPlanEstimatedSavings(Object saving) {
+    return 'Estimated savings: $saving units';
+  }
+
+  @override
+  String quitPlanDayLabel(Object day) {
+    return 'Day $day';
+  }
+
+  @override
+  String plannedCigarettes(Object count) {
+    return '🚬 $count cigarettes';
+  }
+
+  @override
+  String get previousStep => 'Previous';
+
+  @override
+  String get nextStep => 'Next';
+
+  @override
+  String usernameAlreadyUsed(Object name) {
+    return '\'$name\' is already taken, please choose another.';
+  }
+
+  @override
+  String usernameAlreadyUsedPleaseEdit(Object name) {
+    return '\'$name\' is already taken, please go back and edit.';
+  }
+
+  @override
+  String get usernameStartQuitJourney => 'Start your quit journey 🚀';
+
+  @override
   String get lifestyleTitle => 'Healthy Lifestyle';
 
   @override
@@ -271,6 +314,65 @@ class AppLocalizationsEn extends AppLocalizations {
   String get todaySmokingSchedule => 'Today\'s Smoking Schedule';
 
   @override
+  String dailySignInNotification(Object rank) {
+    return '📆 Daily sign-in: you are currently [$rank]';
+  }
+
+  @override
+  String dailyRewardNotification(Object reward) {
+    return '💰 System automatically issued today\'s reward of $reward coins!';
+  }
+
+  @override
+  String get smokingUnlockNotification =>
+      '🔔 Smoking unlock time has arrived! A new quota is unlocked and you have successfully smoked 2 fewer cigarettes today!';
+
+  @override
+  String get smokeSuccessMessage =>
+      '🎉 You are amazing — one less cigarette smoked!';
+
+  @override
+  String get cravingWarningMessage =>
+      '🚨 Warning: craving detected! Friends have been notified!';
+
+  @override
+  String get friendEncouragementMessage =>
+      '💬 Friend Xiao Ming: Keep going! Enter the relief chamber below!';
+
+  @override
+  String get cravingReliefChamberTitle => '🚨 Craving Relief Chamber';
+
+  @override
+  String get mitigationTileMedical =>
+      '1. Medical tips (built-in quit articles)';
+
+  @override
+  String get mitigationTileShortJokes => '2. Short jokes (brief stories)';
+
+  @override
+  String get readingArticleOfflineLabel =>
+      'Reading articles (available offline after download)';
+
+  @override
+  String get youtubeVideoLabel => '3. YouTube videos (watch a clip)';
+
+  @override
+  String get musicLinkLabel => '4. Music links (listen to a song)';
+
+  @override
+  String cigarettesCount(Object count) {
+    return '$count cigarettes';
+  }
+
+  @override
+  String currencyAmount(Object amount) {
+    return '¥$amount';
+  }
+
+  @override
+  String get todaySaved => 'Saved Today';
+
+  @override
   String get smoked => 'Smoked ✓';
 
   @override
@@ -278,9 +380,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get remainingAmount => 'Remaining';
-
-  @override
-  String get todaySaved => 'Saved Today';
 
   @override
   String get coinUnit => 'Coins';
@@ -380,6 +479,93 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registerNewAccount => 'Register New Account';
 
   @override
+  String get enterValidEmail => 'Please enter a valid email address';
+
+  @override
+  String get passwordMinLengthError => 'Password must be at least 6 characters';
+
+  @override
+  String get emailAlreadyRegistered =>
+      'This email is already registered. Please sign in.';
+
+  @override
+  String get weakPassword => 'Password strength is insufficient';
+
+  @override
+  String get invalidEmailFormat => 'Invalid email format';
+
+  @override
+  String get registrationFailed =>
+      'Registration failed. Please try again later.';
+
+  @override
+  String get fillEmailAndPassword => 'Please fill in email and password';
+
+  @override
+  String get invalidEmailOrPassword => 'Email or password is incorrect';
+
+  @override
+  String get tooManyAttempts => 'Too many attempts. Please try again later';
+
+  @override
+  String get loginFailed => 'Login failed. Please try again later';
+
+  @override
+  String loginFailedWithError(Object error) {
+    return 'Login failed: $error';
+  }
+
+  @override
+  String get externalLinkInvalidFormat =>
+      'Invalid link format, showing internal content.';
+
+  @override
+  String get externalLinkOpenTimeout =>
+      'External link could not be opened within 10 seconds; showing internal content instead.';
+
+  @override
+  String get externalLinkOpenFailed =>
+      'Failed to open external link; showing internal content instead.';
+
+  @override
+  String get onlineGameRecommendation => '🌐 Online games recommended';
+
+  @override
+  String get nextTip => 'Next tip';
+
+  @override
+  String get randomTip => 'Random';
+
+  @override
+  String get successfullySurvivedButton => '🟢 I made it through!';
+
+  @override
+  String get cravingTip =>
+      '💡 Tip: When cravings hit, take 3 deep breaths to help ease discomfort!';
+
+  @override
+  String get offlineBuiltInLabel => '✅ Fully built-in · Play offline';
+
+  @override
+  String get motivationalQuote1 =>
+      'Every cigarette you don\'t smoke is a victory; you\'re reclaiming control of your life!';
+
+  @override
+  String get motivationalQuote2 =>
+      'Take a deep breath! This fresh air is stronger than nicotine!';
+
+  @override
+  String get motivationalQuote3 =>
+      'Cravings only last about 3 minutes each time — if you can push through, you win!';
+
+  @override
+  String get motivationalQuote4 =>
+      'The money you save is more than cash — it\'s more time with your family!';
+
+  @override
+  String get motivationalQuote5 => 'You are stronger than you think!';
+
+  @override
   String get loginAppSloganTitle => 'Quit Smoking Better';
 
   @override
@@ -422,7 +608,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get introNext => 'Next ›';
 
   @override
-  String get rankingGlobalTitle => 'Global Ranking';
+  String get rankingGlobalTitle => '全球排行榜';
 
   @override
   String rankingQuitDays(Object days) {
