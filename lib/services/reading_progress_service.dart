@@ -16,7 +16,9 @@ class ReadingProgressService {
     final raw = prefs.getString(_statisticsKey);
     if (raw == null) return const ReadingStatistics();
     try {
-      return ReadingStatistics.fromJson(Map<String, dynamic>.from(jsonDecode(raw) as Map));
+      return ReadingStatistics.fromJson(
+        Map<String, dynamic>.from(jsonDecode(raw) as Map),
+      );
     } on FormatException {
       return const ReadingStatistics();
     }
@@ -24,7 +26,9 @@ class ReadingProgressService {
 
   Future<bool> isChapterCompleted(String chapterId) async {
     final prefs = await SharedPreferences.getInstance();
-    return (prefs.getStringList(_completedChaptersKey) ?? const []).contains(chapterId);
+    return (prefs.getStringList(_completedChaptersKey) ?? const []).contains(
+      chapterId,
+    );
   }
 
   Future<bool> completeChapter({
@@ -36,7 +40,8 @@ class ReadingProgressService {
     required DateTime now,
   }) async {
     final prefs = await SharedPreferences.getInstance();
-    final completedChapters = prefs.getStringList(_completedChaptersKey) ?? <String>[];
+    final completedChapters =
+        prefs.getStringList(_completedChaptersKey) ?? <String>[];
     if (completedChapters.contains(chapterId)) return false;
 
     var stats = await loadStatistics();
@@ -67,11 +72,16 @@ class ReadingProgressService {
       );
     }
 
-    final completedBooks = prefs.getStringList(_completedBooksKey) ?? <String>[];
+    final completedBooks =
+        prefs.getStringList(_completedBooksKey) ?? <String>[];
     final bookCompleted = isLastChapter && !completedBooks.contains(bookId);
     if (bookCompleted) completedBooks.add(bookId);
     completedChapters.add(chapterId);
-    stats = stats.add(seconds: seconds, words: words, bookCompleted: bookCompleted);
+    stats = stats.add(
+      seconds: seconds,
+      words: words,
+      bookCompleted: bookCompleted,
+    );
     await prefs.setStringList(_completedChaptersKey, completedChapters);
     await prefs.setStringList(_completedBooksKey, completedBooks);
     await prefs.setString(_statisticsKey, jsonEncode(stats.toJson()));

@@ -64,6 +64,7 @@ class _MitigationPageState extends State<MitigationPage> {
 
       if (items.isEmpty) {
         final l10n = AppLocalizations.of(context)!;
+
         if (widget.title == 'Medical') {
           _setError(l10n.medicalLibraryTitle, l10n.medicalLibraryEmpty);
         } else {
