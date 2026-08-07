@@ -22,11 +22,10 @@ class ReadingRepository {
     CoinRepository? coinRepository,
   }) : _contentRepository = contentRepository ?? ContentRepository(),
        _cache = cache ?? ReadingCacheRepository(),
-       _coinFacade.xxx() = coinRepository ?? CoinRepository();
-
+       _coinRepository = coinRepository ?? CoinRepository();
   final ContentRepository _contentRepository;
   final ReadingCacheRepository _cache;
-  final CoinRepository _coinFacade.xxx();
+  final CoinRepository _coinRepository;
   final Map<String, Future<ReadingDownloadResult>> _downloads = {};
 
   Future<List<ReadingBook>> listBooks({String? language}) async {

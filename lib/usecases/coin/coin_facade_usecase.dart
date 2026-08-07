@@ -12,4 +12,20 @@ class CoinFacadeUseCase {
   Future<bool> spend(int amount, String reason) async {
     return await SpendCoinUseCase(_coinRepository).execute(amount, reason);
   }
+
+  Future<bool> claimDailyLogin() async {
+    return await _coinRepository.claimDailyLogin();
+  }
+
+  Future<bool> claimDailyPlanReward() async {
+    return await _coinRepository.claimDailyPlanReward();
+  }
+
+  Future<void> addCoin(int amount, String reason) async {
+    await _coinRepository.addCoin(amount, reason);
+  }
+
+  Future<int> getTotalSpentCoins() async {
+    return await _coinRepository.getTotalSpentCoins();
+  }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/coin_transaction.dart';
 import '../repositories/coin/coin_repository.dart';
-import '../services/coin_service.dart';
+// Use CoinRepository instead of direct CoinService in UI
 import '../usecases/coin/get_coin_balance_usecase.dart';
 import '../l10n/app_localizations.dart';
 
@@ -14,13 +14,10 @@ class CoinPage extends StatefulWidget {
 }
 
 class _CoinPageState extends State<CoinPage> {
-  final CoinRepository _coinRepository = CoinRepository(
-    coinService: CoinService(),
-  );
-  final CoinService _coinService = CoinService();
+  final CoinRepository _coinRepository = CoinRepository();
+
   late final GetCoinBalanceUseCase _getCoinBalanceUseCase =
       GetCoinBalanceUseCase(_coinRepository);
-
   int _balance = 0;
 
   final List<CoinTransaction> _history = [];
@@ -34,13 +31,15 @@ class _CoinPageState extends State<CoinPage> {
   Future<void> _loadBalance() async {
     final balance = await _getCoinBalanceUseCase.execute();
 
+    final history = await _coinRepository.getHistory();
+
     if (!mounted) return;
 
     setState(() {
       _balance = balance;
       _history
         ..clear()
-        ..addAll(_coinService.history);
+        ..addAll(history);
     });
   }
 
