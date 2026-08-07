@@ -3,6 +3,7 @@ import '../l10n/app_localizations.dart';
 import '../models/content/content_category.dart';
 import '../models/content/content_item.dart';
 import '../repositories/content/content_repository.dart';
+import '../usecases/content/get_content_list_usecase.dart';
 
 class ContentManagementPage extends StatefulWidget {
   const ContentManagementPage({super.key});
@@ -12,6 +13,8 @@ class ContentManagementPage extends StatefulWidget {
 }
 
 class _ContentManagementPageState extends State<ContentManagementPage> {
+  final GetContentListUseCase _getContentListUseCase = GetContentListUseCase();
+
   final ContentRepository _repository = ContentRepository();
   final List<ContentCategory> _categories = const [
     ContentCategory.medical,
@@ -24,14 +27,18 @@ class _ContentManagementPageState extends State<ContentManagementPage> {
   late Future<List<ContentItem>> _itemsFuture;
 
   @override
+  @override
   void initState() {
     super.initState();
-    _itemsFuture = _repository.getContents(category: _selectedCategory);
+
+    _itemsFuture = _getContentListUseCase.execute(category: _selectedCategory);
   }
 
   Future<void> _refreshItems() async {
     setState(() {
-      _itemsFuture = _repository.getContents(category: _selectedCategory);
+      _itemsFuture = _getContentListUseCase.execute(
+        category: _selectedCategory,
+      );
     });
   }
 
