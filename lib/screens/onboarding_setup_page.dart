@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
-import '../services/storage_service.dart';
-import '../services/user_service.dart';
+import '../usecases/storage/storage_facade_usecase.dart';
+import '../usecases/user/user_facade_usecase.dart';
 import 'home_page.dart';
 
 /// 首次登入後的完整個人資料設定流程（三步驟）
@@ -10,13 +10,13 @@ import 'home_page.dart';
 /// Step 3：戒菸排程設定（每日支數、抽菸時間窗口、戒菸期限）
 class OnboardingSetupPage extends StatefulWidget {
   final String uid;
-  final UserService userService;
+  final UserFacadeUseCase userFacade;
   final String prefillName;
 
   const OnboardingSetupPage({
     super.key,
     required this.uid,
-    required this.userService,
+    required this.userFacade,
     this.prefillName = '',
   });
 
@@ -90,7 +90,9 @@ class _OnboardingSetupPageState extends State<OnboardingSetupPage> {
     if (_currentStep == 0) {
       final l10n = AppLocalizations.of(context)!;
       // 格式驗證
-      final fmtErr = UserService.validateNameFormat(_nameCtrl.text.trim());
+      final fmtErr = UserFacadeUseCase.validateNameFormat(
+        _nameCtrl.text.trim(),
+      );
       if (fmtErr != null) {
         setState(() => _nameError = _localizeNicknameError(fmtErr, l10n));
         return;
@@ -100,13 +102,17 @@ class _OnboardingSetupPageState extends State<OnboardingSetupPage> {
         _nameError = null;
         _isSaving = true;
       });
-      final available = await widget.userService.isNameAvailable(
+      final available = await widget.userFacade.isNameAvailable(
         _nameCtrl.text.trim(),
         excludeUid: widget.uid,
       );
       setState(() => _isSaving = false);
       if (!available) {
-        setState(() => _nameError = '「${_nameCtrl.text.trim()}」已被使用，請換一個');
+        setState(
+          () => _nameError = AppLocalizations.of(
+            context,
+          )!.usernameAlreadyUsed(_nameCtrl.text.trim()),
+        );
         return;
       }
     }
@@ -158,14 +164,16 @@ class _OnboardingSetupPageState extends State<OnboardingSetupPage> {
     final lm = _lastTime.minute.toString().padLeft(2, '0');
 
     // 重複名稱檢查（附 excludeUid 防止同用戶誤報）
-    final available = await widget.userService.isNameAvailable(
+    final available = await widget.userFacade.isNameAvailable(
       name,
       excludeUid: widget.uid,
     );
     if (!available) {
       setState(() {
         _isSaving = false;
-        _nameError = '「$name」已被使用，請返回修改';
+        _nameError = AppLocalizations.of(
+          context,
+        )!.usernameAlreadyUsedPleaseEdit(name);
       });
       _pageController.animateToPage(
         0,
@@ -176,19 +184,19 @@ class _OnboardingSetupPageState extends State<OnboardingSetupPage> {
     }
 
     // 儲存到本機
-    await StorageService.saveUserName(name);
-    await StorageService.saveUserAge(age);
-    await StorageService.saveUserYears(years);
-    await StorageService.saveDailyCount(count);
-    await StorageService.saveCigarettePrice(price);
-    await StorageService.saveFirstSmokeTime('$fh:$fm');
-    await StorageService.saveLastSmokeTime('$lh:$lm');
-    await StorageService.saveCoins(20);
-    await StorageService.savePremium(false);
+    await StorageFacadeUseCase.saveUserName(name);
+    await StorageFacadeUseCase.saveUserAge(age);
+    await StorageFacadeUseCase.saveUserYears(years);
+    await StorageFacadeUseCase.saveDailyCount(count);
+    await StorageFacadeUseCase.saveCigarettePrice(price);
+    await StorageFacadeUseCase.saveFirstSmokeTime('$fh:$fm');
+    await StorageFacadeUseCase.saveLastSmokeTime('$lh:$lm');
+    await StorageFacadeUseCase.saveCoins(20);
+    await StorageFacadeUseCase.savePremium(false);
 
     // 預訂暱稱 + 同步到 Firestore
-    await widget.userService.reserveName(widget.uid, name);
-    await widget.userService.saveProfile(widget.uid, {
+    await widget.userFacade.reserveName(widget.uid, name);
+    await widget.userFacade.saveProfile(widget.uid, {
       'name': name,
       'user_age': age,
       'user_years': years,
@@ -534,9 +542,9 @@ class _OnboardingSetupPageState extends State<OnboardingSetupPage> {
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           side: const BorderSide(color: _OC.primary),
                         ),
-                        child: const Text(
-                          '上一步',
-                          style: TextStyle(color: _OC.primary),
+                        child: Text(
+                          AppLocalizations.of(context)!.previousStep,
+                          style: const TextStyle(color: _OC.primary),
                         ),
                       ),
                     ),
@@ -562,7 +570,11 @@ class _OnboardingSetupPageState extends State<OnboardingSetupPage> {
                               ),
                             )
                           : Text(
-                              isLast ? '開始戒菸之旅 🚀' : '下一步',
+                              isLast
+                                  ? AppLocalizations.of(
+                                      context,
+                                    )!.usernameStartQuitJourney
+                                  : AppLocalizations.of(context)!.nextStep,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,

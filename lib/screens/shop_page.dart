@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
 
-import '../services/storage_service.dart';
-import '../services/coin_service.dart';
+import '../usecases/storage/storage_facade_usecase.dart';
+// Use CoinRepository instead of direct CoinService in UI
 
 import '../repositories/coin/coin_repository.dart';
 
@@ -44,7 +44,7 @@ class _ShopPageState extends State<ShopPage> {
   void initState() {
     super.initState();
 
-    _coinRepository = CoinRepository(coinService: CoinService());
+    _coinRepository = CoinRepository();
     _getCoinBalanceUseCase = GetCoinBalanceUseCase(_coinRepository);
 
     _spendCoinUseCase = SpendCoinUseCase(_coinRepository);
@@ -55,7 +55,7 @@ class _ShopPageState extends State<ShopPage> {
   Future<void> _loadShopData() async {
     final coins = await _getCoinBalanceUseCase.execute();
 
-    final premium = await StorageService.getPremium();
+    final premium = await StorageFacadeUseCase.getPremium();
 
     if (!mounted) return;
 
@@ -81,7 +81,7 @@ class _ShopPageState extends State<ShopPage> {
   }
 
   Future<void> _unlockPremium() async {
-    await StorageService.savePremium(true);
+    await StorageFacadeUseCase.savePremium(true);
 
     if (!mounted) return;
 

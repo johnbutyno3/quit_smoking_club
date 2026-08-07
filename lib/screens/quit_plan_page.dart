@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../engines/plan_generator.dart';
+import '../l10n/app_localizations.dart';
 import '../models/smoking_plan.dart';
 
 class QuitPlanPage extends StatefulWidget {
@@ -56,8 +57,9 @@ class _QuitPlanPageState extends State<QuitPlanPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text("戒菸計畫")),
+      appBar: AppBar(title: Text(l10n.quitPlanPageTitle)),
 
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -69,7 +71,9 @@ class _QuitPlanPageState extends State<QuitPlanPage> {
 
               keyboardType: TextInputType.number,
 
-              decoration: const InputDecoration(labelText: "每日抽菸數"),
+              decoration: InputDecoration(
+                labelText: l10n.quitPlanDailyCigarettes,
+              ),
             ),
 
             TextField(
@@ -77,7 +81,7 @@ class _QuitPlanPageState extends State<QuitPlanPage> {
 
               keyboardType: TextInputType.number,
 
-              decoration: const InputDecoration(labelText: "每包價格"),
+              decoration: InputDecoration(labelText: l10n.quitPlanPricePerPack),
             ),
 
             TextField(
@@ -85,7 +89,9 @@ class _QuitPlanPageState extends State<QuitPlanPage> {
 
               keyboardType: TextInputType.number,
 
-              decoration: const InputDecoration(labelText: "每包支數"),
+              decoration: InputDecoration(
+                labelText: l10n.quitPlanCigarettesPerPack,
+              ),
             ),
 
             TextField(
@@ -93,7 +99,7 @@ class _QuitPlanPageState extends State<QuitPlanPage> {
 
               keyboardType: TextInputType.number,
 
-              decoration: const InputDecoration(labelText: "戒菸天數"),
+              decoration: InputDecoration(labelText: l10n.quitPlanDays),
             ),
 
             const SizedBox(height: 20),
@@ -101,7 +107,7 @@ class _QuitPlanPageState extends State<QuitPlanPage> {
             ElevatedButton(
               onPressed: generatePlan,
 
-              child: const Text("產生戒菸計畫"),
+              child: Text(l10n.quitPlanGenerateButton),
             ),
 
             const SizedBox(height: 20),
@@ -119,7 +125,7 @@ class _QuitPlanPageState extends State<QuitPlanPage> {
 
                           children: [
                             Text(
-                              "預估節省：$saving 元",
+                              l10n.quitPlanEstimatedSavings(saving.toString()),
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -130,9 +136,15 @@ class _QuitPlanPageState extends State<QuitPlanPage> {
 
                             ...plans.map(
                               (p) => ListTile(
-                                title: Text("第 ${p.day} 天"),
+                                title: Text(
+                                  l10n.quitPlanDayLabel(p.day.toString()),
+                                ),
 
-                                trailing: Text("🚬 ${p.plannedCount} 支"),
+                                trailing: Text(
+                                  l10n.plannedCigarettes(
+                                    p.plannedCount.toString(),
+                                  ),
+                                ),
                               ),
                             ),
                           ],

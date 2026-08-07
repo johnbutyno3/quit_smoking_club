@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+import '../l10n/app_localizations.dart';
+
 import '../models/content/content_category.dart';
 import '../models/content/content_item.dart';
 import '../repositories/content/content_repository.dart';
@@ -58,14 +60,14 @@ class _MitigationPageState extends State<MitigationPage> {
         category: category,
       );
 
+      if (!mounted) return;
+
       if (items.isEmpty) {
+        final l10n = AppLocalizations.of(context)!;
         if (widget.title == 'Medical') {
-          _setError('醫學常識暫無資料', '請稍後更新或切換語言，並確保資料中包含 link。');
+          _setError(l10n.medicalLibraryTitle, l10n.medicalLibraryEmpty);
         } else {
-          _setError(
-            '資料讀取失敗',
-            '未能找到「${widget.title}」的對應內容，請確認 Firebase 或本地資料是否完整。',
-          );
+          _setError(l10n.downloadFailed, l10n.medicalLibraryLoadFailed);
         }
         return;
       }
@@ -81,7 +83,8 @@ class _MitigationPageState extends State<MitigationPage> {
         _selectedLink = selected.link;
       });
     } catch (error) {
-      _setError('資料載入失敗', 'Firebase 讀取資料時發生錯誤：$error');
+      final l10n = AppLocalizations.of(context)!;
+      _setError(l10n.medicalLibraryLoadFailed, l10n.medicalLibraryLoadFailed);
     } finally {
       setState(() {
         _isLoading = false;
@@ -135,7 +138,11 @@ class _MitigationPageState extends State<MitigationPage> {
     if (uri == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.externalLinkInvalidFormat)),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.externalLinkInvalidFormat,
+            ),
+          ),
         );
       }
       return;
@@ -169,14 +176,20 @@ class _MitigationPageState extends State<MitigationPage> {
 
         if (!fallbackLaunched && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(AppLocalizations.of(context)!.externalLinkOpenTimeout)),
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context)!.externalLinkOpenTimeout,
+              ),
+            ),
           );
         }
       }
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${AppLocalizations.of(context)!.externalLinkOpenFailed}')),
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.externalLinkOpenFailed),
+          ),
         );
       }
     } finally {
@@ -203,7 +216,7 @@ class _MitigationPageState extends State<MitigationPage> {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           title: Text(
-            '${widget.title} 危機緩解中',
+            widget.title,
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           backgroundColor: Colors.white.withAlpha(204),
@@ -217,7 +230,7 @@ class _MitigationPageState extends State<MitigationPage> {
               _BuiltInGameCard(
                 emoji: '🧩',
                 title: '2048',
-                subtitle: '滑動合併數字，挑戰 2048！離線可玩',
+                subtitle: AppLocalizations.of(context)!.game2048Subtitle,
                 color: const Color(0xFFEDC22E),
                 onTap: () => Navigator.push(
                   context,
@@ -225,10 +238,10 @@ class _MitigationPageState extends State<MitigationPage> {
                 ),
               ),
               const SizedBox(height: 16),
-              const Padding(
-                padding: EdgeInsets.only(bottom: 8),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
                 child: Text(
-                  '🌐 線上遊戲推薦',
+                  AppLocalizations.of(context)!.onlineGameRecommendation,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
@@ -330,9 +343,9 @@ class _MitigationPageState extends State<MitigationPage> {
                       ),
                     ),
                     onPressed: canSwitchTip ? _showNextTip : null,
-                    child: const Text(
-                      '下一則',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    child: Text(
+                      AppLocalizations.of(context)!.nextTip,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -350,9 +363,9 @@ class _MitigationPageState extends State<MitigationPage> {
                       ),
                     ),
                     onPressed: canSwitchTip ? _showRandomTip : null,
-                    child: const Text(
-                      '隨機',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    child: Text(
+                      AppLocalizations.of(context)!.randomTip,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -370,19 +383,22 @@ class _MitigationPageState extends State<MitigationPage> {
                 elevation: 4,
               ),
               icon: const Icon(Icons.check_circle_outline),
-              label: const Text(
-                '🟢 我成功撐過去了！',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              label: Text(
+                AppLocalizations.of(context)!.successfullySurvivedButton,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               onPressed: () {
                 Navigator.pop(context);
               },
             ),
             const SizedBox(height: 16),
-            const Text(
-              '💡 提示：菸癮犯了時，深呼吸 3 次可以大幅緩解不適喔！',
+            Text(
+              AppLocalizations.of(context)!.cravingTip,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey, fontSize: 11),
+              style: const TextStyle(color: Colors.grey, fontSize: 11),
             ),
           ],
         ),
@@ -472,9 +488,9 @@ class _BuiltInGameCard extends StatelessWidget {
                         color: const Color(0xFF1B5E20).withAlpha(20),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Text(
-                        '✅ 完全內建 · 離線可玩',
-                        style: TextStyle(
+                      child: Text(
+                        AppLocalizations.of(context)!.offlineBuiltInLabel,
+                        style: const TextStyle(
                           fontSize: 10,
                           color: Color(0xFF1B5E20),
                           fontWeight: FontWeight.bold,

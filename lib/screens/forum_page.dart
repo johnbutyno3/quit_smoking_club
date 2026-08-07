@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../models/forum_post.dart';
 import '../repositories/forum_repository.dart';
-import '../services/user_service.dart';
 import 'forum_detail_page.dart';
-import '../repositories/coin/coin_repository.dart';
-import '../services/coin_service.dart';
-import '../usecases/coin/get_coin_balance_usecase.dart';
-import '../usecases/coin/spend_coin_usecase.dart';
+import '../usecases/coin/coin_facade_usecase.dart';
+import '../usecases/user/get_current_user_usecase.dart';
 
 class ForumPage extends StatefulWidget {
   const ForumPage({super.key});
@@ -27,15 +24,8 @@ class _ForumColors {
 class _ForumPageState extends State<ForumPage> {
   final ForumRepository _forumRepository = ForumRepository();
 
-  final CoinRepository _coinRepository = CoinRepository(
-    coinService: CoinService(),
-  );
-  late final GetCoinBalanceUseCase _getCoinBalanceUseCase =
-      GetCoinBalanceUseCase(_coinRepository);
-
-  late final SpendCoinUseCase _spendCoinUseCase = SpendCoinUseCase(
-    _coinRepository,
-  );
+  late final CoinFacadeUseCase _coinFacadeUseCase = CoinFacadeUseCase();
+  final GetCurrentUserUseCase _getCurrentUser = GetCurrentUserUseCase();
   final List<ForumPost> _posts = [];
   bool _isLoading = true;
   int _myCoins = 0;
@@ -59,7 +49,7 @@ class _ForumPageState extends State<ForumPage> {
       _isLoading = true;
     });
 
-    final coins = await _getCoinBalanceUseCase.execute();
+    final coins = await _coinFacadeUseCase.getBalance();
     final posts = await _forumRepository.fetchPosts();
 
     setState(() {
@@ -82,7 +72,7 @@ class _ForumPageState extends State<ForumPage> {
     final l10n = AppLocalizations.of(context)!;
     if (_myCoins >= 5) {
       final latestCoins = _myCoins - 5;
-      final success = await _spendCoinUseCase.execute(5, '論壇送禮');
+      final success = await _coinFacadeUseCase.spend(5, '論壇送禮');
 
       if (!success) {
         return;
@@ -148,7 +138,7 @@ class _ForumPageState extends State<ForumPage> {
                   return;
                 }
 
-                final success = await _spendCoinUseCase.execute(
+                final success = await _coinFacadeUseCase.spend(
                   30,
                   'forum_create_post',
                 );
@@ -157,7 +147,7 @@ class _ForumPageState extends State<ForumPage> {
                   return;
                 }
 
-                final latestCoins = await _getCoinBalanceUseCase.execute();
+                final latestCoins = await _coinFacadeUseCase.getBalance();
                 if (!mounted) return;
 
                 setState(() {
@@ -165,7 +155,7 @@ class _ForumPageState extends State<ForumPage> {
                 });
                 final newPost = ForumPost(
                   id: '',
-                  userId: UserService.currentUid ?? '',
+                  userId: _getCurrentUser.executeUid() ?? '',
                   // 新 UI 仍填入使用者輸入的顯示名稱（向下相容 name -> nickname）
                   name: name,
                   // 沒有 title/category 欄位輸入時使用合理預設
@@ -351,7 +341,7 @@ class _ForumPageState extends State<ForumPage> {
                                 post: post,
                                 currentCoins: _myCoins,
                                 currentUserName: post.name,
-                                currentUid: UserService.currentUid,
+                                currentUid: _getCurrentUser.executeUid(),
                               ),
                             ),
                           );

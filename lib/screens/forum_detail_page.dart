@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../repositories/forum_repository.dart';
 import '../l10n/app_localizations.dart';
 import '../models/forum_post.dart';
-import '../services/coin_service.dart';
 import '../repositories/coin/coin_repository.dart';
 
 class ForumDetailPage extends StatefulWidget {
@@ -28,9 +27,7 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
 
   final TextEditingController _commentController = TextEditingController();
 
-  final CoinRepository _coinRepository = CoinRepository(
-    coinService: CoinService(),
-  );
+  final CoinRepository _coinRepository = CoinRepository();
   List<Map<String, dynamic>> _comments = [];
 
   bool _loading = true;

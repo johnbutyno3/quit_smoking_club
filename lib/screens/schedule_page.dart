@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
-import '../services/storage_service.dart';
+import '../usecases/storage/storage_facade_usecase.dart';
 
 /// 戒菸排程頁面 - 甘特圖風格，顯示每日計畫 vs 實際抽菸數
 class SchedulePage extends StatefulWidget {
@@ -25,13 +25,13 @@ class _SchedulePageState extends State<SchedulePage> {
   }
 
   Future<void> _load() async {
-    final count = await StorageService.getDailyCount();
-    final days = await StorageService.getPlanDurationDays();
-    final startStr = await StorageService.getPlanStartDate();
+    final count = await StorageFacadeUseCase.getDailyCount();
+    final days = await StorageFacadeUseCase.getPlanDurationDays();
+    final startStr = await StorageFacadeUseCase.getPlanStartDate();
     final today = DateTime.now();
     final todayKey = _fmt(today);
-    final actual = await StorageService.getDayActual(todayKey);
-    final records = await StorageService.getSmokeRecordsForToday();
+    final actual = await StorageFacadeUseCase.getDayActual(todayKey);
+    final records = await StorageFacadeUseCase.getSmokeRecordsForToday();
 
     setState(() {
       _initialCount = count;

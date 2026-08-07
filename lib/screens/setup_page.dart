@@ -3,8 +3,8 @@ import '../l10n/app_localizations.dart';
 import '../screens/content_management_page.dart';
 import '../screens/schedule_page.dart';
 import '../screens/login_page.dart';
-import '../services/storage_service.dart';
-import '../services/user_service.dart';
+import '../usecases/storage/storage_facade_usecase.dart';
+import '../usecases/user/user_facade_usecase.dart';
 
 class SetupPage extends StatefulWidget {
   const SetupPage({super.key});
@@ -57,14 +57,14 @@ class _SetupPageState extends State<SetupPage> {
   }
 
   Future<void> _loadStoredSettings() async {
-    final name = await StorageService.getUserName();
-    final count = await StorageService.getDailyCount();
-    final price = await StorageService.getCigarettePrice();
-    final age = await StorageService.getUserAge();
-    final years = await StorageService.getUserYears();
-    final firstTimeStr = await StorageService.getFirstSmokeTime();
-    final lastTimeStr = await StorageService.getLastSmokeTime();
-    final durationDays = await StorageService.getPlanDurationDays();
+    final name = await StorageFacadeUseCase.getUserName();
+    final count = await StorageFacadeUseCase.getDailyCount();
+    final price = await StorageFacadeUseCase.getCigarettePrice();
+    final age = await StorageFacadeUseCase.getUserAge();
+    final years = await StorageFacadeUseCase.getUserYears();
+    final firstTimeStr = await StorageFacadeUseCase.getFirstSmokeTime();
+    final lastTimeStr = await StorageFacadeUseCase.getLastSmokeTime();
+    final durationDays = await StorageFacadeUseCase.getPlanDurationDays();
     final fParts = firstTimeStr.split(':');
     final lParts = lastTimeStr.split(':');
     setState(() {
@@ -205,7 +205,7 @@ class _SetupPageState extends State<SetupPage> {
                 ),
               );
               if (confirm == true) {
-                await UserService().signOut();
+                await UserFacadeUseCase().signOut();
 
                 // 必須在這裡加上檢查！如果等待結束後畫面已經不存在，就直接結束不執行導頁
                 if (!context.mounted) return;
@@ -359,7 +359,7 @@ class _SetupPageState extends State<SetupPage> {
               final price = int.tryParse(_priceCtrl.text) ?? 120;
               final age = int.tryParse(_ageCtrl.text) ?? 28;
               final years = int.tryParse(_yearsCtrl.text) ?? 8;
-              final fmtErr = UserService.validateNameFormat(name);
+              final fmtErr = UserFacadeUseCase.validateNameFormat(name);
               if (fmtErr != null) {
                 final l10n = AppLocalizations.of(ctx)!;
                 ScaffoldMessenger.of(ctx).showSnackBar(
@@ -373,19 +373,19 @@ class _SetupPageState extends State<SetupPage> {
                 );
                 return;
               }
-              final uid = UserService.currentUid;
+              final uid = UserFacadeUseCase.currentUid;
               if (uid != null) {
-                final service = UserService();
-                await StorageService.saveUserName(name);
-                await StorageService.saveDailyCount(count);
-                await StorageService.saveCigarettePrice(price);
-                await StorageService.saveUserAge(age);
-                await StorageService.saveUserYears(years);
-                await StorageService.savePlanDurationDays(_days.round());
-                await StorageService.savePlanStartDate(
+                final facade = UserFacadeUseCase();
+                await StorageFacadeUseCase.saveUserName(name);
+                await StorageFacadeUseCase.saveDailyCount(count);
+                await StorageFacadeUseCase.saveCigarettePrice(price);
+                await StorageFacadeUseCase.saveUserAge(age);
+                await StorageFacadeUseCase.saveUserYears(years);
+                await StorageFacadeUseCase.savePlanDurationDays(_days.round());
+                await StorageFacadeUseCase.savePlanStartDate(
                   DateTime.now().toIso8601String(),
                 );
-                await service.saveProfile(uid, {
+                await facade.saveProfile(uid, {
                   'name': name,
                   'daily_count': count,
                   'cigarette_price': price,

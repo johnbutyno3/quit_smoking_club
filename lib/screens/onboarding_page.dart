@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home_page.dart';
 import '../l10n/app_localizations.dart';
-import '../services/storage_service.dart';
+import '../usecases/storage/storage_facade_usecase.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -46,9 +46,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
     }
 
     // 將資料安全寫入 StorageService 磁碟快取，解鎖首次下載流程
-    await StorageService.saveUserName(name);
-    await StorageService.saveDailyCount(count);
-    await StorageService.savePremium(false); // 預設為一般會員
+    await StorageFacadeUseCase.saveUserName(name);
+    await StorageFacadeUseCase.saveDailyCount(count);
+    await StorageFacadeUseCase.savePremium(false); // 預設為一般會員
 
     if (mounted) {
       Navigator.pushReplacement(

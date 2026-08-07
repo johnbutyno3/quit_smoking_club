@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
-import '../services/storage_service.dart';
-import '../services/user_service.dart';
+import '../usecases/storage/storage_facade_usecase.dart';
+import '../usecases/user/user_facade_usecase.dart';
 import 'home_page.dart';
 import 'onboarding_setup_page.dart';
 
@@ -70,17 +70,17 @@ class _LoginPageState extends State<LoginPage>
     final name = _regNameCtrl.text.trim();
     final email = _regEmailCtrl.text.trim();
     final pass = _regPassCtrl.text;
-    final nameErr = UserService.validateNameFormat(name);
+    final nameErr = UserFacadeUseCase.validateNameFormat(name);
     if (nameErr != null) {
       setState(() => _error = _localizeNicknameError(nameErr, l10n));
       return;
     }
     if (email.isEmpty || !email.contains('@')) {
-      setState(() => _error = '請輸入正確的電子郵件');
+      setState(() => _error = l10n.enterValidEmail);
       return;
     }
     if (pass.length < 6) {
-      setState(() => _error = '密碼至少需要 6 個字元');
+      setState(() => _error = l10n.passwordMinLengthError);
       return;
     }
     setState(() {
@@ -88,25 +88,25 @@ class _LoginPageState extends State<LoginPage>
       _error = null;
     });
     try {
-      final service = UserService();
-      final available = await service.isNameAvailable(name);
+      final facade = UserFacadeUseCase();
+      final available = await facade.isNameAvailable(name);
       if (!available) {
         setState(() {
           _isLoading = false;
-          _error = '該名稱「$name」已被使用，請換一個暱稱';
+          _error = l10n.usernameAlreadyUsed(name);
         });
         return;
       }
-      final uid = await service.registerWithEmail(email, pass);
-      await service.reserveName(uid, name);
-      await StorageService.saveUserName(name);
+      final uid = await facade.registerWithEmail(email, pass);
+      await facade.reserveName(uid, name);
+      await StorageFacadeUseCase.saveUserName(name);
       if (mounted) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (_) => OnboardingSetupPage(
               uid: uid,
-              userService: service,
+              userFacade: facade,
               prefillName: name,
             ),
           ),
@@ -115,13 +115,13 @@ class _LoginPageState extends State<LoginPage>
     } on Exception catch (e) {
       String msg = e.toString();
       if (msg.contains('email-already-in-use')) {
-        msg = '此電子郵件已被註冊，請直接登入';
+        msg = l10n.emailAlreadyRegistered;
       } else if (msg.contains('weak-password')) {
-        msg = '密碼強度不足';
+        msg = l10n.weakPassword;
       } else if (msg.contains('invalid-email')) {
-        msg = '電子郵件格式不正確';
+        msg = l10n.invalidEmailFormat;
       } else {
-        msg = '註冊失敗，請稍後再試';
+        msg = l10n.registrationFailed;
       }
       setState(() => _error = msg);
     } finally {
@@ -132,10 +132,11 @@ class _LoginPageState extends State<LoginPage>
   }
 
   Future<void> _handleLogin() async {
+    final l10n = AppLocalizations.of(context)!;
     final email = _loginEmailCtrl.text.trim();
     final pass = _loginPassCtrl.text;
     if (email.isEmpty || pass.isEmpty) {
-      setState(() => _error = '請填寫電子郵件與密碼');
+      setState(() => _error = l10n.fillEmailAndPassword);
       return;
     }
     setState(() {
@@ -143,11 +144,11 @@ class _LoginPageState extends State<LoginPage>
       _error = null;
     });
     try {
-      final service = UserService();
-      final uid = await service.signInWithEmail(email, pass);
-      final profile = await service.loadProfile(uid);
+      final facade = UserFacadeUseCase();
+      final uid = await facade.signInWithEmail(email, pass);
+      final profile = await facade.loadProfile(uid);
       if (profile != null) {
-        await service.syncCloudToLocal(uid);
+        await facade.syncCloudToLocal(uid);
         _goHome();
       } else {
         if (mounted) {
@@ -156,7 +157,7 @@ class _LoginPageState extends State<LoginPage>
             MaterialPageRoute(
               builder: (_) => OnboardingSetupPage(
                 uid: uid,
-                userService: service,
+                userFacade: facade,
                 prefillName: '',
               ),
             ),
@@ -168,11 +169,11 @@ class _LoginPageState extends State<LoginPage>
       if (msg.contains('user-not-found') ||
           msg.contains('wrong-password') ||
           msg.contains('invalid-credential')) {
-        msg = '電子郵件或密碼不正確';
+        msg = l10n.invalidEmailOrPassword;
       } else if (msg.contains('too-many-requests')) {
-        msg = '嘗試次數過多，請稍後再試';
+        msg = l10n.tooManyAttempts;
       } else {
-        msg = '登入失敗，請稍後再試';
+        msg = l10n.loginFailed;
       }
       setState(() => _error = msg);
     } finally {
@@ -188,19 +189,25 @@ class _LoginPageState extends State<LoginPage>
       _error = null;
     });
     try {
-      final service = UserService();
-      final uid = await service.signInWithGoogle();
-      final profile = await service.loadProfile(uid);
+      final facade = UserFacadeUseCase();
+      final uid = await facade.signInWithGoogle();
+      final profile = await facade.loadProfile(uid);
       if (profile != null) {
-        await service.syncCloudToLocal(uid);
+        await facade.syncCloudToLocal(uid);
         _goHome();
       } else {
-        _goOnboarding(service, uid, prefill: service.googleDisplayName ?? '');
+        _goOnboarding(facade, uid, prefill: facade.googleDisplayName ?? '');
       }
     } catch (e) {
       debugPrint('[LoginPage] Google signIn error: $e');
+
+      if (!mounted) return;
+
+      final l10n = AppLocalizations.of(context)!;
       setState(() {
-        _error = e.toString().contains('取消') ? null : '登入失敗：$e';
+        _error = e.toString().contains('取消')
+            ? null
+            : l10n.loginFailedWithError(e.toString());
       });
     } finally {
       if (mounted) {
@@ -209,7 +216,11 @@ class _LoginPageState extends State<LoginPage>
     }
   }
 
-  void _goOnboarding(UserService service, String uid, {String prefill = ''}) {
+  void _goOnboarding(
+    UserFacadeUseCase service,
+    String uid, {
+    String prefill = '',
+  }) {
     if (!mounted) {
       return;
     }
@@ -219,7 +230,7 @@ class _LoginPageState extends State<LoginPage>
       MaterialPageRoute(
         builder: (_) => OnboardingSetupPage(
           uid: uid,
-          userService: service,
+          userFacade: service,
           prefillName: prefill,
         ),
       ),
