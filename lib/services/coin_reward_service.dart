@@ -1,23 +1,20 @@
 import '../config/coin_rules.dart';
-import 'coin_service.dart';
+import '../repositories/coin/coin_repository.dart';
 
 /// Handles reward-related COIN operations.
 /// Keeps reward rules away from general spending logic.
 class CoinRewardService {
-  CoinRewardService({CoinService? coinService})
-      : _coinService = coinService ?? CoinService();
+  CoinRewardService({CoinRepository? coinRepository})
+    : _coinRepository = coinRepository ?? CoinRepository();
 
-  final CoinService _coinService;
+  final CoinRepository _coinRepository;
 
   Future<void> rewardDailyLogin() async {
-    await _coinService.addCoin(
-      CoinRules.dailyLoginReward,
-      'daily_login',
-    );
+    await _coinRepository.addCoin(CoinRules.dailyLoginReward, 'daily_login');
   }
 
   Future<void> rewardDailyPlan() async {
-    await _coinService.addCoin(
+    await _coinRepository.addCoin(
       CoinRules.dailyPlanReward,
       'daily_plan_reward',
     );

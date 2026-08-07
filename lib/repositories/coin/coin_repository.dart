@@ -3,14 +3,18 @@ import '../../services/coin_service.dart';
 import '../../usecases/storage/storage_facade_usecase.dart';
 
 class CoinRepository {
-  final CoinService _coinService;
-
   CoinRepository({CoinService? coinService})
     : _coinService = coinService ?? CoinService();
+
+  final CoinService _coinService;
 
   Future<int> getBalance() async {
     await _coinService.loadBalance();
     return _coinService.balance;
+  }
+
+  Future<int> getCoins() async {
+    return getBalance();
   }
 
   Future<int> getTotalSpentCoins() async {
@@ -19,19 +23,15 @@ class CoinRepository {
   }
 
   Future<bool> claimDailyLogin() async {
-    return await _coinService.claimDailyLogin();
+    return _coinService.claimDailyLogin();
   }
 
   Future<bool> claimDailyPlanReward() async {
-    return await _coinService.claimDailyPlanReward();
-  }
-
-  Future<int> getCoins() async {
-    return await getBalance();
+    return _coinService.claimDailyPlanReward();
   }
 
   Future<bool> spendCoin(int amount, String reason) async {
-    return await _coinService.spendCoin(amount, reason);
+    return _coinService.spendCoin(amount, reason);
   }
 
   Future<void> addCoin(int amount, String reason) async {
@@ -39,6 +39,6 @@ class CoinRepository {
   }
 
   Future<List<CoinTransaction>> getHistory() async {
-    return await StorageFacadeUseCase.getCoinHistory();
+    return StorageFacadeUseCase.getCoinHistory();
   }
 }
