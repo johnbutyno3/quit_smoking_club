@@ -58,4 +58,10 @@ class ForumRepository {
       userId: resolvedUserId,
     );
   }
+
+  /// Gift persistence is intentionally unavailable until the forum_gifts
+  /// table is defined. Keep the repository API for existing UI compatibility.
+  Future<void> giftPost(String postId, {String? userId}) async {
+    return;
+  }
 }
