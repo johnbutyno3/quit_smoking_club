@@ -1,19 +1,9 @@
 import '../models/content/content_item.dart';
 import '../models/reading_book.dart';
+import '../models/reading_download_result.dart';
 import '../repositories/content/content_repository.dart';
 import '../repositories/coin/coin_repository.dart';
 import '../repositories/reading_cache_repository.dart';
-
-enum ReadingDownloadStatus { downloaded, alreadyCached, insufficientCoins }
-
-class ReadingDownloadResult {
-  const ReadingDownloadResult(this.status, {this.book});
-
-  final ReadingDownloadStatus status;
-  final ReadingBook? book;
-
-  bool get isAvailable => book != null;
-}
 
 class ReadingRepository {
   ReadingRepository({
@@ -75,7 +65,6 @@ class ReadingRepository {
         try {
           await _cache.saveBook(book);
         } catch (_) {
-          // A failed cache write must not leave the user charged for an unusable book.
           if (book.downloadCoinCost > 0) {
             await _coinRepository.addCoin(
               book.downloadCoinCost,
