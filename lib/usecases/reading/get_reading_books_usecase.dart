@@ -10,4 +10,8 @@ class GetReadingBooksUseCase {
   Future<List<ReadingBook>> execute({String? language}) {
     return _repository.listBooks(language: language);
   }
+
+  Future<ReadingBook?> loadCachedBook(String bookId) {
+    return _repository.loadCachedBook(bookId);
+  }
 }
