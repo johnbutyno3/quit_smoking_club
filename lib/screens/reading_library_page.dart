@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
 import '../models/reading_book.dart';
+import '../models/reading_download_result.dart';
 import '../usecases/reading/download_reading_book_usecase.dart';
 import '../usecases/reading/get_reading_books_usecase.dart';
 import 'reading_reader_page.dart';
