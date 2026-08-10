@@ -24,10 +24,8 @@ class ForumRepository {
     await SupabaseForumService.deletePost(postId);
   }
 
-  Future<List<Map<String, dynamic>>> fetchComments(String postId) async {
-    // SupabaseForumService currently does not implement comments API.
-    // Return empty list as a safe fallback to avoid analyze/runtime errors.
-    return <Map<String, dynamic>>[];
+  Future<List<Map<String, dynamic>>> fetchComments(String postId) {
+    return SupabaseForumService.getComments(postId);
   }
 
   Future<void> addComment({
@@ -35,24 +33,28 @@ class ForumRepository {
     required String userId,
     required String nickname,
     required String content,
-  }) async {
-    // Comments are not yet implemented in SupabaseForumService.
-    // Keep as no-op to preserve UI behavior and avoid throwing.
-    return;
+  }) {
+    return SupabaseForumService.createComment(
+      postId: postId,
+      userId: userId,
+      nickname: nickname,
+      content: content,
+    );
   }
 
-  Future<void> deleteComment(String commentId) async {
-    // Not implemented in SupabaseForumService yet.
-    return;
+  Future<void> deleteComment(String commentId) {
+    return SupabaseForumService.deleteComment(commentId);
   }
 
-  Future<void> likePost(String postId) async {
-    // Like action is not implemented in SupabaseForumService; no-op.
-    return;
-  }
+  Future<void> likePost(String postId, {String? userId}) {
+    final resolvedUserId = userId ?? SupabaseService.userId;
+    if (resolvedUserId == null || resolvedUserId.isEmpty) {
+      throw Exception('user_not_authenticated');
+    }
 
-  Future<void> giftPost(String postId) async {
-    // Gift action is not implemented in SupabaseForumService; no-op.
-    return;
+    return SupabaseForumService.likePost(
+      postId: postId,
+      userId: resolvedUserId,
+    );
   }
 }
