@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
-import '../repositories/forum_repository.dart';
+
 import '../l10n/app_localizations.dart';
 import '../models/forum_post.dart';
 import '../repositories/coin/coin_repository.dart';
+import '../repositories/forum_repository.dart';
+import '../usecases/coin/spend_coin_usecase.dart';
+import '../usecases/forum/create_forum_comment_usecase.dart';
+import '../usecases/forum/get_forum_comments_usecase.dart';
 
 class ForumDetailPage extends StatefulWidget {
   final ForumPost post;
@@ -23,18 +27,28 @@ class ForumDetailPage extends StatefulWidget {
 }
 
 class _ForumDetailPageState extends State<ForumDetailPage> {
-  final ForumRepository _forumRepository = ForumRepository();
+  late final GetForumCommentsUseCase _getForumCommentsUseCase;
+  late final CreateForumCommentUseCase _createForumCommentUseCase;
 
   final TextEditingController _commentController = TextEditingController();
-
-  final CoinRepository _coinRepository = CoinRepository();
   List<Map<String, dynamic>> _comments = [];
-
   bool _loading = true;
 
   @override
   void initState() {
     super.initState();
+
+    final forumRepository = ForumRepository();
+    final spendCoinUseCase = SpendCoinUseCase(CoinRepository());
+
+    _getForumCommentsUseCase = GetForumCommentsUseCase(
+      repository: forumRepository,
+    );
+    _createForumCommentUseCase = CreateForumCommentUseCase(
+      forumRepository: forumRepository,
+      spendCoinUseCase: spendCoinUseCase,
+    );
+
     _loadComments();
   }
 
@@ -46,7 +60,7 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
 
   Future<void> _loadComments() async {
     try {
-      final comments = await _forumRepository.fetchComments(widget.post.id);
+      final comments = await _getForumCommentsUseCase.execute(widget.post.id);
 
       if (!mounted) return;
 
@@ -55,7 +69,7 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
         _loading = false;
       });
     } catch (e) {
-      debugPrint('讀取留言失敗: $e');
+      debugPrint('Failed to load forum comments: $e');
 
       if (!mounted) return;
 
@@ -65,30 +79,17 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
     }
   }
 
-  Future<bool> _payComment() async {
-    return await _coinRepository.spendCoin(1, 'forum_comment');
-  }
-
   Future<void> _sendComment() async {
     final l10n = AppLocalizations.of(context)!;
     final text = _commentController.text.trim();
 
     if (text.isEmpty) return;
 
-    final success = await _payComment();
-
-    if (!mounted) return;
-
-    if (!success) {
-      _showCoinDialog(text);
-      return;
-    }
-
     try {
-      await _forumRepository.addComment(
+      await _createForumCommentUseCase.execute(
+        postId: widget.post.id,
         userId: widget.currentUid ?? '',
         nickname: widget.currentUserName,
-        postId: widget.post.id,
         content: text,
       );
 
@@ -105,8 +106,14 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
         ),
       );
     } catch (e) {
-      debugPrint('留言寫入失敗: $e');
+      if (!mounted) return;
 
+      if (e.toString().contains('insufficient_coin')) {
+        _showCoinDialog(text);
+        return;
+      }
+
+      debugPrint('Failed to create forum comment: $e');
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.forumCommentFailed)));
@@ -119,24 +126,20 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
       builder: (dialogContext) {
         return AlertDialog(
           title: Text(AppLocalizations.of(context)!.insufficientCoins),
-
-          content: Text(AppLocalizations.of(context)!.forumCommentNeedsOneCoin),
-
+          content: Text(
+            AppLocalizations.of(context)!.forumCommentNeedsOneCoin,
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
-
                 _watchAdComment(text);
               },
-
               child: Text(AppLocalizations.of(context)!.forumWatchAdComment),
             ),
-
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
-
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
@@ -145,15 +148,10 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                   ),
                 );
               },
-
               child: Text(AppLocalizations.of(context)!.forumBuyCoin),
             ),
-
             TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-              },
-
+              onPressed: () => Navigator.pop(dialogContext),
               child: Text(AppLocalizations.of(context)!.cancel),
             ),
           ],
@@ -164,6 +162,7 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
 
   Future<void> _watchAdComment(String text) async {
     if (!mounted) return;
+
     final l10n = AppLocalizations.of(context)!;
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -178,7 +177,8 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
     if (!mounted) return;
 
     try {
-      await _forumRepository.addComment(
+      final forumRepository = ForumRepository();
+      await forumRepository.addComment(
         userId: widget.currentUid ?? '',
         nickname: widget.currentUserName,
         postId: widget.post.id,
@@ -186,10 +186,9 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
       );
 
       await _loadComments();
-
       _commentController.clear();
     } catch (e) {
-      debugPrint('廣告留言失敗: $e');
+      debugPrint('Failed to create ad-sponsored forum comment: $e');
     }
   }
 
@@ -202,12 +201,11 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
       appBar: AppBar(
         title: Text(
           l10n.forumPostDetailTitle,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
       ),
-
       body: Column(
         children: [
           Expanded(
@@ -215,7 +213,6 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                 ? const Center(child: CircularProgressIndicator())
                 : ListView(
                     padding: const EdgeInsets.all(16),
-
                     children: [
                       Row(
                         children: [
@@ -224,9 +221,7 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                             size: 40,
                             color: Colors.grey,
                           ),
-
                           const SizedBox(width: 10),
-
                           Text(
                             post.name,
                             style: const TextStyle(
@@ -236,63 +231,47 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                           ),
                         ],
                       ),
-
                       const SizedBox(height: 20),
-
                       Text(
                         post.content,
-
                         style: const TextStyle(fontSize: 16, height: 1.5),
                       ),
-
                       const SizedBox(height: 25),
-
                       const Divider(),
-
                       Text(
                         l10n.forumComments,
-
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-
                       const SizedBox(height: 10),
-
                       if (_comments.isEmpty)
                         Center(
                           child: Padding(
                             padding: const EdgeInsets.all(20),
-
                             child: Text(
                               l10n.forumNoComments,
-                              style: TextStyle(color: Colors.grey),
+                              style: const TextStyle(color: Colors.grey),
                             ),
                           ),
                         )
                       else
                         ListView.builder(
                           shrinkWrap: true,
-
                           physics: const NeverScrollableScrollPhysics(),
-
                           itemCount: _comments.length,
-
                           itemBuilder: (context, index) {
                             final comment = _comments[index];
-
                             return Card(
                               child: ListTile(
                                 leading: const Icon(
                                   Icons.account_circle,
                                   color: Colors.grey,
                                 ),
-
                                 title: Text(
                                   comment['userName'] ?? l10n.anonymousUser,
                                 ),
-
                                 subtitle: Text(comment['content'] ?? ''),
                               ),
                             );
@@ -301,33 +280,25 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                     ],
                   ),
           ),
-
           Container(
             padding: const EdgeInsets.all(10),
-
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.white,
-
               boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
             ),
-
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _commentController,
-
                     decoration: InputDecoration(
                       hintText: l10n.forumCommentHint,
-
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                 ),
-
                 IconButton(
                   icon: const Icon(Icons.send, color: Colors.blue),
-
                   onPressed: _sendComment,
                 ),
               ],
