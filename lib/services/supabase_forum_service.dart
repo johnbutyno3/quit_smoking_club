@@ -36,4 +36,62 @@ class SupabaseForumService {
         .update({'is_deleted': true})
         .eq('id', postId);
   }
+
+  static Future<List<Map<String, dynamic>>> getComments(
+    String postId,
+  ) async {
+    final response = await SupabaseService.client
+        .from('forum_comments')
+        .select()
+        .eq('post_id', postId)
+        .order('created_at', ascending: true);
+
+    return List<Map<String, dynamic>>.from(response);
+  }
+
+  static Future<void> createComment({
+    required String postId,
+    required String userId,
+    required String nickname,
+    required String content,
+  }) async {
+    await SupabaseService.client.from('forum_comments').insert({
+      'post_id': postId,
+      'user_id': userId,
+      'nickname': nickname,
+      'content': content,
+    });
+  }
+
+  static Future<void> deleteComment(String commentId) async {
+    await SupabaseService.client
+        .from('forum_comments')
+        .delete()
+        .eq('id', commentId);
+  }
+
+  static Future<void> likePost({
+    required String postId,
+    required String userId,
+  }) async {
+    final existing = await SupabaseService.client
+        .from('forum_likes')
+        .select('id')
+        .eq('post_id', postId)
+        .eq('user_id', userId)
+        .maybeSingle();
+
+    if (existing != null) {
+      await SupabaseService.client
+          .from('forum_likes')
+          .delete()
+          .eq('id', existing['id']);
+      return;
+    }
+
+    await SupabaseService.client.from('forum_likes').insert({
+      'post_id': postId,
+      'user_id': userId,
+    });
+  }
 }
