@@ -1,4 +1,5 @@
 import '../../models/reading_book.dart';
+import '../../models/reading_download_result.dart';
 import '../../repositories/reading_repository.dart';
 
 class DownloadReadingBookUseCase {
