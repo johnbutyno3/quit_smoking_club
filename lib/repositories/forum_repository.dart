@@ -1,5 +1,6 @@
 import '../models/forum_post.dart';
 import '../services/supabase_forum_service.dart';
+import '../services/supabase_service.dart';
 
 class ForumRepository {
   Future<List<ForumPost>> fetchPosts() async {
