@@ -1,3 +1,5 @@
+import 'reading_book.dart';
+
 enum ReadingDownloadStatus { downloaded, alreadyCached, insufficientCoins }
 
 class ReadingDownloadResult {
