@@ -7,9 +7,9 @@ import '../l10n/app_localizations.dart';
 
 import '../models/content/content_category.dart';
 import '../models/content/content_item.dart';
-import '../repositories/content/content_repository.dart';
 
 import 'game_hub_page.dart';
+import '../usecases/content/get_content_list_usecase.dart';
 
 class MitigationPage extends StatefulWidget {
   final String title;
@@ -29,8 +29,7 @@ class _MitigateColors {
 
 class _MitigationPageState extends State<MitigationPage> {
   final List<ContentItem> _tips = [];
-  final ContentRepository _contentRepository = ContentRepository();
-
+  final GetContentListUseCase _getContentListUseCase = GetContentListUseCase();
   String? _selectedTitle;
   String? _selectedContent;
   String? _selectedLink;
@@ -55,7 +54,7 @@ class _MitigationPageState extends State<MitigationPage> {
           .toLowerCase()
           .replaceAll('_', '-');
       final category = ContentCategoryParser.fromValue(widget.title);
-      final items = await _contentRepository.getContents(
+      final items = await _getContentListUseCase.execute(
         language: localeString,
         category: category,
       );
