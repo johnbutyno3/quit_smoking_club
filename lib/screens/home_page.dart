@@ -1,5 +1,3 @@
-import '../engines/reward_engine.dart';
-import '../usecases/user/get_current_user_usecase.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -18,7 +16,6 @@ import '../engines/achievement_engine.dart';
 import '../widgets/achievement_card.dart';
 import 'quit_plan_page.dart';
 import 'coin_page.dart';
-import 'ranking_page.dart';
 import 'reading_library_page.dart';
 import 'medical_library_page.dart';
 import 'music_library_page.dart';
@@ -48,7 +45,6 @@ class _ThemeColors {
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   late final CoinFacadeUseCase _coinFacade;
   late SmokingEngine engine;
-  late RewardEngine rewardEngine;
   late AchievementEngine achievement;
   late RecoveryEngine recovery;
   late SmokingState state;
@@ -142,30 +138,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final firstMin = int.tryParse(fParts[1]) ?? 0;
     final lastHour = int.tryParse(lParts[0]) ?? 22;
     final lastMin = int.tryParse(lParts[1]) ?? 0;
-
-    final isPremium = await StorageFacadeUseCase.getPremium();
-    final lastDate = await StorageFacadeUseCase.getLastResetDate();
-    final todayStr = "${now.year}-${now.month}-${now.day}";
-    if (lastDate != todayStr) {
-      final reward = isPremium ? 100 : 20;
-      sCoins = await _coinFacade.getBalance();
-      await StorageFacadeUseCase.saveLastResetDate(todayStr);
-      final uid = GetCurrentUserUseCase().executeUid();
-
-      if (uid != null) {
-        try {
-          await _coinFacade.addCoin(reward, 'daily_login_reward');
-        } catch (_) {}
-      }
-
-      if (!mounted) return;
-      final l10n = AppLocalizations.of(context)!;
-      final rankStr = isPremium
-          ? l10n.homePremiumMember
-          : l10n.homeRegularMember;
-      _messages.add(l10n.dailySignInNotification(rankStr));
-      _messages.add(l10n.dailyRewardNotification(reward.toString()));
-    }
 
     if (mounted) {
       setState(() {
@@ -481,12 +453,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             context,
                             MaterialPageRoute(
                               builder: (_) => const ForumPage(),
-                            ),
-                          );
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const RankingPage(),
                             ),
                           );
                         },
