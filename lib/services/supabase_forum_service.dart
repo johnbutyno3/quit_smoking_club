@@ -70,7 +70,9 @@ class SupabaseForumService {
         .eq('id', commentId);
   }
 
-  static Future<void> likePost({
+  /// Toggles the current user's like and returns true when the post is liked
+  /// after the operation, or false when the like was removed.
+  static Future<bool> likePost({
     required String postId,
     required String userId,
   }) async {
@@ -86,12 +88,13 @@ class SupabaseForumService {
           .from('forum_likes')
           .delete()
           .eq('id', existing['id']);
-      return;
+      return false;
     }
 
     await SupabaseService.client.from('forum_likes').insert({
       'post_id': postId,
       'user_id': userId,
     });
+    return true;
   }
 }
