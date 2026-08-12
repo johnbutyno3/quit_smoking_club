@@ -5,16 +5,20 @@ import '../../services/supabase_content_service.dart';
 import '../../services/supabase_reading_service.dart';
 
 class ContentRepository {
-  ContentRepository({SupabaseReadingService? readingService})
-    : _readingService = readingService ?? SupabaseReadingService();
+  ContentRepository({
+    SupabaseContentService? contentService,
+    SupabaseReadingService? readingService,
+  }) : _contentService = contentService ?? SupabaseContentService(),
+       _readingService = readingService ?? SupabaseReadingService();
 
+  final SupabaseContentService _contentService;
   final SupabaseReadingService _readingService;
 
   Future<List<ContentItem>> getContents({
     String? language,
     ContentCategory? category,
   }) async {
-    final rows = await SupabaseContentService.getContents(
+    final rows = await _contentService.getContents(
       language: language,
       category: category?.name,
     );
@@ -23,7 +27,7 @@ class ContentRepository {
   }
 
   Future<ContentItem?> getContentById(String id) async {
-    final row = await SupabaseContentService.getContentById(id);
+    final row = await _contentService.getContentById(id);
     if (row == null) {
       return null;
     }
@@ -36,15 +40,15 @@ class ContentRepository {
     final payload = item.toMap();
 
     if (existing == null) {
-      await SupabaseContentService.createContent(payload);
+      await _contentService.createContent(payload);
       return;
     }
 
-    await SupabaseContentService.updateContent(item.uniqueId, payload);
+    await _contentService.updateContent(item.uniqueId, payload);
   }
 
   Future<void> deleteContent(String id) {
-    return SupabaseContentService.deleteContent(id);
+    return _contentService.deleteContent(id);
   }
 
   Future<List<ContentItem>> getReadingContents({String? language}) async {
