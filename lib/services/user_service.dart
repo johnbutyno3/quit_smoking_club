@@ -172,9 +172,6 @@ class UserService {
     if (data['daily_count'] != null) {
       await StorageService.saveDailyCount(data['daily_count'] as int);
     }
-    if (data['coins'] != null) {
-      await StorageService.saveCoins(data['coins'] as int);
-    }
     if (data['is_premium'] != null) {
       await StorageService.savePremium(data['is_premium'] as bool);
     }
