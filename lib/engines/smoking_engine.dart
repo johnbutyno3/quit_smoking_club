@@ -13,80 +13,74 @@ class SmokingEngine {
   /// 今日計畫可抽支數
   int get todayPlannedCount {
     final generator = PlanGenerator(plan);
-
     final todayPlan = generator.getTodayPlan(state.planStartDate);
 
-    return todayPlan?.plannedCount ?? plan.plannedCount;
+    return todayPlan?.plannedCount ?? 0;
   }
 
-  /// 目前時間已經開放的抽菸額度
+  /// 依「計畫時間」計算目前已開放的額度。
+  ///
+  /// 不使用 lastSmokeTime，避免把「原定解禁時間」
+  /// 與「實際抽菸時間」混成同一條時間軸。
   int get availableSlots {
     final now = DateTime.now();
-
-    int count = 0;
-
-    for (final time in schedule) {
-      if (now.isAfter(time) || now.isAtSameMomentAs(time)) {
-        count++;
-      }
-    }
-
-    return count;
+    return schedule.where((time) => !now.isBefore(time)).length;
   }
 
   int get remaining {
     final value = todayPlannedCount - totalSmoked;
-
     return value > 0 ? value : 0;
   }
 
   int get overCount {
     final value = totalSmoked - todayPlannedCount;
-
     return value > 0 ? value : 0;
   }
 
-  // 每支間隔時間
+  /// 每支之間的計畫間隔時間（分鐘）
   int get intervalMinutes {
     if (todayPlannedCount <= 1) return 0;
 
     final totalMinutes = state.endTime.difference(state.startTime).inMinutes;
-
     return totalMinutes ~/ (todayPlannedCount - 1);
   }
 
-  // 下一次解禁時間
+  /// 下一次實際解禁時間。
+  ///
+  /// 第一支以計畫開始時間為準；之後依最後一次實際抽菸時間重新計算。
   DateTime? get nextUnlockTime {
-    if (totalSmoked >= todayPlannedCount) {
+    if (todayPlannedCount <= 0 || totalSmoked >= todayPlannedCount) {
       return null;
     }
 
-    // 第一支
+    final now = DateTime.now();
+
     if (state.lastSmokeTime == null) {
-      return state.startTime;
+      return state.startTime.isAfter(now) ? state.startTime : now;
     }
 
-    // 後續從實際抽菸時間重新計算
+    final dynamicNext = state.lastSmokeTime!.add(
+      Duration(minutes: intervalMinutes),
+    );
 
-    return state.lastSmokeTime!.add(Duration(minutes: intervalMinutes));
+    return dynamicNext.isAfter(now) ? dynamicNext : now;
   }
 
-  // 動態排程
+  /// 原定計畫排程。
+  ///
+  /// 排程永遠從 startTime 開始，不因實際抽菸時間改變。
+  /// 實際抽菸造成的延後只由 nextUnlockTime 處理。
   List<DateTime> get schedule {
-    List<DateTime> result = [];
-
-    DateTime current;
-
-    if (state.lastSmokeTime == null) {
-      current = state.startTime;
-    } else {
-      current = state.lastSmokeTime!;
+    if (todayPlannedCount <= 0) {
+      return const <DateTime>[];
     }
 
-    for (int i = 0; i < todayPlannedCount; i++) {
-      result.add(current.add(Duration(minutes: intervalMinutes * i)));
-    }
-
-    return result;
+    return List<DateTime>.generate(
+      todayPlannedCount,
+      (index) => state.startTime.add(
+        Duration(minutes: intervalMinutes * index),
+      ),
+      growable: false,
+    );
   }
 }
