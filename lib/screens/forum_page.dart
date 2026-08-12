@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
 import '../models/forum_post.dart';
-import '../repositories/coin/coin_repository.dart';
 import '../repositories/forum_repository.dart';
 import '../usecases/coin/coin_facade_usecase.dart';
-import '../usecases/coin/spend_coin_usecase.dart';
 import '../usecases/forum/create_forum_post_usecase.dart';
 import '../usecases/forum/get_forum_posts_usecase.dart';
 import '../usecases/user/get_current_user_usecase.dart';
@@ -35,7 +33,7 @@ class _ForumPageState extends State<ForumPage> {
   late final CreateForumPostUseCase _createForumPostUseCase =
       CreateForumPostUseCase(
         forumRepository: _forumRepository,
-        spendCoinUseCase: SpendCoinUseCase(CoinRepository()),
+        coinFacadeUseCase: _coinFacadeUseCase,
       );
 
   bool _isLoading = true;
