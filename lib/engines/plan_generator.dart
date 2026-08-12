@@ -14,59 +14,52 @@ class PlanGenerator {
 
   const PlanGenerator(this.plan);
 
-  /// 產生整個戒菸計畫
+  /// 產生完整的每日戒菸計畫。
+  ///
+  /// 最後一天固定為 0，代表完成戒菸目標。
   List<DailyPlan> generateQuitPlan(int startCount, int days) {
+    if (days <= 0) {
+      return const <DailyPlan>[];
+    }
+
+    if (days == 1) {
+      return const [DailyPlan(day: 1, plannedCount: 0)];
+    }
+
+    final safeStartCount = startCount < 0 ? 0 : startCount;
     final result = <DailyPlan>[];
 
     for (int day = 1; day <= days; day++) {
       final progress = (day - 1) / (days - 1);
+      final count = (safeStartCount * (1 - progress)).round();
 
-      final count = (startCount * (1 - progress)).round();
-
-      result.add(DailyPlan(day: day, plannedCount: count));
+      result.add(
+        DailyPlan(
+          day: day,
+          plannedCount: day == days ? 0 : count,
+        ),
+      );
     }
 
     return result;
   }
 
+  /// 依目前 SmokingPlan 產生完整計畫。
   List<DailyPlan> generate() {
-    final List<DailyPlan> plans = [];
-
-    final int startCount = plan.plannedCount;
-    final int totalDays = plan.durationDays;
-
-    if (totalDays <= 0) {
-      return plans;
-    }
-
-    if (totalDays == 1) {
-      return const [DailyPlan(day: 1, plannedCount: 0)];
-    }
-
-    for (int day = 1; day <= totalDays; day++) {
-      final double progress = (day - 1) / (totalDays - 1);
-
-      int count = (startCount * (1 - progress)).round();
-
-      if (count < 0) {
-        count = 0;
-      }
-
-      plans.add(DailyPlan(day: day, plannedCount: count));
-    }
-
-    plans[plans.length - 1] = DailyPlan(day: totalDays, plannedCount: 0);
-
-    return plans;
+    return generateQuitPlan(plan.plannedCount, plan.durationDays);
   }
 
   /// 取得指定天數
   DailyPlan? getPlanOfDay(int day) {
+    if (day <= 0) {
+      return null;
+    }
+
     final plans = generate();
 
-    for (final plan in plans) {
-      if (plan.day == day) {
-        return plan;
+    for (final dailyPlan in plans) {
+      if (dailyPlan.day == day) {
+        return dailyPlan;
       }
     }
 
