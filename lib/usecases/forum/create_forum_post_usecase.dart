@@ -1,14 +1,14 @@
 import '../../models/forum_post.dart';
 import '../../repositories/forum_repository.dart';
-import '../coin/spend_coin_usecase.dart';
+import '../coin/coin_facade_usecase.dart';
 
 class CreateForumPostUseCase {
   final ForumRepository forumRepository;
-  final SpendCoinUseCase spendCoinUseCase;
+  final CoinFacadeUseCase coinFacadeUseCase;
 
   CreateForumPostUseCase({
     required this.forumRepository,
-    required this.spendCoinUseCase,
+    required this.coinFacadeUseCase,
   });
 
   Future<void> execute({required ForumPost post, int cost = 30}) async {
@@ -16,12 +16,24 @@ class CreateForumPostUseCase {
       throw Exception('post_content_empty');
     }
 
-    final spent = await spendCoinUseCase.execute(cost, 'forum_create_post');
+    final spent = await coinFacadeUseCase.spend(cost, 'forum_create_post');
 
     if (!spent) {
       throw Exception('insufficient_coin');
     }
 
-    await forumRepository.addPost(post);
+    try {
+      await forumRepository.addPost(post);
+    } catch (error) {
+      try {
+        await coinFacadeUseCase.addCoin(cost, 'forum_create_post_refund');
+      } catch (refundError) {
+        throw StateError(
+          'forum_post_failed_and_coin_refund_failed: '
+          '$error; refund=$refundError',
+        );
+      }
+      rethrow;
+    }
   }
 }
