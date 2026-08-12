@@ -71,11 +71,20 @@ class _ForumPageState extends State<ForumPage> {
   }
 
   Future<void> _handleLike(ForumPost post) async {
-    await _forumRepository.likePost(post.id);
-    if (!mounted) return;
-    final index = _posts.indexWhere((item) => item.id == post.id);
-    if (index == -1) return;
-    setState(() => _posts[index] = post.copyWith(likes: post.likes + 1));
+    try {
+      final isLiked = await _forumRepository.likePost(post.id);
+      if (!mounted) return;
+      final index = _posts.indexWhere((item) => item.id == post.id);
+      if (index == -1) return;
+      final delta = isLiked ? 1 : -1;
+      setState(() {
+        _posts[index] = post.copyWith(
+          likes: (post.likes + delta).clamp(0, 1 << 30),
+        );
+      });
+    } catch (error) {
+      if (mounted) _showSnack(error.toString());
+    }
   }
 
   Future<void> _handleSendGift(ForumPost post) async {
