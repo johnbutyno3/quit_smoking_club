@@ -47,7 +47,7 @@ class ForumRepository {
     return SupabaseForumService.deleteComment(commentId);
   }
 
-  Future<void> likePost(String postId, {String? userId}) {
+  Future<bool> likePost(String postId, {String? userId}) {
     final resolvedUserId = userId ?? SupabaseService.userId;
     if (resolvedUserId == null || resolvedUserId.isEmpty) {
       throw Exception('user_not_authenticated');
