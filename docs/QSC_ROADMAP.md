@@ -1,43 +1,38 @@
 # Quit Smoking Club
-# QSC Roadmap Document V1.0
+# QSC Roadmap Document V3.0
 
-最後更新：2026-07-30
+最後更新：2026-08-12
 
 ---
 
 # 1. Product Vision
 
-
 Quit Smoking Club 的目標：
 
-建立全球化戒菸社群平台。
+建立全球化、以健康生活為核心的戒菸社群平台。
 
+戒菸是入口，不是整個產品的全部。
 
 核心方向：
 
 - 科學化戒菸計畫
 - 漸進式降低抽菸量
-- 社群支持
+- 社群陪伴
+- 健康生活內容
 - 遊戲化獎勵
 - 長期戒菸維持
-
 
 ---
 
 # 2. Current Project Status
 
-
 目前版本：
 
-V2 Refactor
-
-
-目前技術：
+**V3-main**
 
 Framework:
 
 Flutter
-
 
 Platforms:
 
@@ -45,170 +40,123 @@ Platforms:
 - iOS
 - Web
 
-
 Backend:
 
-Firebase + Supabase Hybrid Architecture
-
-
----
-
-# 3. Completed Items
-
-
-## Project Foundation
-
-
-已完成：
-
-- Flutter 專案架構建立
-- Models / Services / Repositories / Engines 分層
-- Localization 架構建立
-- GitHub Repository 管理
-
+**Firebase + Supabase 分流架構**
 
 ---
 
-## Quit Smoking Core
+# 3. V3 Architecture Status
 
+## Firebase — Private / User-owned Data
 
-已完成：
+保留 Firebase 作為：
 
-- SmokingState
-- SmokingPlan
-- SmokingEngine
-- PlanGenerator
-- 抽菸紀錄流程
-- 戒菸計畫邏輯
+- Authentication
+- User Profile
+- 個人設定
+- 個人戒菸資料
+- 抽菸紀錄
+- 私人進度
+- COIN balance
+- VIP 狀態
 
+## Supabase — Public / Community / Content
 
----
+使用 Supabase 作為：
 
-## Reward System
-
-
-已完成：
-
-- CoinService 基礎架構
-- COIN 餘額管理
-- COIN 增加與消費流程
-- Reward Engine 初步設計
-
-
----
-
-## Documentation
-
-
-已完成：
-
-- QSC_PROJECT_RULES.md
-- QSC_ARCHITECTURE.md
-- QSC_DATABASE_SCHEMA.md
-
-
----
-
-# 4. Current Development Phase
-
-
-## Phase 1
-## Core Stability
-
-
-目標：
-
-完成穩定戒菸核心功能。
-
-
-工作：
-
-- 修正 Bug
-- 優化 Smoking Engine
-- 完善戒菸流程
-- 強化資料保存
-- 完成使用者狀態管理
-
-
----
-
-# 5. Phase 2
-# Coin Economy
-
-
-目標：
-
-建立完整虛擬經濟系統。
-
-
-功能：
-
-- Coin Transaction
-- 每日任務獎勵
-- 商店系統
-- 商品管理
-- COIN 消費紀錄
-
-
-需注意：
-
-避免：
-
-- COIN 無限產生
-- 經濟失衡
-- 破壞付費價值
-
-
----
-
-# 6. Phase 3
-# Community Platform
-
-
-目標：
-
-建立戒菸互助社群。
-
-
-功能：
-
+- Medical
+- Stories
+- Music
+- YouTube
+- Games content
+- Reading content
 - Forum
-- Post
-- Comment
-- 社群互動
-- COIN 社群經濟
+- 公開社群資料
 
+## Local Storage
 
-限制：
+用途：
 
-目前：
-
-- 文字內容
-- Emoji
-- Badge
-
-
-禁止：
-
-- 圖片上傳
-- 影片上傳
-
+- Reading cache
+- Offline fallback
+- 暫存資料
 
 ---
 
-# 7. Phase 4
-# Content Platform
+# 4. Completed V3 Work
 
+## Architecture
 
-目標：
+- [DONE] Models / Services / Repositories / Engines 分層
+- [DONE] UseCase layer 持續導入
+- [DONE] Firebase / Supabase data ownership 分流
+- [DONE] ContentRepository 統一公開內容入口
+- [DONE] 舊 `getMedicalContents()` / `getStoryContents()` / `getMusicContents()` / `getYouTubeContents()` 呼叫已清除
 
-建立戒菸內容生態。
+## Content
 
+- [DONE] Medical → ContentRepository → Supabase
+- [DONE] Stories → ContentRepository → Supabase
+- [DONE] Music → ContentRepository → Supabase
+- [DONE] YouTube → ContentRepository → Supabase
+- [DONE] Reading → SupabaseReadingService + ReadingRepository + Local Cache
 
-資料來源：
+## COIN
 
-Supabase
+- [DONE] CoinService Firebase balance source of truth
+- [DONE] CoinRepository
+- [DONE] SpendCoinUseCase
+- [DONE] CoinFacadeUseCase
+- [DONE] Supabase coin transaction logging
+- [DONE] Forum create-post flow 使用 UseCase 扣幣
 
+## Forum
+
+- [DONE] ForumRepository → SupabaseForumService
+- [DONE] Forum posts / comments / likes 使用 Supabase
+- [DONE] Like toggle 基礎 backend flow
+- [DONE] CreateForumPostUseCase
+- [DONE] CreateForumCommentUseCase
+
+## Quality
+
+- [DONE] Localization architecture
+- [DONE] Flutter analyze currently passes
+
+---
+
+# 5. Current Development Phase
+
+# Phase 3 — Community Platform Stabilization
+
+目前不是重新建立 Forum，而是**修正已存在流程的一致性與資料正確性**。
+
+Priority 0：
+
+1. Forum Like UI count 與 toggle 結果一致
+2. Forum Gift persistence
+3. Forum comment nickname 欄位一致
+4. currentUserName 使用真正登入者資料
+5. Forum category canonicalization
+6. 移除 category 對中文翻譯文字的依賴
+
+完成 P0 後：
+
+Priority 1：
+
+- ForumComment typed model
+- Forum pagination
+- Post / Comment delete policy 統一
+- COIN transaction reason canonicalization
+
+---
+
+# 6. Phase 4 — Content Platform
+
+主要來源：
+
+**Supabase**
 
 內容：
 
@@ -217,190 +165,104 @@ Supabase
 - Music
 - Games
 - YouTube References
-
+- Reading
 
 特色：
 
-支援：
-
 - 多語言
 - 全球內容
-- 離線快取
+- Local cache
+- Offline fallback
 
+此階段核心 Content Architecture 已完成，後續以內容品質與資料管理為主，不重新設計資料流。
 
 ---
 
-# 8. Phase 5
-# Monetization
+# 7. Phase 5 — Monetization
 
+VIP baseline：
 
-目標：
+**99 TWD / Month**
 
-建立可持續營運模式。
-
-
-收入來源：
-
-## VIP
-
-方案：
-
-99 TWD / Month
-
-
-功能：
+方向：
 
 - 移除廣告
 - 更多 COIN
-- 特殊優惠
+- COIN 購買優惠
+- 特殊功能優惠
 
+COIN：
 
----
-
-## Advertisement
-
-
-Free User：
-
-提供廣告收益。
-
-
-VIP：
-
-移除廣告。
-
+- App 內虛擬貨幣
+- 不可兌換現金
+- 由使用率與收益持續調整經濟平衡
 
 ---
 
-## In-App Purchase
+# 8. Phase 6 — Global Expansion
 
-
-可能包含：
-
-- COIN 購買
-- VIP 升級
-- 虛擬商品
-
-
----
-
-# 9. Phase 6
-# Global Expansion
-
-
-目標：
-
-全球市場發布。
-
-
-工作：
-
-- 多語言完善
+- 多語言
 - 國家化內容
 - 時區支援
 - 全球社群測試
 
+---
+
+# 9. Future Features
+
+- Achievement System
+- Ranking System
+- Enterprise Program
+- Notification System
+- 更多健康生活內容
 
 ---
 
-# 10. Future Features
+# 10. Development Priority Rules
 
+目前順序：
 
-可能新增：
+**Forum Core Stabilization**
 
+↓
 
-## Achievement System
+**Data Consistency / Transaction Safety**
 
-包含：
+↓
 
-- 戒菸里程碑
-- Badge
-- 成就收藏
+**Content Quality / Management**
 
+↓
+
+**Monetization**
+
+↓
+
+**Global Expansion**
+
+禁止因為文件或架構整理而反覆重做已完成項目。
 
 ---
 
-## Ranking System
+# 11. Roadmap Rules
 
-包含：
+所有新增功能必須符合：
 
-- 社群排行
-- 戒菸挑戰
-- 活躍排行
+- QSC Project Rules
+- QSC Architecture
+- QSC V3 TODO
 
+規則：
 
----
-
-## Enterprise Program
-
-
-可能方向：
-
-- 公司員工戒菸方案
-- 團體挑戰
-- 健康管理合作
-
-
----
-
-# 11. Development Priority Rules
-
-
-開發順序：
-
-
-穩定核心功能
-
-↓
-
-完善資料架構
-
-↓
-
-建立社群
-
-↓
-
-建立內容平台
-
-↓
-
-商業化
-
-↓
-
-全球化
-
-
----
-
-# 12. Roadmap Principles
-
-
-所有新增功能：
-
-必須符合：
-
-
-QSC Project Rules
-
-以及：
-
-QSC Architecture
-
-
-避免：
-
-- 為增加功能而增加功能
-- 過度複雜化
-- 影響核心戒菸體驗
-
+- DONE 項目不得反覆列為 TODO
+- 發現新問題才新增 TODO
+- 先修真正影響正確性的問題
+- 不為追求完美架構而重寫
+- Firebase / Supabase 分流不可再次倒退
 
 ---
 
 # END
 
-
 Quit Smoking Club
-
-QSC Roadmap Document V1.0
+QSC Roadmap Document V3.0
