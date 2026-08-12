@@ -15,7 +15,6 @@ class ContentManagementPage extends StatefulWidget {
 
 class _ContentManagementPageState extends State<ContentManagementPage> {
   late final ContentRepository _repository;
-
   late final GetContentListUseCase _getContentListUseCase;
 
   final List<ContentCategory> _categories = const [
@@ -27,7 +26,6 @@ class _ContentManagementPageState extends State<ContentManagementPage> {
   ];
 
   ContentCategory _selectedCategory = ContentCategory.medical;
-
   late Future<List<ContentItem>> _itemsFuture;
 
   @override
@@ -35,13 +33,11 @@ class _ContentManagementPageState extends State<ContentManagementPage> {
     super.initState();
 
     _repository = ContentRepository();
-
     _getContentListUseCase = GetContentListUseCase(repository: _repository);
-
     _itemsFuture = _getContentListUseCase.execute(category: _selectedCategory);
   }
 
-  Future<void> _refreshItems() async {
+  void _refreshItems() {
     setState(() {
       _itemsFuture = _getContentListUseCase.execute(
         category: _selectedCategory,
@@ -49,30 +45,25 @@ class _ContentManagementPageState extends State<ContentManagementPage> {
     });
   }
 
-  String _categoryLabel(ContentCategory category) {
+  String _categoryLabel(ContentCategory category, AppLocalizations l10n) {
     switch (category) {
       case ContentCategory.medical:
-        return 'Medical';
-
+        return l10n.healthKnowledge;
       case ContentCategory.stories:
-        return 'Stories';
-
+        return l10n.readingTitle;
       case ContentCategory.youtube:
-        return 'YouTube';
-
+        return l10n.youtubeVideoLabel;
       case ContentCategory.music:
-        return 'Music';
-
+        return l10n.relaxMusic;
       case ContentCategory.games:
-        return 'Games';
-
+        return l10n.gameHub;
       case ContentCategory.reading:
-        return 'Reading';
+        return l10n.readingTitle;
     }
   }
 
-  void _openEditor([ContentItem? item]) {
-    Navigator.push(
+  Future<void> _openEditor([ContentItem? item]) async {
+    await Navigator.push<void>(
       context,
       MaterialPageRoute(
         builder: (_) => ContentEditPage(
@@ -81,7 +72,11 @@ class _ContentManagementPageState extends State<ContentManagementPage> {
           repository: _repository,
         ),
       ),
-    ).then((_) => _refreshItems());
+    );
+
+    if (mounted) {
+      _refreshItems();
+    }
   }
 
   @override
@@ -90,25 +85,20 @@ class _ContentManagementPageState extends State<ContentManagementPage> {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.contentManagementTitle)),
-
       body: Padding(
         padding: const EdgeInsets.all(12),
-
         child: Column(
           children: [
             DropdownButton<ContentCategory>(
               value: _selectedCategory,
-
               items: _categories
                   .map(
                     (category) => DropdownMenuItem(
                       value: category,
-
-                      child: Text(_categoryLabel(category)),
+                      child: Text(_categoryLabel(category, l10n)),
                     ),
                   )
                   .toList(),
-
               onChanged: (value) {
                 if (value == null) {
                   return;
@@ -116,38 +106,31 @@ class _ContentManagementPageState extends State<ContentManagementPage> {
 
                 setState(() {
                   _selectedCategory = value;
-
                   _itemsFuture = _getContentListUseCase.execute(
                     category: value,
                   );
                 });
               },
             ),
-
             const SizedBox(height: 12),
-
             ElevatedButton(
-              onPressed: () => _openEditor(),
-
+              onPressed: _openEditor,
               child: Text(l10n.contentManagementAdd),
             ),
-
             const SizedBox(height: 12),
-
             Expanded(
               child: FutureBuilder<List<ContentItem>>(
                 future: _itemsFuture,
-
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  if (!snapshot.hasData) {
+                  if (snapshot.hasError) {
                     return Center(child: Text(l10n.contentManagementNoData));
                   }
 
-                  final items = snapshot.data!
+                  final items = (snapshot.data ?? [])
                       .where((e) => e.category == _selectedCategory)
                       .toList();
 
@@ -157,22 +140,19 @@ class _ContentManagementPageState extends State<ContentManagementPage> {
 
                   return ListView.builder(
                     itemCount: items.length,
-
                     itemBuilder: (context, index) {
                       final item = items[index];
 
                       return ListTile(
                         title: Text(item.title),
-
                         subtitle: Text(item.language),
-
                         trailing: IconButton(
                           icon: const Icon(Icons.delete),
-
                           onPressed: () async {
                             await _repository.deleteContent(item.uniqueId);
-
-                            _refreshItems();
+                            if (mounted) {
+                              _refreshItems();
+                            }
                           },
                         ),
                       );
@@ -190,18 +170,13 @@ class _ContentManagementPageState extends State<ContentManagementPage> {
 
 class ContentEditPage extends StatefulWidget {
   final ContentCategory category;
-
   final ContentItem? initialItem;
-
   final ContentRepository repository;
 
   const ContentEditPage({
     super.key,
-
     required this.category,
-
     required this.repository,
-
     this.initialItem,
   });
 
@@ -211,11 +186,8 @@ class ContentEditPage extends StatefulWidget {
 
 class _ContentEditPageState extends State<ContentEditPage> {
   final _titleCtrl = TextEditingController();
-
   final _contentCtrl = TextEditingController();
-
   final _languageCtrl = TextEditingController();
-
   final _linkCtrl = TextEditingController();
 
   @override
@@ -223,31 +195,35 @@ class _ContentEditPageState extends State<ContentEditPage> {
     super.initState();
 
     final item = widget.initialItem;
-
     if (item != null) {
       _titleCtrl.text = item.title;
-
       _contentCtrl.text = item.content;
-
       _languageCtrl.text = item.language;
-
       _linkCtrl.text = item.link;
+    } else {
+      _languageCtrl.text = 'all';
     }
+  }
+
+  @override
+  void dispose() {
+    _titleCtrl.dispose();
+    _contentCtrl.dispose();
+    _languageCtrl.dispose();
+    _linkCtrl.dispose();
+    super.dispose();
   }
 
   Future<void> _save() async {
     final item = ContentItem(
       id: widget.initialItem?.id ?? '',
-
       category: widget.category,
-
-      language: _languageCtrl.text,
-
-      title: _titleCtrl.text,
-
-      content: _contentCtrl.text,
-
-      link: _linkCtrl.text,
+      language: _languageCtrl.text.trim().toLowerCase().isEmpty
+          ? 'all'
+          : _languageCtrl.text.trim().toLowerCase(),
+      title: _titleCtrl.text.trim(),
+      content: _contentCtrl.text.trim(),
+      link: _linkCtrl.text.trim(),
     );
 
     await widget.repository.saveContent(item);
@@ -263,38 +239,35 @@ class _ContentEditPageState extends State<ContentEditPage> {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.contentManagementEditTitle)),
-
       body: Padding(
         padding: const EdgeInsets.all(16),
-
         child: Column(
           children: [
             TextField(
               controller: _titleCtrl,
-
               decoration: InputDecoration(
                 labelText: l10n.contentManagementTitleLabel,
               ),
             ),
-
+            TextField(
+              controller: _languageCtrl,
+              decoration: InputDecoration(
+                labelText: l10n.contentManagementLanguageCode,
+              ),
+            ),
             TextField(
               controller: _contentCtrl,
-
               maxLines: 5,
-
               decoration: InputDecoration(
                 labelText: l10n.contentManagementContentLabel,
               ),
             ),
-
             TextField(
               controller: _linkCtrl,
-
               decoration: InputDecoration(
                 labelText: l10n.contentManagementLinkLabel,
               ),
             ),
-
             ElevatedButton(onPressed: _save, child: Text(l10n.save)),
           ],
         ),
