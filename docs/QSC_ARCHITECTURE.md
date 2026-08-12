@@ -1,7 +1,7 @@
 # Quit Smoking Club
-# QSC Architecture Document V1.0
+# QSC Architecture Document V1.1
 
-最後更新：2026-07-30
+最後更新：2026-08-12
 
 ---
 
@@ -39,7 +39,6 @@ lib/
 
 lib/models/
 
-
 責任：
 
 負責資料結構。
@@ -50,20 +49,10 @@ lib/models/
 - Data Object
 - State Model
 
-
-例如：
-
-- SmokingState
-- SmokingPlan
-- UserProfile
-- CoinTransaction
-
-
 禁止：
 
-- 包含 UI 邏輯
-- 包含 API 呼叫
-
+- UI 邏輯
+- API / Database 呼叫
 
 ---
 
@@ -72,7 +61,6 @@ lib/models/
 位置：
 
 lib/engines/
-
 
 責任：
 
@@ -84,60 +72,13 @@ Engine 不負責：
 - Database
 - API
 
+主要 Engine：
 
-目前 Engine：
-
-
-## SmokingEngine
-
-負責：
-
-- 戒菸狀態計算
-- 今日抽菸額度
-- 剩餘次數
-- 時間控制
-
-
----
-
-## PlanGenerator
-
-負責：
-
-- 產生戒菸計畫
-- 每日目標安排
-- 時間排程
-
-
----
-
-## ScoreEngine
-
-負責：
-
-- 戒菸評分
-- 行為評估
-
-
----
-
-## RewardEngine
-
-負責：
-
-- 獎勵計算
-- COIN 發放規則
-
-
----
-
-## BehaviorEngine
-
-負責：
-
-- 行為分析
-- 使用者進度評估
-
+- SmokingEngine：戒菸狀態、額度、剩餘次數與時間控制
+- PlanGenerator：戒菸計畫、每日目標與時間排程
+- ScoreEngine：評分與行為評估
+- RewardEngine：獎勵計算與 COIN 發放規則
+- BehaviorEngine：行為分析與進度評估
 
 ---
 
@@ -147,53 +88,21 @@ Engine 不負責：
 
 lib/services/
 
-
 責任：
 
-提供系統服務。
+提供系統服務、外部 API、Storage 與資料存取實作。
 
+Service 不應被 UI 直接用來繞過 Repository 存取 Repository 所管理的資料。
 
-包含：
+主要 Service：
 
-- Storage
-- Authentication
-- Database Access
-- External Service
+- CoinService
+- StorageService
+- UserService
+- SupabaseContentService
+- SupabaseReadingService
 
-
-目前主要 Service：
-
-
-## CoinService
-
-負責：
-
-- COIN 餘額
-- 增加 COIN
-- 消費 COIN
-- 交易紀錄
-
-
----
-
-## StorageService
-
-負責：
-
-- Local Storage
-- Cache
-- 本機資料保存
-
-
----
-
-## UserService
-
-負責：
-
-- 使用者資料管理
-- 使用者狀態
-
+SupabaseContentService 負責 content_items 的資料存取；Repository 負責把資料來源轉換為 App domain model。
 
 ---
 
@@ -203,52 +112,47 @@ lib/services/
 
 lib/repositories/
 
-
 責任：
 
-管理資料來源。
+管理資料來源與 domain model 之間的邊界。
 
-
-Repository 負責決定：
-
-資料來源：
+Repository 可以決定資料來源：
 
 - Firebase
 - Supabase
 - Local Storage
 
+UI 不直接操作資料庫或 Supabase / Firebase client。
 
-UI 不直接操作資料庫。
+內容資料目前採用：
 
+UI
+↓
+UseCase
+↓
+ContentRepository
+↓
+SupabaseContentService
+↓
+Supabase
 
 ---
 
 # 6. Backend Architecture
 
-
 ## Firebase Flow
 
-用途：
-
-私人資料。
-
+用途：私人資料與會員身份。
 
 流程：
 
 User
-
 ↓
-
-Service
-
+Screen / UseCase
 ↓
-
-Repository
-
+Repository / Service
 ↓
-
 Firebase
-
 
 資料：
 
@@ -257,42 +161,41 @@ Firebase
 - Quit Records
 - Personal Settings
 
+Firebase 不作為公開內容平台的主要資料來源。
 
 ---
 
 ## Supabase Flow
 
-用途：
-
-公開內容。
-
+用途：公開內容與公開社群資料。
 
 流程：
 
 Content UI
-
 ↓
-
+UseCase
+↓
 Repository
-
 ↓
-
+Service
+↓
 Supabase
-
 
 資料：
 
 - Medical
 - Stories
 - Music
+- YouTube References
 - Games
 - Public Content
+- Public Community Data
 
+App 內建內容僅作為離線 / 備援來源，不取代 Supabase 的主要內容來源角色。
 
 ---
 
 # 7. UI Architecture
-
 
 ## Pages / Screens
 
@@ -301,21 +204,18 @@ Supabase
 lib/pages/
 lib/screens/
 
-
 責任：
-
-負責：
 
 - 畫面
 - 使用者互動
 - Navigation
-
+- 呼叫 UseCase / Repository 所提供的功能
 
 禁止：
 
-- 直接寫資料庫邏輯
+- 直接操作資料庫
+- 直接操作 Supabase / Firebase client
 - 大量商業計算
-
 
 ---
 
@@ -325,18 +225,9 @@ lib/screens/
 
 lib/widgets/
 
-
 責任：
 
 可重複 UI 元件。
-
-
-例如：
-
-- Card
-- Button
-- Progress Widget
-
 
 ---
 
@@ -346,113 +237,89 @@ lib/widgets/
 
 lib/l10n/
 
-
-用途：
-
-管理多語言。
-
-
-規則：
-
-所有 UI 文字：
+所有使用者可看到的文字必須使用 localization key。
 
 UI
-
 ↓
-
 Localization Key
-
 ↓
-
 Language File
 
-
-禁止：
-
-直接寫固定文字。
-
+禁止在 Dart UI 程式中加入固定的使用者文字。
 
 ---
 
 # 9. Data Flow Example
 
-
 ## Smoking Record Flow
 
 User Action
-
 ↓
-
 Screen
-
 ↓
-
-Smoking Engine
-
+Engine / UseCase
 ↓
-
 Smoking State Update
-
 ↓
-
 Repository
-
 ↓
-
 Storage / Firebase
 
+---
+
+## Content Flow
+
+User Action
+↓
+Screen
+↓
+UseCase
+↓
+ContentRepository
+↓
+SupabaseContentService
+↓
+Supabase
 
 ---
 
 ## Coin Spending Flow
 
 User Action
-
 ↓
-
 Feature Screen
-
 ↓
-
-Service
-
+UseCase / Service
 ↓
-
 CoinService
-
 ↓
-
-Storage
-
+Repository / Storage
 ↓
-
 Update UI
-
 
 ---
 
 # 10. Architecture Rules
 
+新增功能時確認：
 
-新增功能時：
-
-確認：
-
-1. 是否需要 Model？
-
-2. 是否需要 Engine？
-
-3. 是否需要 Service？
-
-4. 是否需要 Repository？
-
+1. 是否已有 Model？
+2. 是否已有 Engine？
+3. 是否已有 Service？
+4. 是否已有 Repository？
+5. 是否需要 UseCase？
+6. 是否符合 Firebase / Supabase 資料分界？
+7. 是否符合 Localization 規則？
 
 避免：
 
 - UI 包含商業邏輯
+- UI 直接存取資料庫
 - Service 過度肥大
+- Repository 直接承擔 UI 邏輯
 - 重複資料來源
-
+- 公開內容回流 Firebase
+- 為了架構漂亮而無必要新增 Layer 或搬移檔案
 
 ---
 
@@ -460,4 +327,4 @@ Update UI
 
 Quit Smoking Club
 
-QSC Architecture Document V1.0
+QSC Architecture Document V1.1
