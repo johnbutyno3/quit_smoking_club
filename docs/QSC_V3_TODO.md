@@ -14,7 +14,7 @@
 - [DONE] Reading 使用獨立 ReadingRepository + SupabaseReadingService + Local Cache
 - [DONE] COIN repository / use case / facade 分層
 - [DONE] Forum 發文流程已進入 CreateForumPostUseCase
-- [DONE] Forum Like 已進入 Supabase forum_likes toggle 流程
+- [DONE] Forum Like backend toggle + UI 增減同步
 - [DONE] ForumPost 已具備 userId / nickname / category / isSOS 等核心欄位
 - [DONE] Localization 架構持續使用，Flutter analyze 已通過
 
@@ -23,11 +23,9 @@
 ## P0 — 現在必須修
 
 ### 1. Forum Like UI 計數與 Supabase toggle 不一致
-- [TODO]
-- 檔案：`lib/screens/forum_page.dart`
-- 現況：Repository 已實作 like toggle，但 UI `_handleLike()` 目前固定 `likes + 1`。
-- 風險：取消讚時 UI 仍增加，數字會漂移。
-- 修正：Repository 回傳新增/取消狀態或最新 count，UI 依實際結果更新。
+- [DONE]
+- 檔案：`lib/services/supabase_forum_service.dart`, `lib/repositories/forum_repository.dart`, `lib/screens/forum_page.dart`
+- 修正：Supabase like toggle 回傳目前狀態，Repository 傳遞狀態，UI 依新增/取消結果增加或減少 likes，並將下限限制為 0。
 
 ### 2. Forum Gift 尚未真正持久化
 - [TODO]
@@ -117,4 +115,4 @@
 
 **V3-main → Forum Core Stabilization**
 
-先完成 P0 #1~#6，再進入 P1。
+P0 #1 已完成，下一個直接處理 P0 #2~#6。
