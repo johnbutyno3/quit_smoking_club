@@ -4,8 +4,8 @@ import '../l10n/app_localizations.dart';
 import '../repositories/coin/coin_repository.dart';
 import '../usecases/coin/add_coin_usecase.dart';
 import '../usecases/coin/get_coin_balance_usecase.dart';
-import '../usecases/coin/spend_coin_usecase.dart';
 import '../usecases/storage/storage_facade_usecase.dart';
+import 'forum_page.dart';
 
 class ShopPage extends StatefulWidget {
   const ShopPage({super.key});
@@ -26,7 +26,6 @@ class _ShopPageState extends State<ShopPage> {
   late final CoinRepository _coinRepository;
   late final GetCoinBalanceUseCase _getCoinBalanceUseCase;
   late final AddCoinUseCase _addCoinUseCase;
-  late final SpendCoinUseCase _spendCoinUseCase;
 
   int _myCoins = 0;
   bool _isPremiumUser = false;
@@ -37,7 +36,6 @@ class _ShopPageState extends State<ShopPage> {
     _coinRepository = CoinRepository();
     _getCoinBalanceUseCase = GetCoinBalanceUseCase(_coinRepository);
     _addCoinUseCase = AddCoinUseCase(repository: _coinRepository);
-    _spendCoinUseCase = SpendCoinUseCase(_coinRepository);
     _loadShopData();
   }
 
@@ -78,29 +76,16 @@ class _ShopPageState extends State<ShopPage> {
     _showMsg(AppLocalizations.of(context)!.premiumActivated);
   }
 
-  Future<void> _createForum() async {
-    final success = await _spendCoinUseCase.execute(30, 'forum_create_post');
-
-    if (!success) {
-      if (!mounted) return;
-      _showMsg(AppLocalizations.of(context)!.insufficientCoins);
-      return;
-    }
-
-    final latest = await _getCoinBalanceUseCase.execute();
-    if (!mounted) return;
-
-    setState(() {
-      _myCoins = latest;
-    });
-
-    _showMsg(AppLocalizations.of(context)!.postCreated);
+  Future<void> _openForumCreation() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ForumPage()),
+    );
+    if (mounted) _loadShopData();
   }
 
   void _showMsg(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -115,17 +100,11 @@ class _ShopPageState extends State<ShopPage> {
           Card(
             color: ShopColors.walletBackground,
             child: ListTile(
-              leading: const Icon(
-                Icons.account_balance_wallet,
-                color: ShopColors.primaryGold,
-              ),
+              leading: const Icon(Icons.account_balance_wallet, color: ShopColors.primaryGold),
               title: Text(t.myCoins),
               trailing: Text(
                 '$_myCoins 🪙',
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -136,17 +115,14 @@ class _ShopPageState extends State<ShopPage> {
           ),
           const SizedBox(height: 10),
           ElevatedButton(
-            onPressed: _createForum,
+            onPressed: _openForumCreation,
             child: Text(t.shopCreateForumPost),
           ),
           const SizedBox(height: 20),
           Card(
             color: Colors.black87,
             child: ListTile(
-              leading: const Icon(
-                Icons.workspace_premium,
-                color: ShopColors.vipGold,
-              ),
+              leading: const Icon(Icons.workspace_premium, color: ShopColors.vipGold),
               title: Text(
                 _isPremiumUser ? t.shopVipActive : t.shopPremium,
                 style: const TextStyle(color: Colors.white),
@@ -154,10 +130,7 @@ class _ShopPageState extends State<ShopPage> {
               trailing: _isPremiumUser
                   ? const Text(
                       '✓',
-                      style: TextStyle(
-                        color: ShopColors.vipGold,
-                        fontSize: 24,
-                      ),
+                      style: TextStyle(color: ShopColors.vipGold, fontSize: 24),
                     )
                   : ElevatedButton(
                       onPressed: _unlockPremium,
