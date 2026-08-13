@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/youtube/youtube_item.dart';
 
 class YouTubeDetailPage extends StatelessWidget {
@@ -7,8 +9,32 @@ class YouTubeDetailPage extends StatelessWidget {
 
   final YouTubeItem item;
 
+  Future<void> _openVideo(BuildContext context) async {
+    final link = item.videoUrl.trim();
+    if (link.isEmpty) return;
+    final url = link.contains('://') ? link : 'https://$link';
+    try {
+      final opened = await launchUrlString(
+        url,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!opened && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.externalLinkOpenFailed)),
+        );
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.externalLinkOpenFailed)),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(title: Text(item.title)),
       body: SafeArea(
@@ -37,16 +63,26 @@ class YouTubeDetailPage extends StatelessWidget {
               Text(
                 item.summary.isNotEmpty
                     ? item.summary
-                    : 'No summary available.',
+                    : l10n.medicalSummaryUnavailable,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const Divider(height: 28),
-              Text('Video link', style: Theme.of(context).textTheme.titleSmall),
+              Text(l10n.youtubeVideoLabel, style: Theme.of(context).textTheme.titleSmall),
               const SizedBox(height: 6),
               SelectableText(
                 item.videoUrl,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
+              const SizedBox(height: 16),
+              if (item.videoUrl.trim().isNotEmpty)
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () => _openVideo(context),
+                    icon: const Icon(Icons.play_arrow),
+                    label: Text(l10n.youtubeVideoLabel),
+                  ),
+                ),
             ],
           ),
         ),
