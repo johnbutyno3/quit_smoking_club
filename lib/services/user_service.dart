@@ -139,6 +139,25 @@ class UserService {
       ...data,
       'last_seen': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
+
+    // Some existing profile writers use the shorter first_smoke/last_smoke
+    // keys. Keep the local cache synchronized so HomePage, which reads the
+    // StorageService values, immediately sees the same times.
+    final firstSmoke = data['first_smoke'] ?? data['first_smoke_time'];
+    final lastSmoke = data['last_smoke'] ?? data['last_smoke_time'];
+    if (firstSmoke is String && firstSmoke.isNotEmpty) {
+      await StorageService.saveFirstSmokeTime(_normalizeTime(firstSmoke));
+    }
+    if (lastSmoke is String && lastSmoke.isNotEmpty) {
+      await StorageService.saveLastSmokeTime(_normalizeTime(lastSmoke));
+    }
+  }
+
+  String _normalizeTime(String value) {
+    final parts = value.split(':');
+    final hour = int.tryParse(parts.isNotEmpty ? parts[0] : '') ?? 0;
+    final minute = int.tryParse(parts.length > 1 ? parts[1] : '') ?? 0;
+    return '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
   }
 
   /// Uploads local profile data to cloud.
@@ -181,11 +200,14 @@ class UserService {
     if (data['user_years'] != null) {
       await StorageService.saveUserYears(data['user_years'] as int);
     }
-    if (data['first_smoke_time'] != null) {
-      await StorageService.saveFirstSmokeTime(data['first_smoke_time'] as String);
+
+    final firstTime = data['first_smoke_time'] ?? data['first_smoke'];
+    final lastTime = data['last_smoke_time'] ?? data['last_smoke'];
+    if (firstTime is String && firstTime.isNotEmpty) {
+      await StorageService.saveFirstSmokeTime(_normalizeTime(firstTime));
     }
-    if (data['last_smoke_time'] != null) {
-      await StorageService.saveLastSmokeTime(data['last_smoke_time'] as String);
+    if (lastTime is String && lastTime.isNotEmpty) {
+      await StorageService.saveLastSmokeTime(_normalizeTime(lastTime));
     }
 
     debugPrint('[UserService] Cloud to local sync completed: $uid');
