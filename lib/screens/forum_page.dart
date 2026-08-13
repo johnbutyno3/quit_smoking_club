@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
 import '../models/forum_post.dart';
@@ -65,7 +65,9 @@ class _ForumPageState extends State<ForumPage> {
     if (!mounted) return;
     setState(() {
       _myCoins = coins;
-      _posts..clear()..addAll(posts);
+      _posts
+        ..clear()
+        ..addAll(posts);
       _isLoading = false;
     });
   }
@@ -89,7 +91,7 @@ class _ForumPageState extends State<ForumPage> {
 
   Future<void> _handleSendGift(ForumPost post) async {
     final l10n = AppLocalizations.of(context)!;
-    final success = await _coinFacadeUseCase.spend(5, '論壇送禮');
+    final success = await _coinFacadeUseCase.spend(5, '隢??旨');
     if (!success) {
       if (mounted) _showSnack(l10n.forumInsufficientCoinsToGift);
       return;
@@ -124,10 +126,17 @@ class _ForumPageState extends State<ForumPage> {
                 decoration: InputDecoration(labelText: l10n.postName),
               ),
               const SizedBox(height: 12),
-              TextField(
-                controller: contentController,
-                maxLines: 4,
-                decoration: InputDecoration(labelText: l10n.postContent),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: contentController,
+                    maxLines: 4,
+                    decoration: InputDecoration(labelText: l10n.postContent),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text('50 COIN', style: TextStyle(fontSize: 12)),
+                ],
               ),
             ],
           ),
@@ -166,9 +175,9 @@ class _ForumPageState extends State<ForumPage> {
                   final message = error.toString().contains('insufficient_coin')
                       ? l10n.forumNeedCoinsToCreatePost
                       : error.toString();
-                  ScaffoldMessenger.of(dialogContext).showSnackBar(
-                    SnackBar(content: Text(message)),
-                  );
+                  ScaffoldMessenger.of(
+                    dialogContext,
+                  ).showSnackBar(SnackBar(content: Text(message)));
                 }
               },
               child: Text(l10n.publish),
@@ -198,12 +207,18 @@ class _ForumPageState extends State<ForumPage> {
   String _categoryLabel(int categoryId) {
     final l10n = AppLocalizations.of(context)!;
     switch (categoryId) {
-      case 0: return l10n.forumCategoryAll;
-      case 1: return l10n.forumCategoryCraving;
-      case 2: return l10n.forumCategoryStory;
-      case 3: return l10n.forumCategoryHealth;
-      case 4: return l10n.forumCategorySupport;
-      default: return l10n.forumCategoryAll;
+      case 0:
+        return l10n.forumCategoryAll;
+      case 1:
+        return l10n.forumCategoryCraving;
+      case 2:
+        return l10n.forumCategoryStory;
+      case 3:
+        return l10n.forumCategoryHealth;
+      case 4:
+        return l10n.forumCategorySupport;
+      default:
+        return l10n.forumCategoryAll;
     }
   }
 
@@ -230,7 +245,10 @@ class _ForumPageState extends State<ForumPage> {
     return Scaffold(
       backgroundColor: _ForumColors.bg,
       appBar: AppBar(
-        title: Text(l10n.forum, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          l10n.forum,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
@@ -255,9 +273,14 @@ class _ForumPageState extends State<ForumPage> {
                   onTap: () => setState(() => _selectedCategory = category),
                   child: Container(
                     margin: const EdgeInsets.only(right: 8, bottom: 4),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                      color: selected ? const Color(0xFF1B5E20) : Colors.grey.shade100,
+                      color: selected
+                          ? const Color(0xFF1B5E20)
+                          : Colors.grey.shade100,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -265,7 +288,9 @@ class _ForumPageState extends State<ForumPage> {
                       style: TextStyle(
                         color: selected ? Colors.white : Colors.grey,
                         fontSize: 12,
-                        fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: selected
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                       ),
                     ),
                   ),
@@ -289,8 +314,21 @@ class _ForumPageState extends State<ForumPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(l10n.myCoins, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                  Text('$_myCoins 💎', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.blue)),
+                  Text(
+                    l10n.myCoins,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                  Text(
+                    '$_myCoins ??',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -305,7 +343,10 @@ class _ForumPageState extends State<ForumPage> {
                       children: [
                         Text(l10n.emptyForum),
                         const SizedBox(height: 12),
-                        ElevatedButton(onPressed: _showCreatePostDialog, child: Text(l10n.createPost)),
+                        ElevatedButton(
+                          onPressed: _showCreatePostDialog,
+                          child: Text(l10n.createPost),
+                        ),
                       ],
                     ),
                   )
@@ -320,12 +361,16 @@ class _ForumPageState extends State<ForumPage> {
                         child: Card(
                           color: _ForumColors.cardBg,
                           elevation: post.isSOS ? 4 : 2,
-                          shadowColor: post.isSOS ? Colors.redAccent.withAlpha(51) : Colors.black12,
+                          shadowColor: post.isSOS
+                              ? Colors.redAccent.withAlpha(51)
+                              : Colors.black12,
                           margin: const EdgeInsets.only(bottom: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                             side: BorderSide(
-                              color: post.isSOS ? Colors.redAccent.withAlpha(77) : Colors.grey.shade100,
+                              color: post.isSOS
+                                  ? Colors.redAccent.withAlpha(77)
+                                  : Colors.grey.shade100,
                               width: post.isSOS ? 1.5 : 1,
                             ),
                           ),
@@ -336,46 +381,113 @@ class _ForumPageState extends State<ForumPage> {
                               children: [
                                 Row(
                                   children: [
-                                    Icon(Icons.account_circle, size: 36, color: post.isSOS ? Colors.redAccent : Colors.grey.shade400),
+                                    Icon(
+                                      Icons.account_circle,
+                                      size: 36,
+                                      color: post.isSOS
+                                          ? Colors.redAccent
+                                          : Colors.grey.shade400,
+                                    ),
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          Text(post.name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: post.isSOS ? Colors.redAccent : Colors.black87)),
-                                          Text(_getRelativeTime(post.createdAt), style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                                          Text(
+                                            post.name,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 13,
+                                              color: post.isSOS
+                                                  ? Colors.redAccent
+                                                  : Colors.black87,
+                                            ),
+                                          ),
+                                          Text(
+                                            _getRelativeTime(post.createdAt),
+                                            style: const TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 11,
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
                                     if (post.isSOS)
                                       Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                        decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(8)),
-                                        child: Text('🚨 ${l10n.sosPost}', style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 11)),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.shade50,
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '? ${l10n.sosPost}',
+                                          style: const TextStyle(
+                                            color: Colors.red,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 11,
+                                          ),
+                                        ),
                                       ),
                                   ],
                                 ),
                                 const SizedBox(height: 12),
                                 Text(
                                   post.content,
-                                  style: TextStyle(fontSize: 13, height: 1.4, color: Colors.grey.shade800, fontWeight: post.isSOS ? FontWeight.w500 : FontWeight.normal),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    height: 1.4,
+                                    color: Colors.grey.shade800,
+                                    fontWeight: post.isSOS
+                                        ? FontWeight.w500
+                                        : FontWeight.normal,
+                                  ),
                                 ),
                                 const SizedBox(height: 14),
                                 const Divider(height: 1),
                                 const SizedBox(height: 8),
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
                                   children: [
                                     TextButton.icon(
-                                      style: TextButton.styleFrom(foregroundColor: _ForumColors.heart),
-                                      icon: const Icon(Icons.favorite_border, size: 18),
-                                      label: Text('${post.likes} ${l10n.like}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: _ForumColors.heart,
+                                      ),
+                                      icon: const Icon(
+                                        Icons.favorite_border,
+                                        size: 18,
+                                      ),
+                                      label: Text(
+                                        '${post.likes} ${l10n.like}',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                       onPressed: () => _handleLike(post),
                                     ),
                                     TextButton.icon(
-                                      style: TextButton.styleFrom(foregroundColor: _ForumColors.gift),
-                                      icon: const Icon(Icons.card_giftcard, size: 18),
-                                      label: Text('${post.gifts} ${l10n.gift}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: _ForumColors.gift,
+                                      ),
+                                      icon: const Icon(
+                                        Icons.card_giftcard,
+                                        size: 18,
+                                      ),
+                                      label: Text(
+                                        '${post.gifts} ${l10n.gift}',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                       onPressed: () => _handleSendGift(post),
                                     ),
                                   ],

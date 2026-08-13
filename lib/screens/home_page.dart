@@ -14,7 +14,6 @@ import '../models/smoking_plan.dart';
 import '../engines/recovery_engine.dart';
 import '../engines/achievement_engine.dart';
 import '../widgets/achievement_card.dart';
-import 'quit_plan_page.dart';
 import 'coin_page.dart';
 import 'reading_library_page.dart';
 import 'medical_library_page.dart';
@@ -63,7 +62,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     l10n.motivationalQuote5,
   ];
 
-  // 💡 3.2.1 全螢幕劇烈震動與推播提醒狀態
+  // ? 3.2.1 ?刻撟??????冽?????
   bool _isVibrating = false;
   String? _activeNotification;
   bool _hasTriggeredUnlockNotify = false;
@@ -98,7 +97,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     achievement = AchievementEngine(
       smoking: engine,
       recovery: recovery,
-    ); // 計時器每秒自動檢查是否該彈出提醒通知
+    ); // 閮??冽?蝘?炎?交?西府敶???
     _refreshAchievementProgressContext();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted || !_isLoaded) return;
@@ -195,7 +194,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
   }
 
-  // 💡 3.2.1 按下或時間到連動全螢幕高頻劇烈震動
+  // ? 3.2.1 ?????????刻撟??餃?????
   void _triggerVibration() {
     setState(() => _isVibrating = true);
     Future.delayed(const Duration(milliseconds: 300), () {
@@ -203,7 +202,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
   }
 
-  // 💡 3.2.1 橫向滑入自訂頂部推播彈窗
+  // ? 3.2.1 璈怠?皛?芾???冽敶?
   void _showTopBanner(String msg) {
     _triggerVibration();
     setState(() => _activeNotification = msg);
@@ -212,7 +211,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
   }
 
-  // 💡 自動偵測時間到：秒數一歸零全自動觸發通知
+  // ? ?芸??菜葫???堆?蝘銝甇賊?刻?孛?潮
   void _checkCountdownUnlock() {
     final unlockTime = engine.nextUnlockTime;
     if (unlockTime == null) return;
@@ -302,7 +301,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ),
                 width: double.infinity,
                 child: Text(
-                  "「$randomQuote」",
+                  randomQuote,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 13,
@@ -369,66 +368,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       "GameHub",
                     ),
 
-                    // ===== 在這裡貼戒菸計畫 =====
-                    Card(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                    // ===== ?券ㄐ鞎潭??貉???=====
 
-                      child: ListTile(
-                        dense: true,
-
-                        leading: const Icon(
-                          Icons.event_note,
-                          color: Colors.green,
-                        ),
-
-                        title: Text(
-                          "6. ${l10n.quitPlan}",
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-
-                        trailing: const Icon(Icons.arrow_forward_ios, size: 12),
-
-                        onTap: () async {
-                          Navigator.pop(context);
-
-                          final newPlan = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const QuitPlanPage(),
-                            ),
-                          );
-
-                          if (newPlan != null && newPlan is SmokingPlan) {
-                            final newState = SmokingState(
-                              planStartDate: DateTime.now(),
-                              startTime: newPlan.startTime,
-                              endTime: newPlan.endTime,
-                              plannedCount: newPlan.plannedCount,
-                            );
-
-                            setState(() {
-                              engine = SmokingEngine(newState, newPlan);
-
-                              recovery = RecoveryEngine(newState);
-
-                              achievement = AchievementEngine(
-                                smoking: engine,
-                                recovery: recovery,
-                              );
-                            });
-                            _refreshAchievementProgressContext();
-                          }
-                        },
-                      ),
-                    ),
-
-                    // ===== 原本論壇 Card 從這裡開始 =====
+                    // ===== ?隢? Card 敺ㄐ?? =====
                     Card(
                       elevation: 0,
                       shape: RoundedRectangleBorder(
@@ -582,7 +524,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    // 💡 3.2.1 網頁全螢幕高頻震動特效外殼
+    // ? 3.2.1 蝬脤??刻撟??駁????畾?
     return AnimatedPadding(
       duration: const Duration(milliseconds: 50),
       padding: EdgeInsets.only(
@@ -611,7 +553,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 padding: const EdgeInsets.only(right: 8),
                 child: Center(
                   child: Text(
-                    '🪙 $_myCoins',
+                    '?? $_myCoins',
                     style: const TextStyle(
                       color: _ThemeColors.primary,
                       fontWeight: FontWeight.bold,
@@ -644,7 +586,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               ),
             ],
           ),
-          // 💡 3.2.1 堆疊最上層：預留自訂頂部推播彈窗空間
+          // ? 3.2.1 ???銝惜嚗??閮??冽?剖?蝒征??
           body: Stack(
             children: [
               ListView(
@@ -680,7 +622,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
                     remaining: engine.todayPlannedCount - engine.totalSmoked,
                   ),
-                  // 下面接原本其他卡片
+                  // 銝?亙??砍隞??
                   Card(
                     color: Colors.white.withAlpha(230),
                     elevation: 4,
@@ -718,7 +660,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           ),
                         ),
                         trailing: Text(
-                          "$_myCoins 💎",
+                          "$_myCoins ??",
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -836,7 +778,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           ),
                           icon: const Icon(Icons.gpp_bad),
                           label: Text(
-                            '🚨 ${l10n.sos}',
+                            '? ${l10n.sos}',
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
@@ -867,8 +809,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           ),
                           label: Text(
                             canSmoke
-                                ? '🟢 ${l10n.recordSmoking}'
-                                : '🔒 ${l10n.notUnlocked}',
+                                ? '? ${l10n.recordSmoking}'
+                                : '?? ${l10n.notUnlocked}',
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
@@ -931,7 +873,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  // 遊戲大廳獨立按鈕
+                  // ?憭批輒?函???
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -944,7 +886,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      icon: const Text('🎮', style: TextStyle(fontSize: 16)),
+                      icon: const Text('?', style: TextStyle(fontSize: 16)),
                       label: Text(l10n.gameHub),
                       onPressed: () => Navigator.push(
                         context,
@@ -1082,7 +1024,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ],
               ),
 
-              // 💡 3.2.1 頂部橫向自訂推播彈窗組件
+              // ? 3.2.1 ?璈怠??芾??冽敶?蝯辣
               if (_activeNotification != null)
                 Positioned(
                   top: 12,
@@ -1189,7 +1131,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
             ElevatedButton(
               onPressed: () {
-                // 之後導向戒菸計畫頁
+                // 銋?撠??閮??
               },
               child: Text(l10n.startPlan),
             ),

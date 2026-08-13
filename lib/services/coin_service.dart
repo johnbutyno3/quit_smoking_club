@@ -36,7 +36,7 @@ class CoinService {
   int get totalSpentCoins {
     return _history
         .where((item) => item.amount < 0)
-        .fold(0, (sum, item) => sum + item.amount.abs());
+        .fold(0, (total, item) => total + item.amount.abs());
   }
 
   DocumentReference<Map<String, dynamic>> _userDocument(String uid) {

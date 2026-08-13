@@ -1,11 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
 import '../repositories/coin/coin_repository.dart';
 import '../usecases/coin/add_coin_usecase.dart';
 import '../usecases/coin/get_coin_balance_usecase.dart';
 import '../usecases/storage/storage_facade_usecase.dart';
-import 'forum_page.dart';
 
 class ShopPage extends StatefulWidget {
   const ShopPage({super.key});
@@ -76,16 +75,10 @@ class _ShopPageState extends State<ShopPage> {
     _showMsg(AppLocalizations.of(context)!.premiumActivated);
   }
 
-  Future<void> _openForumCreation() async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const ForumPage()),
-    );
-    if (mounted) _loadShopData();
-  }
-
   void _showMsg(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -100,11 +93,17 @@ class _ShopPageState extends State<ShopPage> {
           Card(
             color: ShopColors.walletBackground,
             child: ListTile(
-              leading: const Icon(Icons.account_balance_wallet, color: ShopColors.primaryGold),
+              leading: const Icon(
+                Icons.account_balance_wallet,
+                color: ShopColors.primaryGold,
+              ),
               title: Text(t.myCoins),
               trailing: Text(
-                '$_myCoins 🪙',
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                '$_myCoins COIN',
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -113,16 +112,14 @@ class _ShopPageState extends State<ShopPage> {
             onPressed: () => buyCoins(10),
             child: Text(t.shopBuyCoins(10)),
           ),
-          const SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: _openForumCreation,
-            child: Text(t.shopCreateForumPost),
-          ),
           const SizedBox(height: 20),
           Card(
             color: Colors.black87,
             child: ListTile(
-              leading: const Icon(Icons.workspace_premium, color: ShopColors.vipGold),
+              leading: const Icon(
+                Icons.workspace_premium,
+                color: ShopColors.vipGold,
+              ),
               title: Text(
                 _isPremiumUser ? t.shopVipActive : t.shopPremium,
                 style: const TextStyle(color: Colors.white),
@@ -130,7 +127,10 @@ class _ShopPageState extends State<ShopPage> {
               trailing: _isPremiumUser
                   ? const Text(
                       '✓',
-                      style: TextStyle(color: ShopColors.vipGold, fontSize: 24),
+                      style: TextStyle(
+                        color: ShopColors.vipGold,
+                        fontSize: 24,
+                      ),
                     )
                   : ElevatedButton(
                       onPressed: _unlockPremium,

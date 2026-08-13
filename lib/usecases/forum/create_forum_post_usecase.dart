@@ -14,7 +14,7 @@ class CreateForumPostUseCase {
     CoinRepository? coinRepository,
   }) : coinRepository = coinRepository ?? CoinRepository();
 
-  Future<void> execute({required ForumPost post, int cost = 30}) async {
+  Future<void> execute({required ForumPost post, int cost = 50}) async {
     if (post.content.trim().isEmpty) {
       throw Exception('post_content_empty');
     }
