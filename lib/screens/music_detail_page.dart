@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../l10n/app_localizations.dart';
 import '../models/music/music_item.dart';
@@ -7,6 +8,29 @@ class MusicDetailPage extends StatelessWidget {
   const MusicDetailPage({super.key, required this.item});
 
   final MusicItem item;
+
+  Future<void> _openMusic(BuildContext context) async {
+    final link = item.link.trim();
+    if (link.isEmpty) return;
+    final url = link.contains('://') ? link : 'https://$link';
+    try {
+      final opened = await launchUrlString(
+        url,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!opened && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.externalLinkOpenFailed)),
+        );
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.externalLinkOpenFailed)),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +71,15 @@ class MusicDetailPage extends StatelessWidget {
                 SelectableText(
                   item.link,
                   style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () => _openMusic(context),
+                    icon: const Icon(Icons.play_arrow),
+                    label: Text(l10n.musicLinkLabel),
+                  ),
                 ),
               ],
             ],
