@@ -10,8 +10,8 @@ import 'reading_library_page.dart';
 import 'youtube_library_page.dart';
 
 /// V3 application shell.
-/// Home is the landing page; the six destinations below are secondary
-/// product areas and remain persistent throughout the session.
+/// Home is the landing page. The bottom bar contains exactly the six
+/// secondary destinations requested by the product design.
 class MainNavigationPage extends StatefulWidget {
   const MainNavigationPage({super.key});
 
@@ -20,14 +20,13 @@ class MainNavigationPage extends StatefulWidget {
 }
 
 class _MainNavigationPageState extends State<MainNavigationPage> {
-  int _index = 0;
+  int _index = -1;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     final pages = <Widget>[
-      const HomePage(),
       MitigationPage(title: l10n.cravingReliefChamberTitle),
       const ForumPage(),
       const ReadingLibraryPage(),
@@ -37,7 +36,6 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     ];
 
     final labels = <String>[
-      l10n.appTitle,
       'SOS',
       l10n.forum,
       l10n.readingArticleOfflineLabel,
@@ -47,7 +45,6 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     ];
 
     final icons = <IconData>[
-      Icons.home_outlined,
       Icons.sos,
       Icons.forum_outlined,
       Icons.article_outlined,
@@ -56,17 +53,63 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       Icons.calendar_today_outlined,
     ];
 
+    final body = _index < 0
+        ? const HomePage()
+        : pages[_index];
+
     return Scaffold(
-      body: IndexedStack(index: _index, children: pages),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
-        onDestinationSelected: (value) => setState(() => _index = value),
-        destinations: List.generate(
-          labels.length,
-          (index) => NavigationDestination(
-            icon: Icon(icons[index]),
-            selectedIcon: Icon(icons[index]),
-            label: labels[index],
+      body: body,
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            border: Border(
+              top: BorderSide(
+                color: Theme.of(context).dividerColor.withValues(alpha: 0.25),
+              ),
+            ),
+          ),
+          child: Row(
+            children: List.generate(labels.length, (index) {
+              final selected = _index == index;
+              return Expanded(
+                child: InkWell(
+                  onTap: () => setState(() => _index = index),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          icons[index],
+                          size: 22,
+                          color: selected
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          labels[index],
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight:
+                                selected ? FontWeight.w700 : FontWeight.w400,
+                            color: selected
+                                ? Theme.of(context).colorScheme.primary
+                                : Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }),
           ),
         ),
       ),
