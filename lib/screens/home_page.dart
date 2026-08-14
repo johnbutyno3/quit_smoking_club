@@ -405,7 +405,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             Container(
               width: 48,
               height: 48,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: _ThemeColors.bgTop,
                 shape: BoxShape.circle,
               ),
@@ -579,56 +579,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildBottomAction(IconData icon, String label, VoidCallback onTap) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: 23, color: _ThemeColors.primary),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNav() {
-    final l10n = AppLocalizations.of(context)!;
-    return Container(
-      margin: const EdgeInsets.fromLTRB(10, 4, 10, 10),
-      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 7),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 12, offset: Offset(0, 3)),
-        ],
-      ),
-      child: Row(
-        children: [
-          _buildBottomAction(Icons.sos, l10n.sos, _showSOS),
-          _buildBottomAction(Icons.forum_outlined, l10n.forum, () => _open(context, const ForumPage())),
-          _buildBottomAction(Icons.menu_book_outlined, l10n.readingArticleOfflineLabel, () => _open(context, const ReadingLibraryPage())),
-          _buildBottomAction(Icons.video_library_outlined, l10n.youtubeVideoLabel, () => _open(context, const YouTubeLibraryPage())),
-          _buildBottomAction(Icons.sports_esports_outlined, l10n.gameHub, () => _open(context, const GameHubPage())),
-          _buildBottomAction(Icons.schedule_outlined, l10n.todaySmokingSchedule, _showSchedule),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -664,31 +614,24 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ),
         body: SafeArea(
           top: false,
-          child: Column(
-            children: [
-              Expanded(
-                child: !_isLoaded
-                    ? const Center(child: CircularProgressIndicator())
-                    : ListView(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                        children: [
-                          _buildConversationCard(),
-                          const SizedBox(height: 14),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(child: _buildUnlockCard()),
-                              const SizedBox(width: 12),
-                              Expanded(child: _buildTodayCard()),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                        ],
-                      ),
-              ),
-              _buildBottomNav(),
-            ],
-          ),
+          child: !_isLoaded
+              ? const Center(child: CircularProgressIndicator())
+              : ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
+                  children: [
+                    _buildConversationCard(),
+                    const SizedBox(height: 14),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(child: _buildUnlockCard()),
+                        const SizedBox(width: 12),
+                        Expanded(child: _buildTodayCard()),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                ),
         ),
       ),
     );
