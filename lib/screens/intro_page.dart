@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
+import 'home_page.dart';
 import 'login_page.dart';
 import 'app_gate.dart';
 
@@ -31,7 +32,8 @@ class _IntroPageState extends State<IntroPage> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => kRequireLogin ? const LoginPage() : const _HomeRedirect(),
+        builder: (_) =>
+            kRequireLogin ? const LoginPage() : const _HomeRedirect(),
       ),
     );
   }
