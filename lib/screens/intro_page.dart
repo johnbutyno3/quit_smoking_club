@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import 'login_page.dart';
+import 'app_gate.dart';
 
 /// 首次開啟 App 時顯示的三頁滑動特色介紹
 class IntroPage extends StatefulWidget {
@@ -22,14 +23,16 @@ class _IntroPageState extends State<IntroPage> {
         curve: Curves.easeInOut,
       );
     } else {
-      _goLogin();
+      _finishIntro();
     }
   }
 
-  void _goLogin() {
+  void _finishIntro() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const LoginPage()),
+      MaterialPageRoute(
+        builder: (_) => kRequireLogin ? const LoginPage() : const _HomeRedirect(),
+      ),
     );
   }
 
@@ -67,19 +70,16 @@ class _IntroPageState extends State<IntroPage> {
       body: SafeArea(
         child: Column(
           children: [
-            // Skip button
             Align(
               alignment: Alignment.topRight,
               child: TextButton(
-                onPressed: _goLogin,
+                onPressed: _finishIntro,
                 child: Text(
                   l10n.introSkip,
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                  style: const TextStyle(color: Colors.grey, fontSize: 14),
                 ),
               ),
             ),
-
-            // Slides
             Expanded(
               child: PageView.builder(
                 controller: _controller,
@@ -88,8 +88,6 @@ class _IntroPageState extends State<IntroPage> {
                 itemBuilder: (_, i) => _SlideView(slide: slides[i]),
               ),
             ),
-
-            // Dot indicators
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(slides.length, (i) {
@@ -108,8 +106,6 @@ class _IntroPageState extends State<IntroPage> {
               }),
             ),
             const SizedBox(height: 24),
-
-            // Next / Start button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: SizedBox(
@@ -140,6 +136,35 @@ class _IntroPageState extends State<IntroPage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _HomeRedirect extends StatelessWidget {
+  const _HomeRedirect();
+
+  @override
+  Widget build(BuildContext context) {
+    return const _HomePageLoader();
+  }
+}
+
+class _HomePageLoader extends StatelessWidget {
+  const _HomePageLoader();
+
+  @override
+  Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (context.mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomePage()),
+        );
+      }
+    });
+
+    return const Scaffold(
+      body: Center(child: CircularProgressIndicator()),
     );
   }
 }
