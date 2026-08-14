@@ -43,7 +43,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final CoinRepository _coinRepository = CoinRepository(
     coinService: CoinService(),
   );
-  final CoinService coinService = CoinService();
 
   late SmokingEngine engine;
   late AchievementEngine achievement;
@@ -53,17 +52,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Timer? _timer;
   bool _isLoaded = false;
   int _myCoins = 0;
-  int _cigarettePrice = 120;
   bool _isVibrating = false;
   String? _activeNotification;
   bool _hasTriggeredUnlockNotify = false;
-
-  final List<String> _quotes = [
-    '深呼吸，撐過這一刻就好。',
-    '你正在慢慢把生活拿回來。',
-    '先轉移注意力，菸癮會過去。',
-    '今天的每一次選擇都很重要。',
-  ];
+  final List<String> _messages = [];
 
   @override
   void initState() {
@@ -119,7 +111,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Future<void> _loadStoredData() async {
     final now = DateTime.now();
     final dailyCount = await StorageService.getDailyCount();
-    final price = await StorageService.getCigarettePrice();
     final planStartDateStr = await StorageService.getPlanStartDate();
     final records = await StorageService.getSmokeRecordsForToday();
     final first = await StorageService.getFirstSmokeTime();
@@ -128,9 +119,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final firstParts = first.split(':');
     final lastParts = last.split(':');
     final firstHour = int.tryParse(firstParts.first) ?? 8;
-    final firstMinute = firstParts.length > 1 ? int.tryParse(firstParts[1]) ?? 0 : 0;
+    final firstMinute = firstParts.length > 1
+        ? int.tryParse(firstParts[1]) ?? 0
+        : 0;
     final lastHour = int.tryParse(lastParts.first) ?? 22;
-    final lastMinute = lastParts.length > 1 ? int.tryParse(lastParts[1]) ?? 0 : 0;
+    final lastMinute = lastParts.length > 1
+        ? int.tryParse(lastParts[1]) ?? 0
+        : 0;
 
     final planStartDate = planStartDateStr.isEmpty
         ? now
@@ -164,12 +159,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       role: UserRole.quitter,
       smokingStatus: SmokingStatus.smoker,
     );
+
     final loadedPlan = SmokingPlan(
       startTime: loadedState.startTime,
       endTime: loadedState.endTime,
       plannedCount: dailyCount,
     );
 
+    final l10n = AppLocalizations.of(context);
     setState(() {
       state = loadedState;
       engine = SmokingEngine(loadedState, loadedPlan);
@@ -180,18 +177,27 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         coinRepository: _coinRepository,
       );
       _myCoins = coins;
-      _cigarettePrice = price;
       _isLoaded = true;
+      _messages
+        ..clear()
+        ..add(l10n?.welcomeMessage ?? '')
+        ..add(l10n == null ? '' : '${l10n.hello}, ${UserService.currentDisplayName ?? ''}!');
+      _messages.removeWhere((message) => message.trim().isEmpty);
     });
+
     await achievement.loadLoginStreak();
   }
 
   Future<void> _smoke() async {
     if (!canSmoke) return;
     final now = DateTime.now();
+    final l10n = AppLocalizations.of(context)!;
+
     setState(() {
       engine.state = engine.state.addSmoke(now);
+      _messages.insert(0, l10n.smokeSuccessMessage);
     });
+
     await StorageService.saveSmokeRecords(engine.state.smokeRecords);
     _triggerVibration();
   }
@@ -202,7 +208,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final ready = !unlockTime.isAfter(DateTime.now());
     if (ready && !_hasTriggeredUnlockNotify) {
       _hasTriggeredUnlockNotify = true;
-      _showTopBanner('時間到了，請按「紀錄抽菸」完成本次紀錄。');
+      final l10n = AppLocalizations.of(context)!;
+      _showTopBanner(l10n.smokingUnlockNotification);
     } else if (!ready) {
       _hasTriggeredUnlockNotify = false;
     }
@@ -223,8 +230,39 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
   }
 
+  void _openMessageHistory() {
+    if (_messages.isEmpty) return;
+    showDialog<void>(
+      context: context,
+      builder: (_) => AlertDialog(
+        contentPadding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 360,
+          child: ListView.separated(
+            itemCount: _messages.length,
+            separatorBuilder: (_, __) => const Divider(height: 20),
+            itemBuilder: (_, index) => Text(
+              _messages[index],
+              style: const TextStyle(fontSize: 17, height: 1.45),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _triggerSOS() {
-    final quote = _quotes[Random().nextInt(_quotes.length)];
+    final l10n = AppLocalizations.of(context)!;
+    final quotes = <String>[
+      l10n.motivationalQuote1,
+      l10n.motivationalQuote2,
+      l10n.motivationalQuote3,
+      l10n.motivationalQuote4,
+      l10n.motivationalQuote5,
+    ];
+    final quote = quotes[Random().nextInt(quotes.length)];
+
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -238,21 +276,34 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ),
         child: Column(
           children: [
-            const Text(
-              'SOS 求協助',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.redAccent),
+            Text(
+              l10n.cravingReliefChamberTitle,
+              style: const TextStyle(
+                fontSize: 21,
+                fontWeight: FontWeight.bold,
+                color: Colors.redAccent,
+              ),
             ),
-            const SizedBox(height: 12),
-            Text('「$quote」', textAlign: TextAlign.center),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
+            Text(
+              quote,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 17, height: 1.4),
+            ),
+            const SizedBox(height: 18),
             ListTile(
               leading: const Icon(Icons.self_improvement),
-              title: const Text('進入緩解艙'),
+              title: Text(
+                l10n.mitigationTileMedical,
+                style: const TextStyle(fontSize: 17),
+              ),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const MitigationPage(title: 'SOS')),
+                  MaterialPageRoute(
+                    builder: (_) => MitigationPage(title: l10n.sos),
+                  ),
                 );
               },
             ),
@@ -263,6 +314,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void _openVideoAudio() {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet<void>(
       context: context,
       builder: (_) => SafeArea(
@@ -271,18 +323,28 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           children: [
             ListTile(
               leading: const Icon(Icons.video_library),
-              title: const Text('影片'),
+              title: Text(l10n.youtubeVideoLabel),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const YouTubeLibraryPage()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const YouTubeLibraryPage(),
+                  ),
+                );
               },
             ),
             ListTile(
               leading: const Icon(Icons.music_note),
-              title: const Text('音樂'),
+              title: Text(l10n.musicLinkLabel),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const MusicLibraryPage()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const MusicLibraryPage(),
+                  ),
+                );
               },
             ),
           ],
@@ -297,7 +359,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     return AnimatedPadding(
       duration: const Duration(milliseconds: 60),
-      padding: EdgeInsets.only(left: _isVibrating ? 5 : 0, right: _isVibrating ? 0 : 5),
+      padding: EdgeInsets.only(
+        left: _isVibrating ? 5 : 0,
+        right: _isVibrating ? 0 : 5,
+      ),
       child: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -309,23 +374,44 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: Text(l10n.appTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
+            title: Text(
+              l10n.appTitle,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             backgroundColor: Colors.white.withAlpha(220),
             elevation: 0,
             actions: [
-              InkWell(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CoinPage())),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Center(
-                    child: Text('🪙 $_myCoins', style: const TextStyle(fontWeight: FontWeight.bold)),
+              IconButton(
+                tooltip: l10n.coinBalanceTitle,
+                icon: const Icon(Icons.monetization_on, color: Colors.amber),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const CoinPage()),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 6),
+                child: Center(
+                  child: Text(
+                    '$_myCoins',
+                    style: const TextStyle(
+                      color: _ThemeColors.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
                   ),
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.settings_outlined, color: _ThemeColors.primary),
+                icon: const Icon(
+                  Icons.settings_outlined,
+                  color: _ThemeColors.primary,
+                ),
                 onPressed: () async {
-                  await Navigator.push(context, MaterialPageRoute(builder: (_) => const SetupPage()));
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SetupPage()),
+                  );
                   _loadStoredData();
                 },
               ),
@@ -334,14 +420,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           body: Stack(
             children: [
               ListView(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
+                padding: const EdgeInsets.fromLTRB(14, 14, 14, 24),
                 children: [
-                  _buildCurrentProgress(),
-                  const SizedBox(height: 14),
-                  _buildTimerCard(),
-                  const SizedBox(height: 14),
-                  _buildSchedulePreview(),
-                  const SizedBox(height: 14),
+                  _buildMainDashboard(),
+                  const SizedBox(height: 12),
+                  _buildMessageCard(),
+                  const SizedBox(height: 12),
                   _buildBottomOptions(),
                 ],
               ),
@@ -358,9 +442,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       padding: const EdgeInsets.all(13),
                       child: Row(
                         children: [
-                          const Icon(Icons.notifications_active, color: Colors.amber),
+                          const Icon(
+                            Icons.notifications_active,
+                            color: Colors.amber,
+                          ),
                           const SizedBox(width: 8),
-                          Expanded(child: Text(_activeNotification!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                          Expanded(
+                            child: Text(
+                              _activeNotification!,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -373,190 +469,262 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildCurrentProgress() {
-    final day = DateTime.now().difference(engine.state.planStartDate).inDays + 1;
-    final total = engine.plan.durationDays;
-    final achievementProgress = achievement.totalCount == 0 ? 0.0 : achievement.progress;
-
-    return Card(
-      elevation: 2,
-      color: Colors.white.withAlpha(235),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 15, 16, 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('目前進度', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _progressPanel(
-                    title: '戒菸進度',
-                    value: 'Day $day / $total',
-                    detail: '今日 ${engine.totalSmoked} / ${engine.todayPlannedCount}',
-                    progress: total == 0 ? 0 : (day / total).clamp(0.0, 1.0),
-                    icon: Icons.flag_circle_outlined,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _progressPanel(
-                    title: '成就項目進度',
-                    value: '${achievement.completedCount} / ${achievement.totalCount}',
-                    detail: '已完成成就',
-                    progress: achievementProgress,
-                    icon: Icons.emoji_events_outlined,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _progressPanel({
-    required String title,
-    required String value,
-    required String detail,
-    required double progress,
-    required IconData icon,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF7FAF7),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(children: [Icon(icon, size: 20, color: _ThemeColors.primary), const SizedBox(width: 6), Expanded(child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)))]),
-          const SizedBox(height: 8),
-          Text(value, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: _ThemeColors.primary)),
-          const SizedBox(height: 3),
-          Text(detail, style: const TextStyle(fontSize: 11, color: Colors.grey)),
-          const SizedBox(height: 8),
-          LinearProgressIndicator(
-            value: progress,
-            minHeight: 6,
-            borderRadius: BorderRadius.circular(6),
-            backgroundColor: Colors.grey.shade200,
-            valueColor: const AlwaysStoppedAnimation(_ThemeColors.accent),
-          ),
-        ],
-      ),
+  Widget _buildMainDashboard() {
+    final l10n = AppLocalizations.of(context)!;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(child: _buildTimerCard()),
+        const SizedBox(width: 10),
+        Expanded(child: _buildCombinedProgressCard()),
+      ],
     );
   }
 
   Widget _buildTimerCard() {
+    final l10n = AppLocalizations.of(context)!;
     final unlockTime = engine.nextUnlockTime;
     final isReady = unlockTime == null || !unlockTime.isAfter(DateTime.now());
-    final diff = unlockTime == null ? Duration.zero : unlockTime.difference(DateTime.now());
+    final diff = unlockTime == null
+        ? Duration.zero
+        : unlockTime.difference(DateTime.now());
     final remainingSeconds = max(0, diff.inSeconds);
     final totalSeconds = max(1, engine.intervalMinutes * 60);
-    final elapsedProgress = isReady ? 1.0 : (1 - remainingSeconds / totalSeconds).clamp(0.0, 1.0);
+    final progress = isReady
+        ? 1.0
+        : (1 - remainingSeconds / totalSeconds).clamp(0.0, 1.0);
 
     return Card(
       elevation: 3,
       color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 18),
-        child: Column(
-          children: [
-            const Text('下一次解鎖', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.grey)),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: 230,
-              height: 230,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    width: 220,
-                    height: 220,
-                    child: CircularProgressIndicator(
-                      value: elapsedProgress,
-                      strokeWidth: 14,
-                      backgroundColor: Colors.grey.shade200,
-                      valueColor: AlwaysStoppedAnimation(isReady ? Colors.orange : _ThemeColors.accent),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(34),
-                    child: isReady
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text('時間到了', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: _ThemeColors.primary)),
-                              const SizedBox(height: 6),
-                              const Text('要抽菸請按這裡紀錄', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.grey)),
-                              const SizedBox(height: 10),
-                              ElevatedButton.icon(
-                                onPressed: canSmoke ? _smoke : null,
-                                icon: const Icon(Icons.edit_note, size: 18),
-                                label: const Text('紀錄抽菸'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: _ThemeColors.accent,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                                ),
-                              ),
-                            ],
-                          )
-                        : Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(countdownString, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold, fontFamily: 'monospace', color: _ThemeColors.primary)),
-                              const SizedBox(height: 7),
-                              const Text('等待下一次解鎖', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                            ],
-                          ),
-                  ),
-                ],
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(22),
+        onTap: isReady && canSmoke ? _smoke : null,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(8, 14, 8, 14),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                isReady ? l10n.smokingUnlockNotification : l10n.nextSmokeCountdown,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: isReady ? 14 : 15,
+                  fontWeight: FontWeight.bold,
+                  color: isReady ? _ThemeColors.primary : Colors.grey,
+                ),
               ),
+              const SizedBox(height: 12),
+              AspectRatio(
+                aspectRatio: 1,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      value: progress,
+                      strokeWidth: 11,
+                      backgroundColor: Colors.grey.shade200,
+                      valueColor: AlwaysStoppedAnimation(
+                        isReady ? Colors.orange : _ThemeColors.accent,
+                      ),
+                    ),
+                    Text(
+                      countdownString,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 23,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'monospace',
+                        color: _ThemeColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                isReady ? l10n.recordSmoking : l10n.notUnlocked,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCombinedProgressCard() {
+    final day = DateTime.now().difference(engine.state.planStartDate).inDays + 1;
+    final total = engine.plan.durationDays;
+    final achievementProgress = achievement.totalCount == 0
+        ? 0.0
+        : achievement.progress;
+    final scheduleProgress = engine.todayPlannedCount == 0
+        ? 0.0
+        : (engine.totalSmoked / engine.todayPlannedCount).clamp(0.0, 1.0);
+
+    return Card(
+      elevation: 2,
+      color: Colors.white.withAlpha(235),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(13, 14, 13, 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _miniProgress(
+              icon: Icons.flag_circle_outlined,
+              title: 'Day $day / $total',
+              detail: '${engine.totalSmoked} / ${engine.todayPlannedCount}',
+              progress: total == 0 ? 0 : (day / total).clamp(0.0, 1.0),
             ),
-            const SizedBox(height: 4),
-            Text(canSmoke && isReady ? '請確認後再紀錄本次抽菸' : '尚未到時間', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+            const SizedBox(height: 14),
+            _miniProgress(
+              icon: Icons.emoji_events_outlined,
+              title: '${achievement.completedCount} / ${achievement.totalCount}',
+              detail: l10n.achievementTitle,
+              progress: achievementProgress,
+            ),
+            const SizedBox(height: 14),
+            _miniProgress(
+              icon: Icons.schedule_outlined,
+              title: '${engine.totalSmoked} / ${engine.todayPlannedCount}',
+              detail: l10n.todaySmokingSchedule,
+              progress: scheduleProgress,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSchedulePreview() {
+  Widget _miniProgress({
+    required IconData icon,
+    required String title,
+    required String detail,
+    required double progress,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 19, color: _ThemeColors.primary),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                detail,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: _ThemeColors.primary,
+          ),
+        ),
+        const SizedBox(height: 5),
+        LinearProgressIndicator(
+          value: progress,
+          minHeight: 6,
+          borderRadius: BorderRadius.circular(6),
+          backgroundColor: Colors.grey.shade200,
+          valueColor: const AlwaysStoppedAnimation(_ThemeColors.accent),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMessageCard() {
+    if (_messages.isEmpty) return const SizedBox.shrink();
     return Card(
       elevation: 1,
       color: Colors.white.withAlpha(235),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-        child: Row(
-          children: [
-            const Icon(Icons.schedule, color: _ThemeColors.primary),
-            const SizedBox(width: 8),
-            const Expanded(child: Text('今日抽菸排程', style: TextStyle(fontWeight: FontWeight.bold))),
-            Text('${engine.totalSmoked} / ${engine.todayPlannedCount}', style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
-          ],
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: _openMessageHistory,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(15, 13, 15, 13),
+          child: Row(
+            children: [
+              const Icon(Icons.forum_outlined, color: _ThemeColors.primary),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  _messages.first,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 16, height: 1.35),
+                ),
+              ),
+              const Icon(Icons.chevron_right, color: Colors.grey),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildBottomOptions() {
+    final l10n = AppLocalizations.of(context)!;
     final items = <_HomeOption>[
-      _HomeOption('SOS', Icons.sos, Colors.redAccent, _triggerSOS),
-      _HomeOption('論壇', Icons.forum_outlined, Colors.blue, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ForumPage()))),
-      _HomeOption('文章', Icons.menu_book_outlined, _ThemeColors.primary, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ReadingLibraryPage()))),
-      _HomeOption('影音', Icons.video_library_outlined, Colors.deepPurple, _openVideoAudio),
-      _HomeOption('遊戲', Icons.sports_esports_outlined, Colors.orange, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GameHubPage()))),
-      _HomeOption('今日排程', Icons.calendar_today_outlined, Colors.teal, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SchedulePage()))),
+      _HomeOption(l10n.sos, Icons.sos, Colors.redAccent, _triggerSOS),
+      _HomeOption(
+        l10n.forum,
+        Icons.forum_outlined,
+        Colors.blue,
+        () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const ForumPage()),
+        ),
+      ),
+      _HomeOption(
+        l10n.readingArticleOfflineLabel,
+        Icons.menu_book_outlined,
+        _ThemeColors.primary,
+        () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const ReadingLibraryPage()),
+        ),
+      ),
+      _HomeOption(
+        l10n.youtubeVideoLabel,
+        Icons.video_library_outlined,
+        Colors.deepPurple,
+        _openVideoAudio,
+      ),
+      _HomeOption(
+        l10n.gameHub,
+        Icons.sports_esports_outlined,
+        Colors.orange,
+        () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const GameHubPage()),
+        ),
+      ),
+      _HomeOption(
+        l10n.todaySmokingSchedule,
+        Icons.calendar_today_outlined,
+        Colors.teal,
+        () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const SchedulePage()),
+        ),
+      ),
     ];
 
     return Card(
@@ -564,9 +732,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       color: Colors.white.withAlpha(240),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
         child: Row(
-          children: items.map((item) => Expanded(child: _buildOption(item))).toList(),
+          children: items
+              .map((item) => Expanded(child: _buildOption(item)))
+              .toList(),
         ),
       ),
     );
@@ -577,13 +747,19 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       onTap: item.onTap,
       borderRadius: BorderRadius.circular(14),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 2),
+        padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 1),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(item.icon, color: item.color, size: 23),
-            const SizedBox(height: 5),
-            Text(item.label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600)),
+            Icon(item.icon, color: item.color, size: 22),
+            const SizedBox(height: 4),
+            Text(
+              item.label,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+            ),
           ],
         ),
       ),
