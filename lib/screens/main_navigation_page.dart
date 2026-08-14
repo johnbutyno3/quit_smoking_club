@@ -4,10 +4,14 @@ import '../l10n/app_localizations.dart';
 import 'daily_schedule_page.dart';
 import 'forum_page.dart';
 import 'game_hub_page.dart';
+import 'home_page.dart';
 import 'mitigation_page.dart';
 import 'reading_library_page.dart';
 import 'youtube_library_page.dart';
 
+/// V3 application shell.
+/// Home is the landing page; the six destinations below are secondary
+/// product areas and remain persistent throughout the session.
 class MainNavigationPage extends StatefulWidget {
   const MainNavigationPage({super.key});
 
@@ -23,6 +27,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     final l10n = AppLocalizations.of(context)!;
 
     final pages = <Widget>[
+      const HomePage(),
       MitigationPage(title: l10n.cravingReliefChamberTitle),
       const ForumPage(),
       const ReadingLibraryPage(),
@@ -32,6 +37,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     ];
 
     final labels = <String>[
+      l10n.appTitle,
       'SOS',
       l10n.forum,
       l10n.readingArticleOfflineLabel,
@@ -41,6 +47,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     ];
 
     final icons = <IconData>[
+      Icons.home_outlined,
       Icons.sos,
       Icons.forum_outlined,
       Icons.article_outlined,
