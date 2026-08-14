@@ -9,8 +9,7 @@ import 'mitigation_page.dart';
 import 'reading_library_page.dart';
 import 'youtube_library_page.dart';
 
-/// V3 application shell.
-/// Home is the landing page. The bottom bar contains exactly six secondary destinations.
+/// V3 application shell. Owns the single Scaffold and the six-item navigation bar.
 class MainNavigationPage extends StatefulWidget {
   const MainNavigationPage({super.key});
 
@@ -50,7 +49,13 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     ];
 
     return Scaffold(
-      body: _index < 0 ? const HomePage() : pages[_index],
+      body: IndexedStack(
+        index: _index < 0 ? 0 : _index + 1,
+        children: <Widget>[
+          const HomePage(),
+          ...pages,
+        ],
+      ),
       bottomNavigationBar: SafeArea(
         top: false,
         child: Material(
