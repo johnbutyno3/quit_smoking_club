@@ -1,0 +1,245 @@
+name: QSC one-time home navigation fix
+
+on:
+  push:
+    branches:
+      - v3-main
+
+permissions:
+  contents: write
+
+jobs:
+  fix-home-navigation:
+    if: ${{ !contains(github.event.head_commit.message, 'fix(home): add V3 six-entry bottom navigation') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: v3-main
+          fetch-depth: 0
+
+      - name: Patch HomePage
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          path = Path('lib/screens/home_page.dart')
+          text = path.read_text(encoding='utf-8')
+
+          if "import 'schedule_page.dart';" not in text:
+              text = text.replace(
+                  "import 'reading_library_page.dart';\n",
+                  "import 'reading_library_page.dart';\nimport 'schedule_page.dart';\n",
+                  1,
+              )
+
+          old = re.compile(
+              r"\n                  const SizedBox\(height: 16\),\n"
+              r"                  Row\(\n"
+              r"                    children: \[\n"
+              r"                      Expanded\(\n"
+              r"                        child: ElevatedButton\([\s\S]*?"
+              r"                  const SizedBox\(height: 28\),\n"
+              r"                  Text\(\n"
+              r"                    '\$\{l10n\.todaySmokingSchedule\}:",
+          )
+
+          replacement = """
+                  const SizedBox(height: 28),
+                  Text(
+                    '${l10n.todaySmokingSchedule}:'"""
+
+          text, count = old.subn(replacement, text, count=1)
+          if count != 1:
+              raise SystemExit('HomePage legacy forum/shop/game block was not found; refusing partial edit.')
+
+          method = r'''
+
+  Widget _buildHomeBottomNavigationBar() {
+    final l10n = AppLocalizations.of(context)!;
+
+    return SafeArea(
+      top: false,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(top: BorderSide(color: Colors.grey.shade200)),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 8,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          children: [
+            _buildHomeNavItem(
+              icon: Icons.gpp_bad,
+              label: l10n.sos,
+              color: Colors.redAccent,
+              onTap: _triggerSOS,
+            ),
+            _buildHomeNavItem(
+              icon: Icons.forum_outlined,
+              label: l10n.forum,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ForumPage()),
+              ),
+            ),
+            _buildHomeNavItem(
+              icon: Icons.menu_book_outlined,
+              label: l10n.readingArticleOfflineLabel,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ReadingLibraryPage()),
+              ),
+            ),
+            _buildHomeNavItem(
+              icon: Icons.video_library_outlined,
+              label: l10n.youtubeVideoLabel,
+              onTap: _openMediaMenu,
+            ),
+            _buildHomeNavItem(
+              icon: Icons.sports_esports_outlined,
+              label: l10n.gameHub,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const GameHubPage()),
+              ),
+            ),
+            _buildHomeNavItem(
+              icon: Icons.schedule_outlined,
+              label: l10n.todaySmokingSchedule,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SchedulePage()),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHomeNavItem({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    Color? color,
+  }) {
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 20, color: color ?? _ThemeColors.primary),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: color ?? Colors.grey.shade800,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openMediaMenu() {
+    final l10n = AppLocalizations.of(context)!;
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.video_library_outlined),
+              title: Text(l10n.youtubeVideoLabel),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const YouTubeLibraryPage()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.music_note_outlined),
+              title: Text(l10n.musicLinkLabel),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const MusicLibraryPage()),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+'''
+
+          marker = "\n  @override\n  Widget build(BuildContext context) {"
+          if method.strip() not in text:
+              if marker not in text:
+                  raise SystemExit('HomePage build marker not found; refusing partial edit.')
+              text = text.replace(marker, method + marker, 1)
+
+          scaffold_marker = """          ),
+          // ? 3.2.1 ???銝惜"""
+          if "bottomNavigationBar: _buildHomeBottomNavigationBar()," not in text:
+              target = """          ),
+          // ? 3.2.1 ???銝惜"""
+              if target in text:
+                  text = text.replace(
+                      target,
+                      """          ),
+          bottomNavigationBar: _buildHomeBottomNavigationBar(),
+          // ? 3.2.1 ???銝惜""",
+                      1,
+                  )
+              else:
+                  # Stable fallback: insert before the body property of this Scaffold.
+                  body_marker = "          body: Stack("
+                  if body_marker not in text:
+                      raise SystemExit('Scaffold body marker not found; refusing partial edit.')
+                  text = text.replace(
+                      body_marker,
+                      "          bottomNavigationBar: _buildHomeBottomNavigationBar(),\n" + body_marker,
+                      1,
+                  )
+
+          path.write_text(text, encoding='utf-8')
+          print('HomePage navigation patch applied.')
+
+      - name: Validate Dart formatting
+        run: |
+          dart format lib/screens/home_page.dart
+
+      - name: Commit and remove one-time workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/qsc_fix_home_nav_once.yml
+          git add lib/screens/home_page.dart .github/workflows/qsc_fix_home_nav_once.yml
+          git commit -m "fix(home): add V3 six-entry bottom navigation"
+          git push origin v3-main
