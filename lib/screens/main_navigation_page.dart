@@ -21,8 +21,6 @@ class MainNavigationPage extends StatefulWidget {
 class _MainNavigationPageState extends State<MainNavigationPage> {
   int _index = -1;
 
-  void _goHome() => setState(() => _index = -1);
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
