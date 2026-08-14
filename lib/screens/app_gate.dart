@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'home_page.dart';
 import 'login_page.dart';
 import 'intro_page.dart';
 import 'onboarding_setup_page.dart';
+import 'main_navigation_page.dart';
 
 import '../usecases/storage/storage_facade_usecase.dart';
 import '../usecases/user/user_facade_usecase.dart';
@@ -35,9 +35,7 @@ class _AppGateState extends State<AppGate> {
 
       if (!introShown) {
         await StorageFacadeUseCase.saveIntroShown(true);
-
         if (!mounted) return;
-
         setState(() {
           _page = const IntroPage();
           _loading = false;
@@ -47,19 +45,16 @@ class _AppGateState extends State<AppGate> {
 
       if (!kRequireLogin) {
         if (!mounted) return;
-
         setState(() {
-          _page = const HomePage();
+          _page = const MainNavigationPage();
           _loading = false;
         });
         return;
       }
 
       final uid = UserFacadeUseCase.currentUid;
-
       if (uid == null || uid.isEmpty) {
         if (!mounted) return;
-
         setState(() {
           _page = const LoginPage();
           _loading = false;
@@ -72,7 +67,6 @@ class _AppGateState extends State<AppGate> {
 
       if (profile == null) {
         if (!mounted) return;
-
         setState(() {
           _page = OnboardingSetupPage(uid: uid, userFacade: userFacade);
           _loading = false;
@@ -81,18 +75,17 @@ class _AppGateState extends State<AppGate> {
       }
 
       if (!mounted) return;
-
       setState(() {
-        _page = const HomePage();
+        _page = const MainNavigationPage();
         _loading = false;
       });
     } catch (error) {
       debugPrint('[AppGate] initialization error: $error');
-
       if (!mounted) return;
-
       setState(() {
-        _page = kRequireLogin ? const LoginPage() : const HomePage();
+        _page = kRequireLogin
+            ? const LoginPage()
+            : const MainNavigationPage();
         _loading = false;
       });
     }
@@ -101,7 +94,9 @@ class _AppGateState extends State<AppGate> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
 
     return _page ?? const LoginPage();
