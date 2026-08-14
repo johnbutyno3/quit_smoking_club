@@ -46,6 +46,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Timer? _timer;
   bool _isLoaded = false;
   String _userName = '';
+  int _coinBalance = 0;
   final List<String> _messages = [];
 
   @override
@@ -101,6 +102,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final records = await StorageFacadeUseCase.getSmokeRecordsForToday();
     final first = await StorageFacadeUseCase.getFirstSmokeTime();
     final last = await StorageFacadeUseCase.getLastSmokeTime();
+    final balance = await _coinFacade.getBalance();
 
     final firstParts = first.split(':');
     final lastParts = last.split(':');
@@ -118,89 +120,27 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       plannedCount: count,
       smokeRecords: records,
       lastSmokeTime: records.isNotEmpty ? records.last : null,
-      role: UserRole.quitter,
-      smokingStatus: SmokingStatus.smoker,
     );
-    final plan = SmokingPlan(
+    final loadedPlan = SmokingPlan(
       startTime: loadedState.startTime,
       endTime: loadedState.endTime,
-      plannedCount: count,
+      plannedCount: loadedState.plannedCount,
     );
 
     setState(() {
       state = loadedState;
-      engine = SmokingEngine(loadedState, plan);
-      recovery = RecoveryEngine(loadedState);
+      engine = SmokingEngine(state, loadedPlan);
+      recovery = RecoveryEngine(state);
       achievement = AchievementEngine(smoking: engine, recovery: recovery);
       _userName = name;
+      _coinBalance = balance;
       _isLoaded = true;
-
-      if (_messages.isEmpty) {
-        final l10n = AppLocalizations.of(context)!;
-        _messages.add(l10n.welcomeMessage);
-        if (name.isNotEmpty) {
-          _messages.add('${l10n.hello}, $name!');
-        }
-      }
     });
-
-    final streak = await StorageFacadeUseCase.getLoginStreak();
-    final totalSpent = await _coinFacade.getTotalSpentCoins();
-    if (!mounted) return;
-    achievement.updateProgressContext(
-      loginStreak: streak,
-      totalSpentCoins: totalSpent,
-    );
   }
 
-  Future<void> _recordSmoke() async {
-    if (!canSmoke) return;
-    final now = DateTime.now();
-    final l10n = AppLocalizations.of(context)!;
-
-    setState(() {
-      engine.state = engine.state.addSmoke(now);
-      _messages.add(l10n.smokeSuccessMessage);
-    });
-
-    if (engine.remaining == 0) {
-      await _coinFacade.claimDailyPlanReward();
-    }
-    await StorageFacadeUseCase.saveSmokeRecords(engine.state.smokeRecords);
-    if (!mounted) return;
-    setState(() {});
-  }
-
-  bool get canSmoke {
-    if (engine.totalSmoked >= engine.todayPlannedCount) return false;
-    final unlock = engine.nextUnlockTime;
-    return unlock == null || !DateTime.now().isBefore(unlock);
-  }
-
-  String get countdownString {
-    final unlock = engine.nextUnlockTime;
-    if (unlock == null) return '00:00:00';
-    final diff = unlock.difference(DateTime.now());
-    if (diff.isNegative) return '00:00:00';
-    final h = diff.inHours.toString().padLeft(2, '0');
-    final m = (diff.inMinutes % 60).toString().padLeft(2, '0');
-    final s = (diff.inSeconds % 60).toString().padLeft(2, '0');
-    return '$h:$m:$s';
-  }
-
-  double get unlockProgress {
-    final unlock = engine.nextUnlockTime;
-    if (unlock == null) return 1;
-
-    final interval = Duration(minutes: engine.intervalMinutes);
-    if (interval.inSeconds <= 0) return 1;
-
-    final start = engine.state.lastSmokeTime ?? engine.state.startTime;
-    final total = unlock.difference(start).inSeconds;
-    if (total <= 0) return 1;
-
-    final elapsed = DateTime.now().difference(start).inSeconds;
-    return (elapsed / total).clamp(0.0, 1.0);
+  Future<void> _open(BuildContext context, Widget page) async {
+    await Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+    await _loadStoredData();
   }
 
   void _showMessageHistory() {
@@ -210,15 +150,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       isScrollControlled: true,
       builder: (_) => SafeArea(
         child: SizedBox(
-          height: MediaQuery.of(context).size.height * .72,
+          height: MediaQuery.of(context).size.height * .55,
           child: Column(
             children: [
-              const SizedBox(height: 16),
-              Text(
-                l10n.appTitle,
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              Padding(
+                padding: const EdgeInsets.all(18),
+                child: Text(l10n.welcomeMessage, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
               ),
-              const SizedBox(height: 8),
               const Divider(height: 1),
               Expanded(
                 child: ListView.builder(
@@ -231,10 +169,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       color: Colors.grey.shade50,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Text(
-                      _messages[index],
-                      style: const TextStyle(fontSize: 17, height: 1.5),
-                    ),
+                    child: Text(_messages[index], style: const TextStyle(fontSize: 17, height: 1.5)),
                   ),
                 ),
               ),
@@ -258,10 +193,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  l10n.todaySmokingSchedule,
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
+                Text(l10n.todaySmokingSchedule, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 10),
                 Expanded(
                   child: ListView.separated(
@@ -270,41 +202,17 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     itemBuilder: (_, index) {
                       final time = engine.schedule[index];
                       final now = DateTime.now();
-                      final scheduled = DateTime(
-                        now.year,
-                        now.month,
-                        now.day,
-                        time.hour,
-                        time.minute,
-                      );
+                      final scheduled = DateTime(now.year, now.month, now.day, time.hour, time.minute);
                       final smoked = index < engine.totalSmoked;
                       final past = now.isAfter(scheduled);
                       return ListTile(
                         contentPadding: EdgeInsets.zero,
                         leading: Icon(
-                          smoked
-                              ? Icons.check_circle
-                              : past
-                                  ? Icons.cancel_outlined
-                                  : Icons.lock_clock,
-                          color: smoked
-                              ? Colors.green
-                              : past
-                                  ? Colors.grey
-                                  : _ThemeColors.accent,
+                          smoked ? Icons.check_circle : past ? Icons.cancel_outlined : Icons.lock_clock,
+                          color: smoked ? Colors.green : past ? Colors.grey : _ThemeColors.accent,
                         ),
-                        title: Text(
-                          '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
-                          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                        ),
-                        trailing: Text(
-                          smoked
-                              ? l10n.smoked
-                              : past
-                                  ? l10n.notRecorded
-                                  : l10n.notUnlocked,
-                          style: const TextStyle(fontSize: 14),
-                        ),
+                        title: Text('${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                        trailing: Text(smoked ? l10n.smoked : past ? l10n.notRecorded : l10n.notUnlocked, style: const TextStyle(fontSize: 14)),
                       );
                     },
                   ),
@@ -317,26 +225,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Future<void> _open(BuildContext context, Widget page) async {
-    await Navigator.push(context, MaterialPageRoute(builder: (_) => page));
-  }
-
   void _showSOS() {
     final l10n = AppLocalizations.of(context)!;
-    final quotes = <String>[
-      l10n.motivationalQuote1,
-      l10n.motivationalQuote2,
-      l10n.motivationalQuote3,
-      l10n.motivationalQuote4,
-      l10n.motivationalQuote5,
-    ];
+    final quotes = <String>[l10n.motivationalQuote1, l10n.motivationalQuote2, l10n.motivationalQuote3, l10n.motivationalQuote4, l10n.motivationalQuote5];
     final quote = quotes[Random().nextInt(quotes.length)];
-
     setState(() {
       _messages.add(l10n.cravingWarningMessage);
       _messages.add(l10n.friendEncouragementMessage);
     });
-
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -346,16 +242,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                l10n.cravingReliefChamberTitle,
-                style: const TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
-              ),
+              Text(l10n.cravingReliefChamberTitle, style: const TextStyle(fontSize: 21, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
-              Text(
-                quote,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 17, height: 1.5),
-              ),
+              Text(quote, textAlign: TextAlign.center, style: const TextStyle(fontSize: 17, height: 1.5)),
               const SizedBox(height: 14),
               Wrap(
                 spacing: 8,
@@ -378,12 +267,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _sosAction(String label, VoidCallback onPressed) {
-    return OutlinedButton(
-      onPressed: onPressed,
-      child: Text(label, style: const TextStyle(fontSize: 14)),
-    );
-  }
+  Widget _sosAction(String label, VoidCallback onPressed) => OutlinedButton(onPressed: onPressed, child: Text(label, style: const TextStyle(fontSize: 14)));
 
   Widget _buildConversationCard() {
     final l10n = AppLocalizations.of(context)!;
@@ -393,40 +277,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       borderRadius: BorderRadius.circular(22),
       child: Container(
         padding: const EdgeInsets.fromLTRB(20, 18, 18, 18),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(22),
-          boxShadow: const [
-            BoxShadow(color: Colors.black12, blurRadius: 12, offset: Offset(0, 4)),
-          ],
-        ),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(22), boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 12, offset: Offset(0, 4))]),
         child: Row(
           children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: const BoxDecoration(
-                color: _ThemeColors.bgTop,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.forum_outlined, color: _ThemeColors.primary),
-            ),
+            Container(width: 48, height: 48, decoration: const BoxDecoration(color: _ThemeColors.bgTop, shape: BoxShape.circle), child: const Icon(Icons.forum_outlined, color: _ThemeColors.primary)),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    _userName.isEmpty ? l10n.welcomeMessage : '${l10n.hello}, $_userName',
-                    style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                  ),
+                  Text(_userName.isEmpty ? l10n.welcomeMessage : '${l10n.hello}, $_userName', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 5),
-                  Text(
-                    message,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 16, height: 1.35, color: Colors.black87),
-                  ),
+                  Text(message, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 16, height: 1.35, color: Colors.black87)),
                 ],
               ),
             ),
@@ -441,75 +303,31 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final l10n = AppLocalizations.of(context)!;
     final unlocked = canSmoke;
     final remaining = engine.remaining;
-
     return InkWell(
       onTap: unlocked ? _recordSmoke : null,
       borderRadius: BorderRadius.circular(24),
       child: Container(
         height: 265,
         padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: const [
-            BoxShadow(color: Colors.black12, blurRadius: 12, offset: Offset(0, 4)),
-          ],
-        ),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 12, offset: Offset(0, 4))]),
         child: Column(
           children: [
-            Text(
-              unlocked ? l10n.recordSmoking : l10n.nextSmokeCountdown,
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: unlocked ? _ThemeColors.primary : Colors.grey.shade700,
-              ),
-            ),
+            Text(unlocked ? l10n.recordSmoking : l10n.nextSmokeCountdown, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: unlocked ? _ThemeColors.primary : Colors.grey.shade700)),
             const SizedBox(height: 8),
             Expanded(
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  SizedBox(
-                    width: 178,
-                    height: 178,
-                    child: CircularProgressIndicator(
-                      value: unlockProgress,
-                      strokeWidth: 13,
-                      backgroundColor: Colors.grey.shade200,
-                      color: unlocked ? _ThemeColors.accent : _ThemeColors.primary,
-                    ),
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        countdownString,
-                        style: const TextStyle(
-                          fontSize: 29,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'monospace',
-                          letterSpacing: 1,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        unlocked ? l10n.recordSmoking : l10n.notUnlocked,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: unlocked ? _ThemeColors.primary : Colors.grey,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
+                  SizedBox(width: 178, height: 178, child: CircularProgressIndicator(value: unlockProgress, strokeWidth: 13, backgroundColor: Colors.grey.shade200, color: unlocked ? _ThemeColors.accent : _ThemeColors.primary)),
+                  Column(mainAxisSize: MainAxisSize.min, children: [
+                    Text(countdownString, style: const TextStyle(fontSize: 29, fontWeight: FontWeight.bold, fontFamily: 'monospace', letterSpacing: 1)),
+                    const SizedBox(height: 4),
+                    Text(unlocked ? l10n.recordSmoking : l10n.notUnlocked, style: TextStyle(fontSize: 13, color: unlocked ? _ThemeColors.primary : Colors.grey, fontWeight: FontWeight.w600)),
+                  ]),
                 ],
               ),
             ),
-            Text(
-              remaining > 0 ? l10n.cigarettesCount(remaining) : l10n.smoked,
-              style: const TextStyle(fontSize: 13, color: Colors.grey),
-            ),
+            Text(remaining > 0 ? l10n.cigarettesCount(remaining) : l10n.smoked, style: const TextStyle(fontSize: 13, color: Colors.grey)),
           ],
         ),
       ),
@@ -521,24 +339,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final currentDay = DateTime.now().difference(engine.state.planStartDate).inDays + 1;
     final totalDays = engine.plan.durationDays;
     final progress = totalDays <= 0 ? 0.0 : (currentDay / totalDays).clamp(0.0, 1.0);
-
     return Container(
       height: 265,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 12, offset: Offset(0, 4)),
-        ],
-      ),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 12, offset: Offset(0, 4))]),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            l10n.todaySmokingSchedule,
-            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-          ),
+          Text(l10n.todaySmokingSchedule, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           _todayRow(Icons.emoji_events_outlined, l10n.smokedCount, '${engine.totalSmoked}/${engine.todayPlannedCount}'),
           const SizedBox(height: 10),
@@ -546,70 +354,46 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           const SizedBox(height: 10),
           _todayRow(Icons.calendar_today_outlined, l10n.todaySmokingSchedule, 'Day $currentDay/$totalDays'),
           const Spacer(),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 9,
-              backgroundColor: Colors.grey.shade200,
-              color: _ThemeColors.accent,
-            ),
-          ),
+          ClipRRect(borderRadius: BorderRadius.circular(8), child: LinearProgressIndicator(value: progress, minHeight: 9, backgroundColor: Colors.grey.shade200, color: _ThemeColors.accent)),
           const SizedBox(height: 8),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: _showSchedule,
-              child: Text(l10n.todaySmokingSchedule),
-            ),
-          ),
+          Align(alignment: Alignment.centerRight, child: TextButton(onPressed: _showSchedule, child: Text(l10n.todaySmokingSchedule))),
         ],
       ),
     );
   }
 
-  Widget _todayRow(IconData icon, String label, String value) {
-    return Row(
-      children: [
-        Icon(icon, size: 21, color: _ThemeColors.primary),
-        const SizedBox(width: 9),
-        Expanded(child: Text(label, style: const TextStyle(fontSize: 14))),
-        Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-      ],
-    );
-  }
+  Widget _todayRow(IconData icon, String label, String value) => Row(children: [Icon(icon, size: 21, color: _ThemeColors.primary), const SizedBox(width: 9), Expanded(child: Text(label, style: const TextStyle(fontSize: 14))), Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold))]);
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [_ThemeColors.bgTop, _ThemeColors.bgBottom],
-        ),
-      ),
+      decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [_ThemeColors.bgTop, _ThemeColors.bgBottom])),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          title: Text(
-            l10n.appTitle,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
+          title: Text(l10n.appTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
           backgroundColor: Colors.white.withAlpha(220),
           elevation: 0,
           actions: [
-            IconButton(
-              tooltip: l10n.coinBalanceTitle,
-              icon: const Icon(Icons.monetization_on, color: Colors.amber, size: 28),
-              onPressed: () async {
+            InkWell(
+              onTap: () async {
                 await _open(context, const CoinPage());
-                await _loadStoredData();
               },
+              borderRadius: BorderRadius.circular(18),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.monetization_on, color: Colors.amber, size: 27),
+                    const SizedBox(width: 5),
+                    Text('$_coinBalance', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 4),
           ],
         ),
         body: SafeArea(
@@ -621,18 +405,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   children: [
                     _buildConversationCard(),
                     const SizedBox(height: 14),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(child: _buildUnlockCard()),
-                        const SizedBox(width: 12),
-                        Expanded(child: _buildTodayCard()),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
+                    _buildUnlockCard(),
+                    const SizedBox(height: 14),
+                    _buildTodayCard(),
                   ],
                 ),
-        ),
       ),
     );
   }
