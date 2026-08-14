@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -9,18 +8,9 @@ import '../engines/achievement_engine.dart';
 import '../l10n/app_localizations.dart';
 import '../models/smoking_plan.dart';
 import '../models/smoking_state.dart';
-import '../models/user_role.dart';
-import '../models/user_smoking_status.dart';
 import '../usecases/coin/coin_facade_usecase.dart';
 import '../usecases/storage/storage_facade_usecase.dart';
 import 'coin_page.dart';
-import 'forum_page.dart';
-import 'game_hub_page.dart';
-import 'medical_library_page.dart';
-import 'music_library_page.dart';
-import 'reading_library_page.dart';
-import 'story_library_page.dart';
-import 'youtube_library_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -138,9 +128,64 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     });
   }
 
-  Future<void> _open(BuildContext context, Widget page) async {
-    await Navigator.push(context, MaterialPageRoute(builder: (_) => page));
-    await _loadStoredData();
+  bool get canSmoke {
+    final next = engine.nextUnlockTime;
+    return next == null || !DateTime.now().isBefore(next);
+  }
+
+  double get unlockProgress {
+    if (canSmoke) return 1.0;
+    final next = engine.nextUnlockTime;
+    if (next == null) return 1.0;
+    final interval = Duration(minutes: engine.intervalMinutes);
+    if (interval.inSeconds <= 0) return 0.0;
+    final start = next.subtract(interval);
+    final total = interval.inMilliseconds;
+    final elapsed = DateTime.now().difference(start).inMilliseconds;
+    return (elapsed / total).clamp(0.0, 1.0);
+  }
+
+  String get countdownString {
+    final next = engine.nextUnlockTime;
+    if (next == null || !DateTime.now().isBefore(next)) return '00:00:00';
+    final remaining = next.difference(DateTime.now());
+    final hours = remaining.inHours.toString().padLeft(2, '0');
+    final minutes = (remaining.inMinutes % 60).toString().padLeft(2, '0');
+    final seconds = (remaining.inSeconds % 60).toString().padLeft(2, '0');
+    return '$hours:$minutes:$seconds';
+  }
+
+  Future<void> _recordSmoke() async {
+    if (!canSmoke || engine.remaining <= 0) return;
+    final now = DateTime.now();
+    final records = List<DateTime>.from(state.smokeRecords)..add(now);
+    final updatedState = SmokingState(
+      planStartDate: state.planStartDate,
+      startTime: state.startTime,
+      endTime: state.endTime,
+      plannedCount: state.plannedCount,
+      smokeRecords: records,
+      lastSmokeTime: now,
+    );
+    final updatedPlan = SmokingPlan(
+      startTime: updatedState.startTime,
+      endTime: updatedState.endTime,
+      plannedCount: updatedState.plannedCount,
+      durationDays: engine.plan.durationDays,
+    );
+
+    await StorageFacadeUseCase.saveSmokeRecords(records);
+    await StorageFacadeUseCase.saveLastSmokeTime(
+      '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
+    );
+
+    if (!mounted) return;
+    setState(() {
+      state = updatedState;
+      engine = SmokingEngine(updatedState, updatedPlan);
+      recovery = RecoveryEngine(updatedState);
+      achievement = AchievementEngine(smoking: engine, recovery: recovery);
+    });
   }
 
   void _showMessageHistory() {
@@ -165,10 +210,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   itemBuilder: (_, index) => Container(
                     margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade50,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
+                    decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(16)),
                     child: Text(_messages[index], style: const TextStyle(fontSize: 17, height: 1.5)),
                   ),
                 ),
@@ -224,50 +266,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ),
     );
   }
-
-  void _showSOS() {
-    final l10n = AppLocalizations.of(context)!;
-    final quotes = <String>[l10n.motivationalQuote1, l10n.motivationalQuote2, l10n.motivationalQuote3, l10n.motivationalQuote4, l10n.motivationalQuote5];
-    final quote = quotes[Random().nextInt(quotes.length)];
-    setState(() {
-      _messages.add(l10n.cravingWarningMessage);
-      _messages.add(l10n.friendEncouragementMessage);
-    });
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(18),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(l10n.cravingReliefChamberTitle, style: const TextStyle(fontSize: 21, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 12),
-              Text(quote, textAlign: TextAlign.center, style: const TextStyle(fontSize: 17, height: 1.5)),
-              const SizedBox(height: 14),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  _sosAction(l10n.mitigationTileMedical, () => _open(context, const MedicalLibraryPage())),
-                  _sosAction(l10n.mitigationTileShortJokes, () => _open(context, const StoryLibraryPage())),
-                  _sosAction(l10n.readingArticleOfflineLabel, () => _open(context, const ReadingLibraryPage())),
-                  _sosAction(l10n.youtubeVideoLabel, () => _open(context, const YouTubeLibraryPage())),
-                  _sosAction(l10n.musicLinkLabel, () => _open(context, const MusicLibraryPage())),
-                  _sosAction(l10n.gameHub, () => _open(context, const GameHubPage())),
-                  _sosAction(l10n.forum, () => _open(context, const ForumPage())),
-                ],
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _sosAction(String label, VoidCallback onPressed) => OutlinedButton(onPressed: onPressed, child: Text(label, style: const TextStyle(fontSize: 14)));
 
   Widget _buildConversationCard() {
     final l10n = AppLocalizations.of(context)!;
@@ -378,7 +376,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           actions: [
             InkWell(
               onTap: () async {
-                await _open(context, const CoinPage());
+                await Navigator.push(context, MaterialPageRoute(builder: (_) => const CoinPage()));
+                await _loadStoredData();
               },
               borderRadius: BorderRadius.circular(18),
               child: Padding(
@@ -410,6 +409,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     _buildTodayCard(),
                   ],
                 ),
+        ),
       ),
     );
   }
