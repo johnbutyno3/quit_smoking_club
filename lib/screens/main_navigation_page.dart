@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/app_localizations.dart';
+import 'daily_schedule_page.dart';
 import 'forum_page.dart';
 import 'game_hub_page.dart';
-import 'home_page.dart';
 import 'mitigation_page.dart';
 import 'reading_library_page.dart';
 import 'youtube_library_page.dart';
-import 'daily_schedule_page.dart';
 
 class MainNavigationPage extends StatefulWidget {
   const MainNavigationPage({super.key});
@@ -24,7 +23,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     final l10n = AppLocalizations.of(context)!;
 
     final pages = <Widget>[
-      const HomePage(),
+      MitigationPage(title: l10n.cravingReliefChamberTitle),
       const ForumPage(),
       const ReadingLibraryPage(),
       const YouTubeLibraryPage(),
