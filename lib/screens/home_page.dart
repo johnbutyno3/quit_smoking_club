@@ -1,11 +1,10 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../models/smoking_state.dart';
 import '../engines/smoking_engine.dart';
 import '../usecases/storage/storage_facade_usecase.dart';
 import 'forum_page.dart';
-import 'shop_page.dart';
 import 'setup_page.dart';
 import 'mitigation_page.dart';
 import 'game_hub_page.dart';
@@ -37,7 +36,6 @@ class _ThemeColors {
   static const accent = Color(0xFF4CAF50);
   static const bgTop = Color(0xFFE8F5E9);
   static const bgBot = Color(0xFFF5F7F6);
-  static const glassBorder = Color(0x33FFFFFF);
   static const cardBg = Colors.white;
 }
 
@@ -127,7 +125,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final planStartDate = planStartDateStr.isNotEmpty
         ? DateTime.parse(planStartDateStr)
         : now;
-    var sCoins = await StorageFacadeUseCase.getCoins();
+    final sCoins = await _coinFacade.getBalance();
     final storedRecords = await StorageFacadeUseCase.getSmokeRecordsForToday();
     final firstTimeStr = await StorageFacadeUseCase.getFirstSmokeTime();
     final lastTimeStr = await StorageFacadeUseCase.getLastSmokeTime();
@@ -181,7 +179,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Future<void> _refreshAchievementProgressContext() async {
-    await _coinFacade.getBalance();
+    final latestCoins = await _coinFacade.getBalance();
+    if (!mounted) return;
+
+    setState(() {
+      _myCoins = latestCoins;
+    });
     final streak = await StorageFacadeUseCase.getLoginStreak();
     final totalSpent = await _coinFacade.getTotalSpentCoins();
     if (!mounted) return;
@@ -553,7 +556,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 padding: const EdgeInsets.only(right: 8),
                 child: Center(
                   child: Text(
-                    '?? $_myCoins',
+                    '$_myCoins COIN',
                     style: const TextStyle(
                       color: _ThemeColors.primary,
                       fontWeight: FontWeight.bold,
@@ -622,55 +625,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
                     remaining: engine.todayPlannedCount - engine.totalSmoked,
                   ),
+
                   // 銝?亙??砍隞??
-                  Card(
-                    color: Colors.white.withAlpha(230),
-                    elevation: 4,
-                    shadowColor: Colors.black12,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      side: const BorderSide(
-                        color: _ThemeColors.glassBorder,
-                        width: 1.5,
-                      ),
-                    ),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(20),
-                      onTap: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ShopPage(),
-                          ),
-                        );
-                        _loadStoredData();
-                      },
-                      child: ListTile(
-                        leading: const Icon(
-                          Icons.stars,
-                          color: Colors.orange,
-                          size: 28,
-                        ),
-                        title: Text(
-                          l10n.coinBalanceTitle,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.orange,
-                          ),
-                        ),
-                        trailing: Text(
-                          "$_myCoins ??",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.orange,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
                   Container(
                     height: 95,
                     padding: const EdgeInsets.all(12),
@@ -808,9 +764,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                 : Icons.lock_outline,
                           ),
                           label: Text(
-                            canSmoke
-                                ? '? ${l10n.recordSmoking}'
-                                : '?? ${l10n.notUnlocked}',
+                            canSmoke ? l10n.recordSmoking : l10n.notUnlocked,
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
@@ -827,50 +781,26 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.blue,
-                            side: const BorderSide(color: Colors.blue),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ForumPage(),
-                            ),
-                          ),
-                          child: Text(l10n.forum),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.blue,
+                        side: const BorderSide(color: Colors.blue),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.orange,
-                            side: const BorderSide(color: Colors.orange),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ShopPage(),
-                            ),
-                          ),
-                          child: Text(l10n.shop),
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ForumPage(),
                         ),
                       ),
-                    ],
+                      child: Text(l10n.forum),
+                    ),
                   ),
                   const SizedBox(height: 10),
                   // ?憭批輒?函???
