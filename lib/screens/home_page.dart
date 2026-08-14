@@ -45,7 +45,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Timer? _timer;
   bool _isLoaded = false;
-  int _myCoins = 0;
   String _userName = '';
   final List<String> _messages = [];
 
@@ -99,7 +98,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final count = await StorageFacadeUseCase.getDailyCount();
     final name = await StorageFacadeUseCase.getUserName();
     final planStart = await StorageFacadeUseCase.getPlanStartDate();
-    final coins = await StorageFacadeUseCase.getCoins();
     final records = await StorageFacadeUseCase.getSmokeRecordsForToday();
     final first = await StorageFacadeUseCase.getFirstSmokeTime();
     final last = await StorageFacadeUseCase.getLastSmokeTime();
@@ -134,7 +132,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       engine = SmokingEngine(loadedState, plan);
       recovery = RecoveryEngine(loadedState);
       achievement = AchievementEngine(smoking: engine, recovery: recovery);
-      _myCoins = coins;
       _userName = name;
       _isLoaded = true;
 
@@ -269,7 +266,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 Expanded(
                   child: ListView.separated(
                     itemCount: engine.schedule.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    separatorBuilder: (_, _) => const Divider(height: 1),
                     itemBuilder: (_, index) {
                       final time = engine.schedule[index];
                       final now = DateTime.now();
@@ -320,8 +317,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  void _open(BuildContext context, Widget page) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+  Future<void> _open(BuildContext context, Widget page) async {
+    await Navigator.push(context, MaterialPageRoute(builder: (_) => page));
   }
 
   void _showSOS() {
