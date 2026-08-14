@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../l10n/app_localizations.dart';
 import '../models/coin_transaction.dart';
 import '../repositories/coin/coin_repository.dart';
+// Use CoinRepository instead of direct CoinService in UI
 import '../usecases/coin/get_coin_balance_usecase.dart';
-import 'shop_page.dart';
+import '../l10n/app_localizations.dart';
 
 class CoinPage extends StatefulWidget {
   const CoinPage({super.key});
@@ -30,6 +30,7 @@ class _CoinPageState extends State<CoinPage> {
 
   Future<void> _loadBalance() async {
     final balance = await _getCoinBalanceUseCase.execute();
+
     final history = await _coinRepository.getHistory();
 
     if (!mounted) return;
@@ -42,34 +43,20 @@ class _CoinPageState extends State<CoinPage> {
     });
   }
 
-  Future<void> _openShop() async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const ShopPage(),
-      ),
-    );
-
-    if (!mounted) return;
-    await _loadBalance();
-  }
-
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.coinHistory)),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.coinHistory)),
       body: Column(
         children: [
           Card(
-            margin: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            margin: const EdgeInsets.all(16),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
                   Text(
-                    l10n.currentBalance,
+                    AppLocalizations.of(context)!.currentBalance,
                     style: const TextStyle(fontSize: 16),
                   ),
                   const SizedBox(height: 8),
@@ -84,22 +71,12 @@ class _CoinPageState extends State<CoinPage> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _openShop,
-                icon: const Icon(Icons.store),
-                label: Text(l10n.shop),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
           Expanded(
             child: _history.isEmpty
                 ? Center(
-                    child: Text(l10n.noTransactionHistory),
+                    child: Text(
+                      AppLocalizations.of(context)!.noTransactionHistory,
+                    ),
                   )
                 : ListView.builder(
                     itemCount: _history.length,

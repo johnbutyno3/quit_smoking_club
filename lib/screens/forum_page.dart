@@ -91,7 +91,7 @@ class _ForumPageState extends State<ForumPage> {
 
   Future<void> _handleSendGift(ForumPost post) async {
     final l10n = AppLocalizations.of(context)!;
-    final success = await _coinFacadeUseCase.spend(5, 'forum_gift');
+    final success = await _coinFacadeUseCase.spend(5, '隢??旨');
     if (!success) {
       if (mounted) _showSnack(l10n.forumInsufficientCoinsToGift);
       return;
@@ -135,10 +135,7 @@ class _ForumPageState extends State<ForumPage> {
                     decoration: InputDecoration(labelText: l10n.postContent),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    l10n.forumNeedCoinsToCreatePost,
-                    style: const TextStyle(fontSize: 12),
-                  ),
+                  const Text('50 COIN', style: TextStyle(fontSize: 12)),
                 ],
               ),
             ],
@@ -325,7 +322,7 @@ class _ForumPageState extends State<ForumPage> {
                     ),
                   ),
                   Text(
-                    '$_myCoins COIN',
+                    '$_myCoins ??',
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
@@ -425,10 +422,12 @@ class _ForumPageState extends State<ForumPage> {
                                         ),
                                         decoration: BoxDecoration(
                                           color: Colors.red.shade50,
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                         child: Text(
-                                          '🆘 ${l10n.sosPost}',
+                                          '? ${l10n.sosPost}',
                                           style: const TextStyle(
                                             color: Colors.red,
                                             fontWeight: FontWeight.bold,
