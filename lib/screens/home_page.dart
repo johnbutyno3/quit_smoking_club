@@ -115,6 +115,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final records = await StorageService.getSmokeRecordsForToday();
     final first = await StorageService.getFirstSmokeTime();
     final last = await StorageService.getLastSmokeTime();
+    final userName = await StorageService.getUserName();
 
     final firstParts = first.split(':');
     final lastParts = last.split(':');
@@ -181,7 +182,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _messages
         ..clear()
         ..add(l10n?.welcomeMessage ?? '')
-        ..add(l10n == null ? '' : '${l10n.hello}, ${UserService.currentDisplayName ?? ''}!');
+        ..add(
+          l10n == null || userName.isEmpty
+              ? ''
+              : '${l10n.hello}, $userName!',
+        );
       _messages.removeWhere((message) => message.trim().isEmpty);
     });
 
@@ -470,7 +475,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Widget _buildMainDashboard() {
-    final l10n = AppLocalizations.of(context)!;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -556,6 +560,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   Widget _buildCombinedProgressCard() {
+    final l10n = AppLocalizations.of(context)!;
     final day = DateTime.now().difference(engine.state.planStartDate).inDays + 1;
     final total = engine.plan.durationDays;
     final achievementProgress = achievement.totalCount == 0
@@ -576,21 +581,24 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           children: [
             _miniProgress(
               icon: Icons.flag_circle_outlined,
-              title: 'Day $day / $total',
-              detail: '${engine.totalSmoked} / ${engine.todayPlannedCount}',
+              title: l10n.dayProgress(day, total),
+              detail: l10n.quitProgress,
               progress: total == 0 ? 0 : (day / total).clamp(0.0, 1.0),
             ),
             const SizedBox(height: 14),
             _miniProgress(
               icon: Icons.emoji_events_outlined,
-              title: '${achievement.completedCount} / ${achievement.totalCount}',
-              detail: l10n.achievementTitle,
+              title: l10n.achievementCompleted(
+                achievement.completedCount,
+                achievement.totalCount,
+              ),
+              detail: l10n.todayAchievement,
               progress: achievementProgress,
             ),
             const SizedBox(height: 14),
             _miniProgress(
               icon: Icons.schedule_outlined,
-              title: '${engine.totalSmoked} / ${engine.todayPlannedCount}',
+              title: l10n.smokedToday(engine.totalSmoked),
               detail: l10n.todaySmokingSchedule,
               progress: scheduleProgress,
             ),
