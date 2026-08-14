@@ -8,6 +8,11 @@ import 'onboarding_setup_page.dart';
 import '../usecases/storage/storage_facade_usecase.dart';
 import '../usecases/user/user_facade_usecase.dart';
 
+// Temporary development setting.
+// Set to true while completing and testing V3 without login.
+// Restore to false before production release.
+const bool kRequireLogin = false;
+
 class AppGate extends StatefulWidget {
   const AppGate({super.key});
 
@@ -27,7 +32,6 @@ class _AppGateState extends State<AppGate> {
 
   Future<void> _checkAppState() async {
     try {
-      // Check whether introduction has been shown
       final introShown = await StorageFacadeUseCase.getIntroShown();
 
       if (!introShown) {
@@ -43,7 +47,19 @@ class _AppGateState extends State<AppGate> {
         return;
       }
 
-      // Check current user
+      // Development mode: bypass login and onboarding so V3 features
+      // can be tested directly from the HomePage.
+      if (!kRequireLogin) {
+        if (!mounted) return;
+
+        setState(() {
+          _page = const HomePage();
+          _loading = false;
+        });
+
+        return;
+      }
+
       final uid = UserFacadeUseCase.currentUid;
 
       if (uid == null || uid.isEmpty) {
@@ -57,25 +73,20 @@ class _AppGateState extends State<AppGate> {
         return;
       }
 
-      // Load user profile
       final userFacade = UserFacadeUseCase();
-
       final profile = await userFacade.loadProfile(uid);
 
-      // User logged in but profile not completed
       if (profile == null) {
         if (!mounted) return;
 
         setState(() {
           _page = OnboardingSetupPage(uid: uid, userFacade: userFacade);
-
           _loading = false;
         });
 
         return;
       }
 
-      // User ready
       if (!mounted) return;
 
       setState(() {
@@ -88,7 +99,7 @@ class _AppGateState extends State<AppGate> {
       if (!mounted) return;
 
       setState(() {
-        _page = const LoginPage();
+        _page = kRequireLogin ? const LoginPage() : const HomePage();
         _loading = false;
       });
     }
@@ -100,6 +111,6 @@ class _AppGateState extends State<AppGate> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    return _page ?? const LoginPage();
+    return _page ?? (kRequireLogin ? const LoginPage() : const HomePage());
   }
 }
