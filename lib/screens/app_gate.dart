@@ -8,6 +8,10 @@ import 'onboarding_setup_page.dart';
 import '../usecases/storage/storage_facade_usecase.dart';
 import '../usecases/user/user_facade_usecase.dart';
 
+/// Development switch: keep login bypassed until the V3 product is complete.
+/// Set to true before production release to restore the normal login flow.
+const bool kRequireLogin = false;
+
 class AppGate extends StatefulWidget {
   const AppGate({super.key});
 
@@ -27,7 +31,6 @@ class _AppGateState extends State<AppGate> {
 
   Future<void> _checkAppState() async {
     try {
-      // Check whether introduction has been shown
       final introShown = await StorageFacadeUseCase.getIntroShown();
 
       if (!introShown) {
@@ -39,11 +42,19 @@ class _AppGateState extends State<AppGate> {
           _page = const IntroPage();
           _loading = false;
         });
-
         return;
       }
 
-      // Check current user
+      if (!kRequireLogin) {
+        if (!mounted) return;
+
+        setState(() {
+          _page = const HomePage();
+          _loading = false;
+        });
+        return;
+      }
+
       final uid = UserFacadeUseCase.currentUid;
 
       if (uid == null || uid.isEmpty) {
@@ -53,29 +64,22 @@ class _AppGateState extends State<AppGate> {
           _page = const LoginPage();
           _loading = false;
         });
-
         return;
       }
 
-      // Load user profile
       final userFacade = UserFacadeUseCase();
-
       final profile = await userFacade.loadProfile(uid);
 
-      // User logged in but profile not completed
       if (profile == null) {
         if (!mounted) return;
 
         setState(() {
           _page = OnboardingSetupPage(uid: uid, userFacade: userFacade);
-
           _loading = false;
         });
-
         return;
       }
 
-      // User ready
       if (!mounted) return;
 
       setState(() {
@@ -88,7 +92,7 @@ class _AppGateState extends State<AppGate> {
       if (!mounted) return;
 
       setState(() {
-        _page = const LoginPage();
+        _page = kRequireLogin ? const LoginPage() : const HomePage();
         _loading = false;
       });
     }
