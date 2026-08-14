@@ -54,11 +54,11 @@ class _QuitPlanPageState extends State<QuitPlanPage> {
       priceController.text = (price > 0 ? price : 120).toString();
       daysController.text = (days > 0 ? days : 90).toString();
       _firstTime = TimeOfDay(
-        hour: firstParts.length > 0 ? int.tryParse(firstParts[0]) ?? 8 : 8,
+        hour: firstParts.isNotEmpty ? int.tryParse(firstParts[0]) ?? 8 : 8,
         minute: firstParts.length > 1 ? int.tryParse(firstParts[1]) ?? 0 : 0,
       );
       _lastTime = TimeOfDay(
-        hour: lastParts.length > 0 ? int.tryParse(lastParts[0]) ?? 22 : 22,
+        hour: lastParts.isNotEmpty ? int.tryParse(lastParts[0]) ?? 22 : 22,
         minute: lastParts.length > 1 ? int.tryParse(lastParts[1]) ?? 0 : 0,
       );
       _loading = false;
