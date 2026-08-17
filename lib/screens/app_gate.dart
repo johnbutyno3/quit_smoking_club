@@ -12,6 +12,10 @@ import '../usecases/user/user_facade_usecase.dart';
 /// Set to true before production release to restore the normal login flow.
 const bool kRequireLogin = false;
 
+/// V3 development switch: skip the legacy intro screen so the current
+/// navigation shell can be verified directly.
+const bool kSkipIntroForV3 = true;
+
 class AppGate extends StatefulWidget {
   const AppGate({super.key});
 
@@ -31,6 +35,15 @@ class _AppGateState extends State<AppGate> {
 
   Future<void> _checkAppState() async {
     try {
+      if (kSkipIntroForV3) {
+        if (!mounted) return;
+        setState(() {
+          _page = const MainNavigationPage();
+          _loading = false;
+        });
+        return;
+      }
+
       final introShown = await StorageFacadeUseCase.getIntroShown();
 
       if (!introShown) {
