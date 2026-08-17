@@ -6,7 +6,6 @@ import 'forum_page.dart';
 import 'game_hub_page.dart';
 import 'home_page.dart';
 import 'mitigation_page.dart';
-import 'profile_page.dart';
 import 'reading_library_page.dart';
 import 'youtube_library_page.dart';
 
