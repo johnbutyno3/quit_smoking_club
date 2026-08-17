@@ -299,20 +299,41 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         appBar: AppBar(
           backgroundColor: Colors.white.withAlpha(225),
           elevation: 0,
-          centerTitle: true,
-          leading: InkWell(
-            onTap: () async {
-              await Navigator.push(context, MaterialPageRoute(builder: (_) => const ShopPage()));
-              await _loadStoredData();
-            },
-            child: Row(mainAxisSize: MainAxisSize.min, children: [const Icon(Icons.monetization_on, color: Colors.amber, size: 25), const SizedBox(width: 3), Text('$_coinBalance', style: const TextStyle(fontWeight: FontWeight.bold))]),
+          centerTitle: false,
+          leadingWidth: 110,
+          leading: Row(
+            children: [
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfilePage())),
+                child: CircleAvatar(radius: 19, backgroundColor: Theme.of(context).colorScheme.primaryContainer, child: Icon(Icons.person, size: 22, color: Theme.of(context).colorScheme.primary)),
+              ),
+              IconButton(
+                icon: const Icon(Icons.settings_outlined),
+                tooltip: t.settings,
+                padding: const EdgeInsets.all(4),
+                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfilePage())),
+              ),
+            ],
           ),
-          title: GestureDetector(
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfilePage())),
-            child: CircleAvatar(radius: 19, backgroundColor: Theme.of(context).colorScheme.primaryContainer, child: Icon(Icons.person, size: 22, color: Theme.of(context).colorScheme.primary)),
-          ),
+          title: const SizedBox.shrink(),
           actions: [
-            IconButton(icon: const Icon(Icons.settings_outlined), tooltip: t.settings, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfilePage()))),
+            InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: () async {
+                await Navigator.push(context, MaterialPageRoute(builder: (_) => const ShopPage()));
+                await _loadStoredData();
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  const Icon(Icons.monetization_on, color: Colors.amber, size: 25),
+                  const SizedBox(width: 4),
+                  Text('$_coinBalance', style: const TextStyle(fontWeight: FontWeight.bold)),
+                ]),
+              ),
+            ),
+            const SizedBox(width: 4),
           ],
         ),
         body: SafeArea(
