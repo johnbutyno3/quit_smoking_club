@@ -103,15 +103,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final firstParts = first.split(':');
     final lastParts = last.split(':');
     final firstHour = int.tryParse(firstParts.first) ?? 8;
-    final firstMinute = int.tryParse(
-          firstParts.length > 1 ? firstParts[1] : '0',
-        ) ??
-        0;
+    final firstMinute = int.tryParse(firstParts.length > 1 ? firstParts[1] : '0') ?? 0;
     final lastHour = int.tryParse(lastParts.first) ?? 22;
-    final lastMinute = int.tryParse(
-          lastParts.length > 1 ? lastParts[1] : '0',
-        ) ??
-        0;
+    final lastMinute = int.tryParse(lastParts.length > 1 ? lastParts[1] : '0') ?? 0;
 
     if (!mounted) return;
 
@@ -141,7 +135,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       if (_messages.isEmpty) {
         final l10n = AppLocalizations.of(context)!;
         _messages.add(l10n.welcomeMessage);
-        _messages.add(l10n.challengeInProgress);
       }
     });
 
@@ -264,13 +257,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     itemBuilder: (context, index) {
                       final time = engine.schedule[index];
                       final now = DateTime.now();
-                      final scheduled = DateTime(
-                        now.year,
-                        now.month,
-                        now.day,
-                        time.hour,
-                        time.minute,
-                      );
+                      final scheduled = DateTime(now.year, now.month, now.day, time.hour, time.minute);
                       final smoked = index < engine.totalSmoked;
                       final past = now.isAfter(scheduled);
 
@@ -360,26 +347,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  _sosAction(
-                    l10n.mitigationTileMedical,
-                    () => _openPage(const MedicalLibraryPage()),
-                  ),
-                  _sosAction(
-                    l10n.mitigationTileShortJokes,
-                    () => _openPage(const StoryLibraryPage()),
-                  ),
-                  _sosAction(
-                    l10n.readingArticleOfflineLabel,
-                    () => _openPage(const ReadingLibraryPage()),
-                  ),
-                  _sosAction(
-                    l10n.youtubeVideoLabel,
-                    () => _openPage(const YouTubeLibraryPage()),
-                  ),
-                  _sosAction(
-                    l10n.gameHub,
-                    () => _openPage(const GameHubPage()),
-                  ),
+                  _sosAction(l10n.mitigationTileMedical, () => _openPage(const MedicalLibraryPage())),
+                  _sosAction(l10n.mitigationTileShortJokes, () => _openPage(const StoryLibraryPage())),
+                  _sosAction(l10n.readingArticleOfflineLabel, () => _openPage(const ReadingLibraryPage())),
+                  _sosAction(l10n.youtubeVideoLabel, () => _openPage(const YouTubeLibraryPage())),
+                  _sosAction(l10n.gameHub, () => _openPage(const GameHubPage())),
                   _sosAction(l10n.forum, () => _openPage(const ForumPage())),
                 ],
               ),
@@ -425,21 +397,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ),
             const SizedBox(width: 13),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _userName.isEmpty ? l10n.welcomeMessage : '${l10n.hello}, $_userName',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    l10n.challengeInProgress,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 17, height: 1.35),
-                  ),
-                ],
+              child: Text(
+                _userName.isEmpty
+                    ? l10n.welcomeMessage
+                    : '${l10n.hello}, $_userName\n${l10n.welcomeMessage}',
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 18, height: 1.4),
               ),
             ),
             const Icon(Icons.chevron_right, color: Colors.grey),
@@ -552,17 +516,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               itemBuilder: (context, index) {
                 final time = engine.schedule[index];
                 final now = DateTime.now();
-                final scheduled = DateTime(
-                  now.year,
-                  now.month,
-                  now.day,
-                  time.hour,
-                  time.minute,
-                );
+                final scheduled = DateTime(now.year, now.month, now.day, time.hour, time.minute);
                 final smoked = index < engine.totalSmoked;
                 final past = now.isAfter(scheduled);
-                final timeText =
-                    '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+                final timeText = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
 
                 return SizedBox(
                   height: 30,
@@ -616,11 +573,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildBottomAction(
-    IconData icon,
-    String label,
-    VoidCallback onTap,
-  ) {
+  Widget _buildBottomAction(IconData icon, String label, VoidCallback onTap) {
     return Expanded(
       child: InkWell(
         onTap: onTap,
@@ -660,31 +613,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       child: Row(
         children: [
           _buildBottomAction(Icons.sos, l10n.sos, _showSOS),
-          _buildBottomAction(
-            Icons.forum_outlined,
-            l10n.forum,
-            () => _openPage(const ForumPage()),
-          ),
-          _buildBottomAction(
-            Icons.menu_book_outlined,
-            l10n.readingArticleOfflineLabel,
-            () => _openPage(const ReadingLibraryPage()),
-          ),
-          _buildBottomAction(
-            Icons.video_library_outlined,
-            l10n.youtubeVideoLabel,
-            () => _openPage(const YouTubeLibraryPage()),
-          ),
-          _buildBottomAction(
-            Icons.sports_esports_outlined,
-            l10n.gameHub,
-            () => _openPage(const GameHubPage()),
-          ),
-          _buildBottomAction(
-            Icons.settings_outlined,
-            l10n.settings,
-            () => _openPage(const SetupPage()),
-          ),
+          _buildBottomAction(Icons.forum_outlined, l10n.forum, () => _openPage(const ForumPage())),
+          _buildBottomAction(Icons.menu_book_outlined, l10n.readingArticleOfflineLabel, () => _openPage(const ReadingLibraryPage())),
+          _buildBottomAction(Icons.video_library_outlined, l10n.youtubeVideoLabel, () => _openPage(const YouTubeLibraryPage())),
+          _buildBottomAction(Icons.sports_esports_outlined, l10n.gameHub, () => _openPage(const GameHubPage())),
+          _buildBottomAction(Icons.settings_outlined, l10n.settings, () => _openPage(const SetupPage())),
         ],
       ),
     );
@@ -714,22 +647,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           actions: [
             IconButton(
               tooltip: l10n.coinBalanceTitle,
-              icon: const Icon(
-                Icons.monetization_on,
-                color: Colors.amber,
-                size: 27,
-              ),
+              icon: const Icon(Icons.monetization_on, color: Colors.amber, size: 27),
               onPressed: () => _openPage(const CoinPage()),
             ),
             Padding(
               padding: const EdgeInsets.only(right: 10),
               child: IconButton(
-                tooltip: l10n.profile,
-                icon: const Icon(
-                  Icons.account_circle_outlined,
-                  color: _ThemeColors.primary,
-                  size: 28,
-                ),
+                tooltip: l10n.settings,
+                icon: const Icon(Icons.account_circle_outlined, color: _ThemeColors.primary, size: 28),
                 onPressed: () => _openPage(const SetupPage()),
               ),
             ),
