@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../l10n/app_localizations.dart';
 import 'game_2048_page.dart';
 import 'game_sudoku_page.dart';
@@ -12,7 +13,6 @@ class GameHubPage extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final games = <_GameEntry>[
       _GameEntry(
-        icon: Icons.grid_4x4,
         emoji: '🧩',
         title: '2048',
         subtitle: l10n.game2048Subtitle,
@@ -20,7 +20,6 @@ class GameHubPage extends StatelessWidget {
         bgColor: const Color(0xFFFFF8E1),
       ),
       _GameEntry(
-        icon: Icons.grid_3x3,
         emoji: '🔢',
         title: 'Sudoku',
         subtitle: l10n.gameHubBuiltInMiniGames,
@@ -63,7 +62,7 @@ class GameHubPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  l10n.gameHubBannerTitle,
+                  l10n.gameHubBuiltInMiniGames,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -72,7 +71,7 @@ class GameHubPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  l10n.gameHubBannerSubtitle,
+                  l10n.offlineBuiltInLabel,
                   style: const TextStyle(
                     color: Colors.white70,
                     fontSize: 12,
@@ -84,7 +83,7 @@ class GameHubPage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: Text(
-              l10n.gameHubSelectGame,
+              l10n.gameHubBuiltInMiniGames,
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -210,7 +209,7 @@ class _GameCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        l10n.gameHubOfflineBuiltIn,
+                        l10n.offlineBuiltInLabel,
                         style: const TextStyle(
                           fontSize: 10,
                           color: Color(0xFF1B5E20),
@@ -235,7 +234,6 @@ class _GameCard extends StatelessWidget {
 }
 
 class _GameEntry {
-  final IconData icon;
   final String emoji;
   final String title;
   final String subtitle;
@@ -243,7 +241,6 @@ class _GameEntry {
   final Color bgColor;
 
   const _GameEntry({
-    required this.icon,
     required this.emoji,
     required this.title,
     required this.subtitle,
