@@ -617,7 +617,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           _buildBottomAction(Icons.menu_book_outlined, l10n.readingArticleOfflineLabel, () => _openPage(const ReadingLibraryPage())),
           _buildBottomAction(Icons.video_library_outlined, l10n.youtubeVideoLabel, () => _openPage(const YouTubeLibraryPage())),
           _buildBottomAction(Icons.sports_esports_outlined, l10n.gameHub, () => _openPage(const GameHubPage())),
-          _buildBottomAction(Icons.settings_outlined, l10n.settings, () => _openPage(const SetupPage())),
+          _buildBottomAction(Icons.calendar_today_outlined, l10n.todaySmokingSchedule, _showSchedule),
         ],
       ),
     );
