@@ -3,17 +3,14 @@ import '../l10n/app_localizations.dart';
 import 'game_2048_page.dart';
 import 'game_sudoku_page.dart';
 
-// ══════════════════════════════════════════════════════════
-//  遊戲大廳 — 完全內建，零 Firebase，零網路請求
-// ══════════════════════════════════════════════════════════
-
+/// Built-in game hub. Games are local-only and never enter the content flow.
 class GameHubPage extends StatelessWidget {
   const GameHubPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final games = [
+    final games = <_GameEntry>[
       _GameEntry(
         icon: Icons.grid_4x4,
         emoji: '🧩',
@@ -22,26 +19,34 @@ class GameHubPage extends StatelessWidget {
         color: const Color(0xFFEDC22E),
         bgColor: const Color(0xFFFFF8E1),
       ),
-      const _GameEntry(
+      _GameEntry(
         icon: Icons.grid_3x3,
         emoji: '🔢',
         title: 'Sudoku',
-        subtitle: 'Classic 9×9 number puzzle',
-        color: Color(0xFF43A047),
-        bgColor: Color(0xFFE8F5E9),
+        subtitle: l10n.gameHubBuiltInMiniGames,
+        color: const Color(0xFF43A047),
+        bgColor: const Color(0xFFE8F5E9),
       ),
     ];
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F7F6),
-      appBar: AppBar(
-        title: Text('🎮 ${l10n.gameHub}', style: const TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
-      ),
-      body: Column(
+
+    return Container(
+      color: const Color(0xFFF5F7F6),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            color: Colors.white,
+            child: Text(
+              '🎮 ${l10n.gameHub}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          ),
           Container(
             width: double.infinity,
             margin: const EdgeInsets.all(16),
@@ -57,15 +62,35 @@ class GameHubPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.gameHubBannerTitle, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(
+                  l10n.gameHubBannerTitle,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text(l10n.gameHubBannerSubtitle, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                Text(
+                  l10n.gameHubBannerSubtitle,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                  ),
+                ),
               ],
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            child: Text(l10n.gameHubSelectGame, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey)),
+            child: Text(
+              l10n.gameHubSelectGame,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+            ),
           ),
           Expanded(
             child: ListView.builder(
@@ -73,7 +98,10 @@ class GameHubPage extends StatelessWidget {
               itemCount: games.length,
               itemBuilder: (context, index) {
                 final game = games[index];
-                return _GameCard(game: game, onTap: () => _launchGame(context, game));
+                return _GameCard(
+                  game: game,
+                  onTap: () => _launchGame(context, game),
+                );
               },
             ),
           ),
@@ -88,22 +116,35 @@ class GameHubPage extends StatelessWidget {
       'Sudoku' => const SudokuPage(),
       _ => null,
     };
-    if (page != null) Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+    if (page != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => page),
+      );
+    }
   }
 }
 
 class _GameCard extends StatelessWidget {
   final _GameEntry game;
   final VoidCallback onTap;
-  const _GameCard({required this.game, required this.onTap});
+
+  const _GameCard({
+    required this.game,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 3,
       shadowColor: game.color.withAlpha(80),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,
@@ -111,7 +152,11 @@ class _GameCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(colors: [game.bgColor, Colors.white], begin: Alignment.topLeft, end: Alignment.bottomRight),
+            gradient: LinearGradient(
+              colors: [game.bgColor, Colors.white],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
           ),
           child: Row(
             children: [
@@ -121,28 +166,66 @@ class _GameCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: game.color.withAlpha(40),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: game.color.withAlpha(80), width: 1.5),
+                  border: Border.all(
+                    color: game.color.withAlpha(80),
+                    width: 1.5,
+                  ),
                 ),
-                child: Center(child: Text(game.emoji, style: const TextStyle(fontSize: 32))),
+                child: Center(
+                  child: Text(
+                    game.emoji,
+                    style: const TextStyle(fontSize: 32),
+                  ),
+                ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(game.title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 1)),
+                    Text(
+                      game.title,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1,
+                      ),
+                    ),
                     const SizedBox(height: 4),
-                    Text(game.subtitle, style: TextStyle(fontSize: 13, color: Colors.grey.shade600)),
+                    Text(
+                      game.subtitle,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(color: const Color(0xFF1B5E20).withAlpha(20), borderRadius: BorderRadius.circular(20)),
-                      child: Text(AppLocalizations.of(context)!.gameHubOfflineBuiltIn, style: const TextStyle(fontSize: 10, color: Color(0xFF1B5E20), fontWeight: FontWeight.bold)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1B5E20).withAlpha(20),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        l10n.gameHubOfflineBuiltIn,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: Color(0xFF1B5E20),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
-              Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey.shade400),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color: Colors.grey.shade400,
+              ),
             ],
           ),
         ),
@@ -158,5 +241,13 @@ class _GameEntry {
   final String subtitle;
   final Color color;
   final Color bgColor;
-  const _GameEntry({required this.icon, required this.emoji, required this.title, required this.subtitle, required this.color, required this.bgColor});
+
+  const _GameEntry({
+    required this.icon,
+    required this.emoji,
+    required this.title,
+    required this.subtitle,
+    required this.color,
+    required this.bgColor,
+  });
 }
