@@ -9,7 +9,6 @@ import '../l10n/app_localizations.dart';
 import '../models/forum_post.dart';
 import '../models/smoking_plan.dart';
 import '../models/smoking_state.dart';
-import '../repositories/forum_repository.dart';
 import '../usecases/coin/coin_facade_usecase.dart';
 import '../usecases/forum/get_forum_posts_usecase.dart';
 import '../usecases/storage/storage_facade_usecase.dart';
@@ -42,7 +41,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   late SmokingState state;
   Timer? _timer;
   bool _isLoaded = false;
-  String _userName = '';
   int _coinBalance = 0;
   List<ForumPost> _recentPosts = const [];
 
@@ -85,7 +83,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Future<void> _loadStoredData() async {
     final now = DateTime.now();
     final count = await StorageFacadeUseCase.getDailyCount();
-    final name = await StorageFacadeUseCase.getUserName();
     final planStart = await StorageFacadeUseCase.getPlanStartDate();
     final records = await StorageFacadeUseCase.getSmokeRecordsForToday();
     final first = await StorageFacadeUseCase.getFirstSmokeTime();
@@ -121,7 +118,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       engine = SmokingEngine(state, loadedPlan);
       recovery = RecoveryEngine(state);
       achievement = AchievementEngine(smoking: engine, recovery: recovery);
-      _userName = name;
       _coinBalance = balance;
       _recentPosts = recentPosts;
       _isLoaded = true;
