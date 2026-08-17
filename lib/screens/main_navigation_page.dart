@@ -6,10 +6,11 @@ import 'forum_page.dart';
 import 'game_hub_page.dart';
 import 'home_page.dart';
 import 'mitigation_page.dart';
+import 'profile_page.dart';
 import 'reading_library_page.dart';
 import 'youtube_library_page.dart';
 
-/// V3 application shell. Owns the single Scaffold and the six-item navigation bar.
+/// V3 application shell. Owns the navigation state and six-item bottom bar.
 class MainNavigationPage extends StatefulWidget {
   const MainNavigationPage({super.key});
 
@@ -20,11 +21,13 @@ class MainNavigationPage extends StatefulWidget {
 class _MainNavigationPageState extends State<MainNavigationPage> {
   int _index = -1;
 
+  void _goHome() => setState(() => _index = -1);
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final pages = <Widget>[
-      MitigationPage(title: l10n.cravingReliefChamberTitle),
+      MitigationPage(title: 'Medical'),
       const ForumPage(),
       const ReadingLibraryPage(),
       const YouTubeLibraryPage(),
@@ -32,7 +35,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       const DailySchedulePage(),
     ];
     final labels = <String>[
-      l10n.sos,
+      l10n.healthKnowledge,
       l10n.forum,
       l10n.readingArticleOfflineLabel,
       l10n.youtubeVideoLabel,
@@ -40,7 +43,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       l10n.todaySmokingSchedule,
     ];
     final icons = <IconData>[
-      Icons.sos,
+      Icons.health_and_safety_outlined,
       Icons.forum_outlined,
       Icons.article_outlined,
       Icons.video_library_outlined,
@@ -48,12 +51,27 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       Icons.calendar_today_outlined,
     ];
 
+    final selectedPage = _index < 0 ? const HomePage() : pages[_index];
+
     return Scaffold(
-      body: IndexedStack(
-        index: _index < 0 ? 0 : _index + 1,
-        children: <Widget>[
-          const HomePage(),
-          ...pages,
+      body: Stack(
+        children: [
+          selectedPage,
+          if (_index >= 0)
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 6,
+              left: 8,
+              child: Material(
+                color: Colors.white.withAlpha(230),
+                shape: const CircleBorder(),
+                elevation: 2,
+                child: IconButton(
+                  tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: _goHome,
+                ),
+              ),
+            ),
         ],
       ),
       bottomNavigationBar: SafeArea(
