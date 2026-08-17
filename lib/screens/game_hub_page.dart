@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
-import 'game_2048_page.dart';
+import 'adventure_2048_page.dart';
 import 'game_sudoku_page.dart';
 
 // ══════════════════════════════════════════════════════════
-//  遊戲大廳 — 完全內建，零 Firebase，零網路請求
+//  遊戲大廳
 // ══════════════════════════════════════════════════════════
 
 class GameHubPage extends StatelessWidget {
@@ -16,11 +16,11 @@ class GameHubPage extends StatelessWidget {
     final games = [
       _GameEntry(
         icon: Icons.grid_4x4,
-        emoji: '🧩',
+        emoji: '🧬',
         title: '2048',
         subtitle: l10n.game2048Subtitle,
-        color: const Color(0xFFEDC22E),
-        bgColor: const Color(0xFFFFF8E1),
+        color: const Color(0xFF26A69A),
+        bgColor: const Color(0xFFE0F2F1),
       ),
       const _GameEntry(
         icon: Icons.grid_3x3,
@@ -48,7 +48,7 @@ class GameHubPage extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFF1B5E20), Color(0xFF4CAF50)],
+                colors: [Color(0xFF00695C), Color(0xFF26A69A)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -84,7 +84,7 @@ class GameHubPage extends StatelessWidget {
 
   void _launchGame(BuildContext context, _GameEntry game) {
     final Widget? page = switch (game.title) {
-      '2048' => const Game2048Page(),
+      '2048' => const Adventure2048Page(),
       'Sudoku' => const SudokuPage(),
       _ => null,
     };
@@ -136,8 +136,8 @@ class _GameCard extends StatelessWidget {
                     const SizedBox(height: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(color: const Color(0xFF1B5E20).withAlpha(20), borderRadius: BorderRadius.circular(20)),
-                      child: Text(AppLocalizations.of(context)!.gameHubOfflineBuiltIn, style: const TextStyle(fontSize: 10, color: Color(0xFF1B5E20), fontWeight: FontWeight.bold)),
+                      decoration: BoxDecoration(color: const Color(0xFF00695C).withAlpha(20), borderRadius: BorderRadius.circular(20)),
+                      child: Text(AppLocalizations.of(context)!.gameHubOfflineBuiltIn, style: const TextStyle(fontSize: 10, color: Color(0xFF00695C), fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
