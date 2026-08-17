@@ -6,10 +6,15 @@ import '../engines/achievement_engine.dart';
 import '../engines/recovery_engine.dart';
 import '../engines/smoking_engine.dart';
 import '../l10n/app_localizations.dart';
+import '../models/forum_post.dart';
 import '../models/smoking_plan.dart';
 import '../models/smoking_state.dart';
+import '../repositories/forum_repository.dart';
 import '../usecases/coin/coin_facade_usecase.dart';
+import '../usecases/forum/get_forum_posts_usecase.dart';
 import '../usecases/storage/storage_facade_usecase.dart';
+import '../usecases/user/get_current_user_usecase.dart';
+import 'forum_detail_page.dart';
 import 'profile_page.dart';
 import 'shop_page.dart';
 
@@ -29,6 +34,8 @@ class _ThemeColors {
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   late final CoinFacadeUseCase _coinFacade;
+  late final GetForumPostsUseCase _getForumPostsUseCase;
+  late final GetCurrentUserUseCase _getCurrentUser;
   late SmokingEngine engine;
   late RecoveryEngine recovery;
   late AchievementEngine achievement;
@@ -37,11 +44,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   bool _isLoaded = false;
   String _userName = '';
   int _coinBalance = 0;
+  List<ForumPost> _recentPosts = const [];
 
   @override
   void initState() {
     super.initState();
     _coinFacade = CoinFacadeUseCase();
+    _getForumPostsUseCase = GetForumPostsUseCase();
+    _getCurrentUser = GetCurrentUserUseCase();
     WidgetsBinding.instance.addObserver(this);
     final now = DateTime.now();
     state = SmokingState(
@@ -87,6 +97,15 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final firstMinute = int.tryParse(firstParts.length > 1 ? firstParts[1] : '0') ?? 0;
     final lastHour = int.tryParse(lastParts.first) ?? 22;
     final lastMinute = int.tryParse(lastParts.length > 1 ? lastParts[1] : '0') ?? 0;
+
+    List<ForumPost> recentPosts = const [];
+    try {
+      final posts = await _getForumPostsUseCase.execute();
+      recentPosts = posts.take(4).toList();
+    } catch (_) {
+      recentPosts = const [];
+    }
+
     if (!mounted) return;
     final loadedState = SmokingState(
       planStartDate: planStart.isNotEmpty ? DateTime.parse(planStart) : now,
@@ -104,6 +123,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       achievement = AchievementEngine(smoking: engine, recovery: recovery);
       _userName = name;
       _coinBalance = balance;
+      _recentPosts = recentPosts;
       _isLoaded = true;
     });
   }
@@ -217,16 +237,58 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Widget _statRow(IconData icon, String label, String value) => Row(children: [Icon(icon, size: 18, color: _ThemeColors.primary), const SizedBox(width: 7), Expanded(child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11))), Text(value, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold))]);
 
-  Widget _buildWelcomeCard() {
+  Widget _buildRecentShares() {
     final t = AppLocalizations.of(context)!;
+    if (_recentPosts.isEmpty) {
+      return _card(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(children: [
+            const Icon(Icons.forum_outlined, size: 34, color: Colors.grey),
+            const SizedBox(height: 8),
+            Text(t.forum, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          ]),
+        ),
+      );
+    }
+
     return _card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(children: [
-          const CircleAvatar(radius: 24, child: Icon(Icons.forum_outlined)),
-          const SizedBox(width: 12),
-          Expanded(child: Text(_userName.isEmpty ? t.welcomeMessage : '${t.hello}, $_userName', maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
-        ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            child: Row(children: [
+              const Icon(Icons.forum_outlined, size: 20),
+              const SizedBox(width: 7),
+              Text(t.forum, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            ]),
+          ),
+          ..._recentPosts.map((post) => InkWell(
+                onTap: () async {
+                  final coins = await _coinFacade.getBalance();
+                  final name = await _getCurrentUser.executeName();
+                  final uid = _getCurrentUser.executeUid();
+                  if (!mounted) return;
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => ForumDetailPage(post: post, currentCoins: coins, currentUserName: name ?? '', currentUid: uid)));
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    const CircleAvatar(radius: 17, child: Icon(Icons.person, size: 18)),
+                    const SizedBox(width: 10),
+                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(post.title.isEmpty ? post.content : post.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 3),
+                      Text(post.content, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: Colors.grey.shade700, height: 1.3)),
+                      const SizedBox(height: 4),
+                      Text(post.nickname.isEmpty ? t.anonymousUser : post.nickname, style: TextStyle(fontSize: 10, color: Colors.grey.shade500)),
+                    ])),
+                    const Icon(Icons.chevron_right, color: Colors.grey),
+                  ]),
+                ),
+              )),
+        ],
       ),
     );
   }
@@ -251,11 +313,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ),
           title: GestureDetector(
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfilePage())),
-            child: CircleAvatar(
-              radius: 19,
-              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-              child: Icon(Icons.person, size: 22, color: Theme.of(context).colorScheme.primary),
-            ),
+            child: CircleAvatar(radius: 19, backgroundColor: Theme.of(context).colorScheme.primaryContainer, child: Icon(Icons.person, size: 22, color: Theme.of(context).colorScheme.primary)),
           ),
           actions: [
             IconButton(icon: const Icon(Icons.settings_outlined), tooltip: t.settings, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfilePage()))),
@@ -268,9 +326,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               : ListView(
                   padding: const EdgeInsets.fromLTRB(16, 14, 16, 20),
                   children: [
-                    _buildWelcomeCard(),
-                    const SizedBox(height: 12),
                     SizedBox(height: 215, child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [Expanded(child: _buildCountdownCard()), const SizedBox(width: 12), Expanded(child: _buildQuitProgressCard())])),
+                    const SizedBox(height: 14),
+                    _buildRecentShares(),
                   ],
                 ),
         ),
